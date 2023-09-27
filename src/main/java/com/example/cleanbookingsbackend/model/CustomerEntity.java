@@ -37,7 +37,7 @@ public class CustomerEntity {
     private Integer postalCode;
     @Column(name = "city", columnDefinition = "text")
     private String city;
-    @Column(name = "phone_number", columnDefinition = "int")
+    @Column(name = "phone_number", columnDefinition = "int", nullable = true)
     private Integer phoneNumber;
 
     @Column(name = "email_address", columnDefinition = "text")

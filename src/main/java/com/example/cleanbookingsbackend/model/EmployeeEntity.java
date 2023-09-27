@@ -27,7 +27,7 @@ public class EmployeeEntity {
     private String firstName;
     @Column(name = "last_name", columnDefinition = "text")
     private String lastName;
-    @Column(name = "phone_number", columnDefinition = "int")
+    @Column(name = "phone_number", columnDefinition = "int", nullable = false)
     private Integer phoneNumber;
 
     @Enumerated(EnumType.STRING)
