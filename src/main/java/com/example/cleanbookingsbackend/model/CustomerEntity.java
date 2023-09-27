@@ -1,4 +1,4 @@
-package com.example.cleanbookingsbackend.Models;
+package com.example.cleanbookingsbackend.model;
 
 import com.example.cleanbookingsbackend.ENUM.CustomerType;
 import jakarta.persistence.*;
@@ -19,7 +19,7 @@ public class CustomerEntity {
     @GeneratedValue(
             strategy = GenerationType.UUID
     )
-    private UUID id;
+    private String id;
 
     @Column(name = "first_name", columnDefinition = "text")
     private String firstName;
