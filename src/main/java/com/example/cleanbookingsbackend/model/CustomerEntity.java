@@ -6,19 +6,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
+import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "customer", uniqueConstraints = @UniqueConstraint(name = "username_unique", columnNames = "email_address"))
+@Table(name = "customer", uniqueConstraints = @UniqueConstraint(name = "username_customer_unique", columnNames = "email_address"))
 public class CustomerEntity {
 
     @Id
     @GeneratedValue(
             strategy = GenerationType.UUID
     )
+    @Column(name = "id", columnDefinition = "text")
     private String id;
 
     @Column(name = "first_name", columnDefinition = "text")
@@ -43,4 +44,8 @@ public class CustomerEntity {
     private String emailAddress;
     @Column(name = "password", columnDefinition = "text", nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "customer")
+    private List<JobEntity> jobs;
+
 }

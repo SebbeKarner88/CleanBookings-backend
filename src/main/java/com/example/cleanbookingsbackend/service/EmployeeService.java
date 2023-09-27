@@ -1,14 +1,14 @@
 package com.example.cleanbookingsbackend.service;
 
-import com.example.cleanbookingsbackend.repository.UserRepository;
+import com.example.cleanbookingsbackend.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class EmployeeService {
 
-    private final UserRepository userRepository;
+    private final EmployeeRepository userRepository;
 
 
 }

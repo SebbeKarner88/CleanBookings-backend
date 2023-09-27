@@ -6,17 +6,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "_user", uniqueConstraints = @UniqueConstraint(name = "username_unique", columnNames = "email_address"))
-public class UserEntity {
+@Table(name = "employee", uniqueConstraints = @UniqueConstraint(name = "username_employee_unique", columnNames = "email_address"))
+public class EmployeeEntity {
 
     @Id
     @GeneratedValue(
             strategy = GenerationType.UUID
     )
+    @Column(name = "id", columnDefinition = "text")
     private String id;
 
     @Column(name = "first_name", columnDefinition = "text")
@@ -34,4 +38,7 @@ public class UserEntity {
     private String emailAddress;
     @Column(name = "password", columnDefinition = "text", nullable = false)
     private String password;
+
+    @ManyToMany(mappedBy = "employee")
+    private List<JobEntity> jobs;
 }
