@@ -1,5 +1,9 @@
 package com.example.cleanbookingsbackend.ENUM;
 
 public enum JobType {
-    BASIC
+    BASIC_CLEANING,
+    TOPP_CLEANING,
+    DIAMOND_CLEANING,
+    WINDOW_CLEANING
+
 }
