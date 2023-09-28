@@ -7,6 +7,7 @@ import com.example.cleanbookingsbackend.exception.ValidationException;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
 import com.example.cleanbookingsbackend.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     public CustomerResponseDTO create(CustomerRegistrationDTO request) throws
@@ -37,7 +39,7 @@ public class CustomerService {
                 request.city(),
                 request.phoneNumber(),
                 request.emailAddress(),
-                request.password(),
+                passwordEncoder.encode(request.password()),
                 null
         );
 
@@ -48,6 +50,8 @@ public class CustomerService {
             throw new RuntimeException("Could not save customer");
         }
     }
+
+
 
     public static CustomerResponseDTO toDTO(CustomerEntity response) {
         return new CustomerResponseDTO(
@@ -63,7 +67,7 @@ public class CustomerService {
     }
 
     private boolean isValidEmailAddress(String email) {
-        return email.length() >= 5 && email.contains("@ .");
+        return email.length() >= 5 && email.contains("@");
     }
 
     private boolean isValidPassword(String password) {
