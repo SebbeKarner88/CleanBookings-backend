@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(name = "/api/v1/user")
+@RequestMapping(path = "/api/v1/user")
 public class EmployeeController {
 
     private final EmployeeService userService;

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpStatusCodeException;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,14 +24,13 @@ public class CustomerController {
 
 
     @PostMapping
-    public ResponseEntity<CustomerResponseDTO> create(@RequestBody CustomerRegistrationDTO request) {
+    public ResponseEntity<?> create(@RequestBody CustomerRegistrationDTO request) {
         try {
             CustomerResponseDTO response = customerService.create(request);
             return ResponseEntity.status(HttpStatus.OK).body(response);
 
         } catch (ValidationException | UsernameIsTakenException | RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.valueOf(String.valueOf(ex))).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
-
 }
