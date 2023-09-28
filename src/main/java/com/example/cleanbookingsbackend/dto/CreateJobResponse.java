@@ -5,6 +5,7 @@ import lombok.Builder;
 
 
 @Builder
-public record CreateJobResponse(String jobId, JobType jobType, String date, String customer, String phoneNumber, String emailAdress, Adress adress) {
+public record CreateJobResponse(String jobId, JobType jobType, String date, Customer customer) {
+    public record Customer(String name, String phoneNumber, String emailAdress, Adress adress){}
     public record Adress(String streetAdress, int postalCode, String city){}
 }
