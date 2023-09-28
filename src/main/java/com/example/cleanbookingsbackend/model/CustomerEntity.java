@@ -1,6 +1,6 @@
 package com.example.cleanbookingsbackend.model;
 
-import com.example.cleanbookingsbackend.ENUM.CustomerType;
+import com.example.cleanbookingsbackend.enums.CustomerType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

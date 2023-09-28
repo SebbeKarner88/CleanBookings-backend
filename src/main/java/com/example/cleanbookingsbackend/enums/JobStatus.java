@@ -1,4 +1,4 @@
-package com.example.cleanbookingsbackend.ENUM;
+package com.example.cleanbookingsbackend.enums;
 
 public enum JobStatus {
     OPEN,

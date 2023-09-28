@@ -1,6 +1,6 @@
-package com.example.cleanbookingsbackend.DTO;
+package com.example.cleanbookingsbackend.dto;
 
-import com.example.cleanbookingsbackend.ENUM.CustomerType;
+import com.example.cleanbookingsbackend.enums.CustomerType;
 
 public record CustomerResponseDTO(String firstName,
                                   String lastName,

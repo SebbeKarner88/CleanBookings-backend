@@ -1,8 +1,8 @@
 
 package com.example.cleanbookingsbackend.model;
 
-import com.example.cleanbookingsbackend.ENUM.JobStatus;
-import com.example.cleanbookingsbackend.ENUM.JobType;
+import com.example.cleanbookingsbackend.enums.JobStatus;
+import com.example.cleanbookingsbackend.enums.JobType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
