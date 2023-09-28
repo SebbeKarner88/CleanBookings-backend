@@ -35,7 +35,7 @@ public class JobService {
         if (jobRepository.findJobEntityByBookedDateAndType(date, type).isPresent())
             throw new IllegalArgumentException("There is already a job of type " + type + " requested on " + date);
 
-        JobEntity requestedJob = new JobEntity(customer, type, date);
+        JobEntity requestedJob = new JobEntity(customer, type, date, request.message());
         jobRepository.save(requestedJob);
 
         sendEmailConfirmation(requestedJob);
@@ -123,6 +123,7 @@ public class JobService {
                 .jobType(job.getType())
                 .date(new SimpleDateFormat("yyyy-MM-dd").format(job.getBookedDate()))
                 .customer(customerDto)
+                .message(job.getMessage())
                 .build();
     }
 }

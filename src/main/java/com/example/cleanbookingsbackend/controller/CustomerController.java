@@ -28,7 +28,6 @@ public class CustomerController {
         try {
             CustomerResponseDTO response = customerService.create(request);
             return ResponseEntity.status(HttpStatus.OK).body(response);
-
         } catch (ValidationException | UsernameIsTakenException | RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }

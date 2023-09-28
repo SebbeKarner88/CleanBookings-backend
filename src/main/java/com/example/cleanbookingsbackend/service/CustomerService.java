@@ -19,11 +19,10 @@ public class CustomerService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public CustomerResponseDTO create(CustomerRegistrationDTO request) throws
-            ValidationException,
+    public CustomerResponseDTO create(CustomerRegistrationDTO request)
+            throws ValidationException,
             UsernameIsTakenException,
-            RuntimeException,
-            IllegalArgumentException {
+            RuntimeException {
 
         validateCustomerInputData(request);
 
@@ -46,7 +45,6 @@ public class CustomerService {
                 passwordEncoder.encode(request.password()),
                 null
         );
-
         try {
             customerRepository.save(customer);
             return toDTO(customer);
@@ -55,7 +53,7 @@ public class CustomerService {
         }
     }
 
-
+    //###### DTO #######
     public static CustomerResponseDTO toDTO(CustomerEntity response) {
         return new CustomerResponseDTO(
                 response.getFirstName(),
@@ -69,6 +67,8 @@ public class CustomerService {
         );
     }
 
+
+    // ##### Validation #####
     private boolean isValidEmailAddress(String email) {
         return email.length() >= 5 && email.contains("@");
     }

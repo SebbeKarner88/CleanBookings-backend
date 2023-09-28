@@ -37,9 +37,9 @@ public class JobEntity {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "job_employee",
-            joinColumns = @JoinColumn(name = "employee_id",
+            joinColumns = @JoinColumn(name = "job_id",
                     referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "job_id",
+            inverseJoinColumns = @JoinColumn(name = "employee_id",
                     referencedColumnName = "id")
     )
     private List<EmployeeEntity> employee;
@@ -48,6 +48,9 @@ public class JobEntity {
     @Column(name = "type")
     private JobType type;
 
+    @Column(name = "message", columnDefinition = "text")
+    private String message;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private JobStatus status;
@@ -55,11 +58,12 @@ public class JobEntity {
     @OneToOne(mappedBy = "job")
     private PaymentEntity payment;
 
-    public JobEntity(CustomerEntity customer, JobType type, Date bookedDate) {
+    public JobEntity(CustomerEntity customer, JobType type, Date bookedDate, String message) {
         this.customer = customer;
         this.type = type;
         this.status = JobStatus.OPEN;
         this.bookedDate = bookedDate;
+        this.message = message;
     }
 }
 
