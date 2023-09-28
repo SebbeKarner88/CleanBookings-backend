@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -23,6 +24,9 @@ public class JobEntity {
     )
     @Column(name = "id", columnDefinition = "text")
     private String id;
+
+    @Column(name = "booked_date", columnDefinition = "varchar")
+    private Date bookedDate;
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
