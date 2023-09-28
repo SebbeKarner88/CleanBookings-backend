@@ -85,10 +85,16 @@ public class JobService {
 
     private CreateJobResponse toDTO(JobEntity job) {
         CustomerEntity customer = job.getCustomer();
-        CreateJobResponse.Adress adress = new CreateJobResponse.Adress(
+        CreateJobResponse.Adress adressDto = new CreateJobResponse.Adress(
                 customer.getStreetAddress(),
                 customer.getPostalCode(),
                 customer.getCity()
+        );
+        CreateJobResponse.Customer customerDto = new CreateJobResponse.Customer(
+                customer.getFirstName() + " " + customer.getLastName(),
+                customer.getPhoneNumber(),
+                customer.getEmailAddress(),
+                adressDto
         );
 
         return CreateJobResponse
@@ -96,10 +102,7 @@ public class JobService {
                 .jobId(job.getId())
                 .jobType(job.getType())
                 .date(new SimpleDateFormat("yyyy-MM-dd").format(job.getBookedDate()))
-                .customer(customer.getFirstName() + " " + customer.getLastName())
-                .phoneNumber(customer.getPhoneNumber())
-                .emailAdress(customer.getEmailAddress())
-                .adress(adress)
+                .customer(customerDto)
                 .build();
     }
 }
