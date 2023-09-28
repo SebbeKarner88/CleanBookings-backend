@@ -2,6 +2,7 @@ package com.example.cleanbookingsbackend.service;
 
 import com.example.cleanbookingsbackend.dto.CustomerRegistrationDTO;
 import com.example.cleanbookingsbackend.dto.CustomerResponseDTO;
+import com.example.cleanbookingsbackend.enums.CustomerType;
 import com.example.cleanbookingsbackend.exception.UsernameIsTakenException;
 import com.example.cleanbookingsbackend.exception.ValidationException;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
@@ -21,10 +22,13 @@ public class CustomerService {
     public CustomerResponseDTO create(CustomerRegistrationDTO request) throws
             ValidationException,
             UsernameIsTakenException,
-            RuntimeException {
+            RuntimeException,
+            IllegalArgumentException {
+
+        validateCustomerInputData(request);
 
         if (!isValidEmailAddress(request.emailAddress()) || !isValidPassword(request.password()))
-            throw new ValidationException("Invalid data input");
+            throw new ValidationException("Invalid email/password data");
 
         if (customerRepository.existsByEmailAddress(request.emailAddress()))
             throw new UsernameIsTakenException("Username is already taken");
@@ -52,7 +56,6 @@ public class CustomerService {
     }
 
 
-
     public static CustomerResponseDTO toDTO(CustomerEntity response) {
         return new CustomerResponseDTO(
                 response.getFirstName(),
@@ -72,5 +75,34 @@ public class CustomerService {
 
     private boolean isValidPassword(String password) {
         return password.length() >= 3;
+    }
+
+    private void validateCustomerInputData(CustomerRegistrationDTO request) {
+        if (request.firstName().isBlank())
+            throw new IllegalArgumentException("First name is required");
+
+        if (request.lastName().isBlank())
+            throw new IllegalArgumentException("Last name is required.");
+
+        if (request.customerType() == null)
+            throw new IllegalArgumentException("Type is required.");
+
+        if (request.streetAddress().isBlank())
+            throw new IllegalArgumentException("Adress is required");
+
+        if (request.postalCode() == null)
+            throw new IllegalArgumentException("Postal code is required.");
+
+        if (request.city().isBlank())
+            throw new IllegalArgumentException("City is required");
+
+        if (request.phoneNumber().isBlank())
+            throw new IllegalArgumentException("Phone number is required.");
+
+        if (request.emailAddress().isBlank())
+            throw new IllegalArgumentException("Email is required");
+
+        if (request.password().isBlank())
+            throw new IllegalArgumentException("Password is required.");
     }
 }
