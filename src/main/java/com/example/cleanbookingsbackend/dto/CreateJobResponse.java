@@ -1,0 +1,10 @@
+package com.example.cleanbookingsbackend.dto;
+
+import com.example.cleanbookingsbackend.enums.JobType;
+import lombok.Builder;
+
+
+@Builder
+public record CreateJobResponse(String jobId, JobType jobType, String date, String customer, String phoneNumber, String emailAdress, Adress adress) {
+    public record Adress(String streetAdress, int postalCode, String city){}
+}

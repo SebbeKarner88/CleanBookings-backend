@@ -5,6 +5,7 @@ import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.JobType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "job")
 public class JobEntity {
 
@@ -53,5 +55,11 @@ public class JobEntity {
     @OneToOne(mappedBy = "job")
     private PaymentEntity payment;
 
+    public JobEntity(CustomerEntity customer, JobType type, Date bookedDate) {
+        this.customer = customer;
+        this.type = type;
+        this.status = JobStatus.OPEN;
+        this.bookedDate = bookedDate;
+    }
 }
 

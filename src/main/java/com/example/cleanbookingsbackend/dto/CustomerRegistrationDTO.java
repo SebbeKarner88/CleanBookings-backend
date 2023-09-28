@@ -9,7 +9,7 @@ public record CustomerRegistrationDTO(String firstName,
                                       String streetAddress,
                                       Integer postalCode,
                                       String city,
-                                      Integer phoneNumber,
+                                      String phoneNumber,
                                       String emailAddress,
                                       String password) {
 }

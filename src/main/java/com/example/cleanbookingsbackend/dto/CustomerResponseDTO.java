@@ -8,6 +8,6 @@ public record CustomerResponseDTO(String firstName,
                                   String streetAddress,
                                   Integer postalCode,
                                   String city,
-                                  Integer phoneNumber,
+                                  String phoneNumber,
                                   String emailAddress) {
 }
