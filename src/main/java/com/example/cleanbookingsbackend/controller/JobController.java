@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/job")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class JobController {
     private final JobService jobService;
 
@@ -61,6 +62,7 @@ public class JobController {
 
     @GetMapping("/booked-cleanings/{customerId}")
     public ResponseEntity<List<JobDto>> getBookedCleanings(@PathVariable String customerId) {
+        System.out.println("Received customerId: " + customerId);
         List<JobEntity> jobs = jobService.getBookedCleaningsForCustomer(customerId);
 
         // Convert JobEntity objects to JobDto objects
@@ -81,4 +83,6 @@ public class JobController {
 
         return jobDto;
     }
+
+
 }
