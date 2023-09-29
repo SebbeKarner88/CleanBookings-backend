@@ -11,6 +11,7 @@ import com.example.cleanbookingsbackend.exception.JobNotFoundException;
 import com.example.cleanbookingsbackend.exception.NotFoundException;
 import com.example.cleanbookingsbackend.exception.UnauthorizedCallException;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
+import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.repository.CustomerRepository;
 import com.example.cleanbookingsbackend.repository.EmployeeRepository;
@@ -25,6 +26,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -77,41 +79,34 @@ public class JobService {
 //    }
 
     private void authorizedCancellation(CancelJobRequest request) throws UnauthorizedCallException, NotFoundException {
+        Optional<CustomerEntity> customerOptional = customerRepository.findById(request.userId());
+        Optional<EmployeeEntity> employeeOptional = employeeRepository.findById(request.userId());
 
-        JobEntity job;
-
-        try {
-            job = jobRepository.findById(request.jobId()).get();
-        } catch (Exception e) {
-            throw new NotFoundException("There is no job with id: " + request.jobId());
+        if (customerOptional.isEmpty() && employeeOptional.isEmpty()) {
+            throw new NotFoundException("No Customer or Administrator exists by id: " + request.userId());
         }
 
-        if (customerRepository.findById(request.userId()).isPresent()) {
+        JobEntity job = jobRepository.findById(request.jobId())
+                .orElseThrow(() -> new NotFoundException("There is no job with id: " + request.jobId()));
 
-            if (job.getCustomer() == customerRepository.findById(request.userId()).get()) {
-
-                if (job.getStatus() == JobStatus.OPEN || job.getStatus() == JobStatus.ASSIGNED) {
-                    jobRepository.deleteById(request.jobId());
-                } else {
-                    throw new UnauthorizedCallException("You may not cancel a completed job.");
-                }
-            } else {
+        if (customerOptional.isPresent()) {
+            CustomerEntity customer = customerOptional.get();
+            if (job.getCustomer() != customer) {
                 throw new UnauthorizedCallException("You are not authorized to perform this action." +
                         "\nThe customer who booked the job is the only one allowed to cancel this booked cleaning.");
             }
 
-        } else if (employeeRepository.findById(request.userId()).isPresent()) {
-
-            if (employeeRepository.findById(request.userId()).get().getRole() == Role.CLEANER) {
+            if (job.getStatus() != JobStatus.OPEN && job.getStatus() != JobStatus.ASSIGNED) {
+                throw new UnauthorizedCallException("You may not cancel a completed job.");
+            }
+        } else if (employeeOptional.isPresent()) {
+            EmployeeEntity employee = employeeOptional.get();
+            if (employee.getRole() == Role.CLEANER) {
                 throw new UnauthorizedCallException("You are not authorized to perform this action." +
                         "\nOnly " + Role.ADMIN + " are allowed to cancel a booked cleaning.");
-            } else {
-                jobRepository.deleteById(request.jobId());
             }
-
-        } else {
-            throw new NotFoundException("No Customer or Administrator exists by id: " + request.userId());
         }
+        jobRepository.deleteById(request.jobId());
     }
 
     private void validateCancelJobInputData(CancelJobRequest request) {
