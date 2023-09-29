@@ -1,6 +1,7 @@
 package com.example.cleanbookingsbackend.service;
 
 import com.example.cleanbookingsbackend.dto.CancelJobRequest;
+import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.JobType;
 import com.example.cleanbookingsbackend.dto.CreateJobRequest;
 import com.example.cleanbookingsbackend.dto.CreateJobResponse;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -178,6 +180,11 @@ public class JobService {
                 .customer(customerDto)
                 .message(job.getMessage())
                 .build();
+    }
+
+    public List<JobEntity> getBookedCleaningsForCustomer(String customerId) throws CustomerNotFoundException {
+        CustomerEntity customer = validateCustomerId(customerId);
+        return jobRepository.findByCustomerAndStatusNot(customer, JobStatus.CLOSED);
     }
 
 }
