@@ -46,6 +46,7 @@ public class CustomerService {
     //###### DTO #######
     public static CustomerResponseDTO toDTO(CustomerEntity response) {
         return new CustomerResponseDTO(
+                response.getId(),
                 response.getFirstName(),
                 response.getLastName(),
                 response.getCustomerType(),
