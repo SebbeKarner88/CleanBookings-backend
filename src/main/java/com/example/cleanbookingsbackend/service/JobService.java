@@ -41,7 +41,7 @@ public class JobService {
         JobEntity requestedJob = new JobEntity(customer, type, date, request.message());
         jobRepository.save(requestedJob);
 
-        sendEmailConfirmation(requestedJob);
+        sendEmailConfirmationBookedJob(requestedJob);
 
         return toDTO(requestedJob);
     }
@@ -49,7 +49,12 @@ public class JobService {
     //WIP
     public CancelJobResponse cancelJobRequest(CancelJobRequest request)
         throws IllegalArgumentException, CustomerNotFoundException, JobNotFoundException {
+
+
+
+
         return null;
+
     }
 
 //    TODO: Keeping this for future use. Will be needed in PUT-request to update a job when assigned.
@@ -99,7 +104,7 @@ public class JobService {
         return type;
     }
 
-    private void sendEmailConfirmation(JobEntity requestedJob) {
+    private void sendEmailConfirmationBookedJob(JobEntity requestedJob) {
         SimpleMailMessage msg = new SimpleMailMessage();
         msg.setFrom("order.cleanbookings@gmail.com");
         msg.setTo(requestedJob.getCustomer().getEmailAddress());
@@ -110,6 +115,10 @@ public class JobService {
         } catch (MailException exception) {
             System.out.println("Email couldn't be sent: " + exception.getMessage());
         }
+    }
+
+    private void sendEmailConfirmationCanceledJob(JobEntity requestedJob) {
+        //WIP
     }
 
     private CreateJobResponse toDTO(JobEntity job) {

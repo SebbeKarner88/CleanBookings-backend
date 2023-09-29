@@ -43,13 +43,7 @@ public class JobController {
     @DeleteMapping
     public ResponseEntity<?> cancelJobRequest(@RequestBody CancelJobRequest request) {
         try {
-            CancelJobResponse response = jobService.cancelJobRequest(request);
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(response.jobId())
-                    .toUri();
-            return ResponseEntity.created(location).body(response);
+            return ResponseEntity.status(HttpStatus.OK).body(jobService.cancelJobRequest(request));
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
         } catch (CustomerNotFoundException | JobNotFoundException exception) {
@@ -58,5 +52,4 @@ public class JobController {
             return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
         }
     }
-
 }
