@@ -3,6 +3,7 @@ package com.example.cleanbookingsbackend.controller;
 import com.example.cleanbookingsbackend.dto.CancelJobRequest;
 import com.example.cleanbookingsbackend.dto.CreateJobRequest;
 import com.example.cleanbookingsbackend.dto.CreateJobResponse;
+import com.example.cleanbookingsbackend.dto.JobDto;
 import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
 import com.example.cleanbookingsbackend.exception.JobNotFoundException;
 import com.example.cleanbookingsbackend.exception.NotFoundException;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -58,13 +60,27 @@ public class JobController {
         }
     }
 
+
     @GetMapping("/booked-cleanings/{customerId}")
-    public ResponseEntity<List<JobEntity>> getBookedCleaningsForCustomer(@PathVariable String customerId) {
-        try {
-            List<JobEntity> bookedCleanings = jobService.getBookedCleaningsForCustomer(customerId);
-            return ResponseEntity.ok(bookedCleanings);
-        } catch (CustomerNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+    public ResponseEntity<List<JobDto>> getBookedCleanings(@PathVariable String customerId) {
+        List<JobEntity> jobs = jobService.getBookedCleaningsForCustomer(customerId);
+
+        // Convert JobEntity objects to JobDto objects
+        List<JobDto> jobDtos = jobs.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(jobDtos);
+    }
+
+    private JobDto convertToDto(JobEntity jobEntity) {
+        JobDto jobDto = new JobDto();
+        jobDto.setId(jobEntity.getId());
+        jobDto.setBookedDate(jobEntity.getBookedDate());
+        jobDto.setType(jobEntity.getType());
+        jobDto.setMessage(jobEntity.getMessage());
+        jobDto.setStatus(jobEntity.getStatus());
+
+        return jobDto;
     }
 }

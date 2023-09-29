@@ -26,7 +26,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +34,7 @@ public class JobService {
     private final CustomerRepository customerRepository;
     private final EmployeeRepository employeeRepository;
     private final JavaMailSender mailSender;
+
 
     public CreateJobResponse createJobRequest(CreateJobRequest request)
             throws IllegalArgumentException, CustomerNotFoundException, ParseException {
@@ -191,18 +191,10 @@ public class JobService {
                 .build();
     }
 
-    public List<JobEntity> getBookedCleaningsForCustomer(String customerId) throws CustomerNotFoundException {
-        CustomerEntity customer = validateCustomerId2(customerId);
-        return jobRepository.findByCustomerAndStatusNot(customer, JobStatus.CLOSED);
-    }
 
-    private CustomerEntity validateCustomerId2(String id) throws CustomerNotFoundException {
-        Optional<CustomerEntity> customer = customerRepository.findById(id);
-        if (customer.isPresent()) {
-            return customer.get();
-        } else {
-            throw new CustomerNotFoundException("Customer not found with ID: " + id);
-        }
+    public List<JobEntity> getBookedCleaningsForCustomer(String customerId) {
+
+        return jobRepository.findByCustomer_Id(customerId);
     }
 
 }

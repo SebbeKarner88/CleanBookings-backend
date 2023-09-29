@@ -16,4 +16,6 @@ public interface JobRepository extends JpaRepository <JobEntity, String> {
     Optional<JobEntity> findJobEntityByBookedDateAndType(Date date, JobType type);
 
     List<JobEntity> findByCustomerAndStatusNot(CustomerEntity customer, JobStatus status);
+
+    List<JobEntity> findByCustomer_Id(String customerId);
 }
