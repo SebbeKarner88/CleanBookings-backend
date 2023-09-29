@@ -67,33 +67,33 @@ public class CustomerService {
         return password.length() >= 3;
     }
 
-    private void validateCustomerInputData(CustomerRegistrationDTO request) {
+    private void validateCustomerInputData(CustomerRegistrationDTO request) throws ValidationException {
         if (request.firstName().isBlank())
-            throw new IllegalArgumentException("First name is required");
+            throw new ValidationException("First name is required");
 
         if (request.lastName().isBlank())
-            throw new IllegalArgumentException("Last name is required.");
+            throw new ValidationException("Last name is required.");
 
         if (request.customerType() == null)
-            throw new IllegalArgumentException("Type is required.");
+            throw new ValidationException("Type is required.");
 
         if (request.streetAddress().isBlank())
-            throw new IllegalArgumentException("Adress is required");
+            throw new ValidationException("Adress is required");
 
         if (request.postalCode() == null)
-            throw new IllegalArgumentException("Postal code is required.");
+            throw new ValidationException("Postal code is required.");
 
         if (request.city().isBlank())
-            throw new IllegalArgumentException("City is required");
+            throw new ValidationException("City is required");
 
         if (request.phoneNumber().isBlank())
-            throw new IllegalArgumentException("Phone number is required.");
+            throw new ValidationException("Phone number is required.");
 
         if (request.emailAddress().isBlank())
-            throw new IllegalArgumentException("Email is required");
+            throw new ValidationException("Email is required");
 
         if (request.password().isBlank())
-            throw new IllegalArgumentException("Password is required.");
+            throw new ValidationException("Password is required.");
     }
 
     // ##### Builder #####
