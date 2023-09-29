@@ -58,11 +58,8 @@ public class JobService {
             throws IllegalArgumentException, JobNotFoundException, NotFoundException, UnauthorizedCallException {
 
         validateCancelJobInputData(request);
-
-        if (jobRepository.findById(request.jobId()).isEmpty())
-            throw new JobNotFoundException("There is no job registered with id: " + request.jobId());
-
         authorizedCancellation(request);
+        sendEmailConfirmationCanceledJob(request);
 
         return true;
     }
@@ -166,7 +163,7 @@ public class JobService {
         }
     }
 
-    private void sendEmailConfirmationCanceledJob(JobEntity requestedJob) {
+    private void sendEmailConfirmationCanceledJob(CancelJobRequest request) {
         //WIP
     }
 
