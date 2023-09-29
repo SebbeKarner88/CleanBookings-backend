@@ -1,4 +1,4 @@
-package com.example.cleanbookingsbackend.service;
+package com.example.cleanbookingsbackend.service.DataInitialization;
 
 import com.example.cleanbookingsbackend.enums.*;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
