@@ -1,9 +1,12 @@
 package com.example.cleanbookingsbackend.service;
 
+import com.example.cleanbookingsbackend.dto.CancelJobRequest;
+import com.example.cleanbookingsbackend.dto.CancelJobResponse;
 import com.example.cleanbookingsbackend.enums.JobType;
 import com.example.cleanbookingsbackend.dto.CreateJobRequest;
 import com.example.cleanbookingsbackend.dto.CreateJobResponse;
 import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
+import com.example.cleanbookingsbackend.exception.JobNotFoundException;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.repository.CustomerRepository;
@@ -41,6 +44,12 @@ public class JobService {
         sendEmailConfirmation(requestedJob);
 
         return toDTO(requestedJob);
+    }
+
+    //WIP
+    public CancelJobResponse cancelJobRequest(CancelJobRequest request)
+        throws IllegalArgumentException, CustomerNotFoundException, JobNotFoundException {
+        return null;
     }
 
 //    TODO: Keeping this for future use. Will be needed in PUT-request to update a job when assigned.
@@ -126,4 +135,5 @@ public class JobService {
                 .message(job.getMessage())
                 .build();
     }
+
 }

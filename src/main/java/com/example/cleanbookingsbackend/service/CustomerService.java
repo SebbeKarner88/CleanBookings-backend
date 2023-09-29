@@ -32,19 +32,8 @@ public class CustomerService {
         if (customerRepository.existsByEmailAddress(request.emailAddress()))
             throw new UsernameIsTakenException("Username is already taken");
 
-        CustomerEntity customer = new CustomerEntity(
-                null,
-                request.firstName(),
-                request.lastName(),
-                request.customerType(),
-                request.streetAddress(),
-                request.postalCode(),
-                request.city(),
-                request.phoneNumber(),
-                request.emailAddress(),
-                passwordEncoder.encode(request.password()),
-                null
-        );
+        CustomerEntity customer = customerBuilder(request);
+
         try {
             customerRepository.save(customer);
             return toDTO(customer);
@@ -52,6 +41,7 @@ public class CustomerService {
             throw new RuntimeException("Could not save customer");
         }
     }
+
 
     //###### DTO #######
     public static CustomerResponseDTO toDTO(CustomerEntity response) {
@@ -104,5 +94,23 @@ public class CustomerService {
 
         if (request.password().isBlank())
             throw new IllegalArgumentException("Password is required.");
+    }
+
+    // ##### Builder #####
+
+    public CustomerEntity customerBuilder(CustomerRegistrationDTO request) {
+        return new CustomerEntity(
+                null,
+                request.firstName(),
+                request.lastName(),
+                request.customerType(),
+                request.streetAddress(),
+                request.postalCode(),
+                request.city(),
+                request.phoneNumber(),
+                request.emailAddress(),
+                passwordEncoder.encode(request.password()),
+                null
+        );
     }
 }

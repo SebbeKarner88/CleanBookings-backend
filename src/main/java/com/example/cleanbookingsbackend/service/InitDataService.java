@@ -11,6 +11,7 @@ import com.example.cleanbookingsbackend.repository.JobRepository;
 import com.example.cleanbookingsbackend.repository.PaymentRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -25,6 +26,7 @@ public class InitDataService {
     private final EmployeeRepository employeeRepository;
     private final JobRepository jobRepository;
     private final PaymentRepository paymentRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @PostConstruct
     public void initializeData() {
@@ -41,7 +43,7 @@ public class InitDataService {
                 "Jane City",
                 "076-250 90 80",
                 "jane.doe@janecity.com",
-                "password",
+                passwordEncoder.encode("password"),
                 null);
 
         CustomerEntity customer2 = new CustomerEntity(
@@ -54,7 +56,7 @@ public class InitDataService {
                 "Jhonny City",
                 "076-250 45 23",
                 "jhonny.doe@aol.com",
-                "password",
+                passwordEncoder.encode("password"),
                 null);
 
         CustomerEntity customer3 = new CustomerEntity(
@@ -67,7 +69,7 @@ public class InitDataService {
                 "Stadstaden",
                 "076-253 45 43",
                 "anders.Svensson@google.com",
-                "password",
+                passwordEncoder.encode("password"),
                 null);
 
         customerRepository.saveAll(List.of(customer1, customer2, customer3));
@@ -81,7 +83,7 @@ public class InitDataService {
                 "073-9 453 843",
                 Role.CLEANER,
                 "Cleaner1@CleanBookings.com",
-                "password",
+                passwordEncoder.encode("password"),
                 null
         );
         EmployeeEntity cleaner2 = new EmployeeEntity(
@@ -91,7 +93,7 @@ public class InitDataService {
                 "073-9 351 733",
                 Role.CLEANER,
                 "Cleaner2@CleanBookings.com",
-                "password",
+                passwordEncoder.encode("password"),
                 null
 
         );
@@ -102,7 +104,7 @@ public class InitDataService {
                 "074-9 433 243",
                 Role.ADMIN,
                 "Admin1@CleanBookings.com",
-                "password",
+                passwordEncoder.encode("password"),
                 null
         );
 

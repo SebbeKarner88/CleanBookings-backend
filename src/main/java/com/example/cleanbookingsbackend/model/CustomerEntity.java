@@ -3,6 +3,7 @@ package com.example.cleanbookingsbackend.model;
 import com.example.cleanbookingsbackend.enums.CustomerType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "customer", uniqueConstraints = @UniqueConstraint(name = "username_customer_unique", columnNames = "email_address"))
