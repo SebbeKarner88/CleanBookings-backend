@@ -55,8 +55,7 @@ public class JobService {
 
     public boolean cancelJobRequest(CancelJobRequest request)
             throws IllegalArgumentException, JobNotFoundException, NotFoundException, UnauthorizedCallException {
-        // WIP! NEED TO CHECK IF JOBSTATUS IS OPEN OR ASSIGNED, ELSE WE CANT CANCEL THE JOB.
-        // NEED TO CHECK IF CUSTOMER IS THE ONE WHO BOOKED THE JOB HE/SHE IS TRYING TO DELETE.
+
         validateCancelJobInputData(request);
 
         if (jobRepository.findById(request.jobId()).isEmpty())
@@ -79,10 +78,28 @@ public class JobService {
 //    }
 
     private void authorizedCancellation(CancelJobRequest request) throws UnauthorizedCallException, NotFoundException {
-        // WIP! NEED TO CHECK IF JOBSTATUS IS OPEN OR ASSIGNED, ELSE WE CANT CANCEL THE JOB.
-        // NEED TO CHECK IF CUSTOMER IS THE ONE WHO BOOKED THE JOB HE/SHE IS TRYING TO DELETE.
+
+        JobEntity job;
+
+        try {
+            job = jobRepository.findById(request.jobId()).get();
+        } catch (Exception e) {
+            throw new NotFoundException("There is no job with id: " + request.jobId());
+        }
+
         if (customerRepository.findById(request.userId()).isPresent()) {
-            jobRepository.deleteById(request.jobId());
+
+            if (job.getCustomer() == customerRepository.findById(request.userId()).get()) {
+
+                if (job.getStatus() == JobStatus.OPEN || job.getStatus() == JobStatus.ASSIGNED) {
+                    jobRepository.deleteById(request.jobId());
+                } else {
+                    throw new UnauthorizedCallException("You may not cancel a completed job.");
+                }
+            } else {
+                throw new UnauthorizedCallException("You are not authorized to perform this action." +
+                        "\nThe customer who booked the job is the only one allowed to cancel this booked cleaning.");
+            }
 
         } else if (employeeRepository.findById(request.userId()).isPresent()) {
 
