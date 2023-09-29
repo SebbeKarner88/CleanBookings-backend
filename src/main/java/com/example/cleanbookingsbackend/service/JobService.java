@@ -1,15 +1,18 @@
 package com.example.cleanbookingsbackend.service;
 
 import com.example.cleanbookingsbackend.dto.CancelJobRequest;
-import com.example.cleanbookingsbackend.dto.CancelJobResponse;
 import com.example.cleanbookingsbackend.enums.JobType;
 import com.example.cleanbookingsbackend.dto.CreateJobRequest;
 import com.example.cleanbookingsbackend.dto.CreateJobResponse;
+import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
 import com.example.cleanbookingsbackend.exception.JobNotFoundException;
+import com.example.cleanbookingsbackend.exception.NotFoundException;
+import com.example.cleanbookingsbackend.exception.UnauthorizedCallException;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.repository.CustomerRepository;
+import com.example.cleanbookingsbackend.repository.EmployeeRepository;
 import com.example.cleanbookingsbackend.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.MailException;
@@ -26,6 +29,7 @@ import java.util.Date;
 public class JobService {
     private final JobRepository jobRepository;
     private final CustomerRepository customerRepository;
+    private final EmployeeRepository employeeRepository;
     private final JavaMailSender mailSender;
 
     public CreateJobResponse createJobRequest(CreateJobRequest request)
@@ -46,15 +50,18 @@ public class JobService {
         return toDTO(requestedJob);
     }
 
-    //WIP
-    public CancelJobResponse cancelJobRequest(CancelJobRequest request)
-        throws IllegalArgumentException, CustomerNotFoundException, JobNotFoundException {
+    public boolean cancelJobRequest(CancelJobRequest request)
+            throws IllegalArgumentException, JobNotFoundException, NotFoundException, UnauthorizedCallException {
+        // WIP! NEED TO CHECK IF JOBSTATUS IS OPEN OR ASSIGNED, ELSE WE CANT CANCEL THE JOB.
+        // NEED TO CHECK IF CUSTOMER IS THE ONE WHO BOOKED THE JOB HE/SHE IS TRYING TO DELETE.
+        validateCancelJobInputData(request);
 
+        if (jobRepository.findById(request.jobId()).isEmpty())
+            throw new JobNotFoundException("There is no job registered with id: " + request.jobId());
 
+        authorizedCancellation(request);
 
-
-        return null;
-
+        return true;
     }
 
 //    TODO: Keeping this for future use. Will be needed in PUT-request to update a job when assigned.
@@ -67,6 +74,34 @@ public class JobService {
 //        employees = employeeRepository.findAllById(ids);
 //        return employees;
 //    }
+
+    private void authorizedCancellation(CancelJobRequest request) throws UnauthorizedCallException, NotFoundException {
+        // WIP! NEED TO CHECK IF JOBSTATUS IS OPEN OR ASSIGNED, ELSE WE CANT CANCEL THE JOB.
+        // NEED TO CHECK IF CUSTOMER IS THE ONE WHO BOOKED THE JOB HE/SHE IS TRYING TO DELETE.
+        if (customerRepository.findById(request.userId()).isPresent()) {
+            jobRepository.deleteById(request.jobId());
+
+        } else if (employeeRepository.findById(request.userId()).isPresent()) {
+
+            if (employeeRepository.findById(request.userId()).get().getRole() == Role.CLEANER) {
+                throw new UnauthorizedCallException("You are not authorized to perform this action." +
+                        "\nOnly " + Role.ADMIN + " are allowed to cancel a booked cleaning.");
+            } else {
+                jobRepository.deleteById(request.jobId());
+            }
+
+        } else {
+            throw new NotFoundException("No Customer or Administrator exists by id: " + request.userId());
+        }
+    }
+
+    private void validateCancelJobInputData(CancelJobRequest request) {
+        if (request.userId().isBlank())
+            throw new IllegalArgumentException("A customer or admin id is required");
+
+        if (request.jobId().isBlank())
+            throw new IllegalArgumentException("A job id is required.");
+    }
 
     private void validateJobRequestInputData(CreateJobRequest request) {
         if (request.customerId().isBlank())

@@ -1,11 +1,12 @@
 package com.example.cleanbookingsbackend.controller;
 
 import com.example.cleanbookingsbackend.dto.CancelJobRequest;
-import com.example.cleanbookingsbackend.dto.CancelJobResponse;
 import com.example.cleanbookingsbackend.dto.CreateJobRequest;
 import com.example.cleanbookingsbackend.dto.CreateJobResponse;
 import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
 import com.example.cleanbookingsbackend.exception.JobNotFoundException;
+import com.example.cleanbookingsbackend.exception.NotFoundException;
+import com.example.cleanbookingsbackend.exception.UnauthorizedCallException;
 import com.example.cleanbookingsbackend.service.JobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -40,13 +41,15 @@ public class JobController {
         }
     }
 
+    // WIP! NEED TO CHECK IF JOBSTATUS IS OPEN OR ASSIGNED, ELSE WE CANT CANCEL THE JOB.
+    // NEED TO CHECK IF CUSTOMER IS THE ONE WHO BOOKED THE JOB HE/SHE IS TRYING TO DELETE.
     @DeleteMapping
     public ResponseEntity<?> cancelJobRequest(@RequestBody CancelJobRequest request) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(jobService.cancelJobRequest(request));
-        } catch (IllegalArgumentException exception) {
+        } catch (IllegalArgumentException | UnauthorizedCallException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
-        } catch (CustomerNotFoundException | JobNotFoundException exception) {
+        } catch (NotFoundException | JobNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");

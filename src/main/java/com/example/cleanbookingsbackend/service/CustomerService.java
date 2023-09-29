@@ -58,7 +58,6 @@ public class CustomerService {
         );
     }
 
-
     // ##### Validation #####
     private boolean isValidEmailAddress(String email) {
         return email.length() >= 5 && email.contains("@");
