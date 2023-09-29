@@ -45,8 +45,6 @@ public class JobController {
         }
     }
 
-    // WIP! NEED TO CHECK IF JOBSTATUS IS OPEN OR ASSIGNED, ELSE WE CANT CANCEL THE JOB.
-    // NEED TO CHECK IF CUSTOMER IS THE ONE WHO BOOKED THE JOB HE/SHE IS TRYING TO DELETE.
     @DeleteMapping
     public ResponseEntity<?> cancelJobRequest(@RequestBody CancelJobRequest request) {
         try {

@@ -14,6 +14,4 @@ public class JobDto {
     private JobType type;
     private String message;
     private JobStatus status;
-
-
 }

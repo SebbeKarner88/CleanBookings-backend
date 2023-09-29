@@ -26,6 +26,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +60,7 @@ public class JobService {
 
         validateCancelJobInputData(request);
         authorizedCancellation(request);
-        sendEmailConfirmationCanceledJob(request);
+        sendEmailConfirmationCanceledJob(jobRepository.findById(request.jobId()).get());
 
         return true;
     }
@@ -163,8 +164,18 @@ public class JobService {
         }
     }
 
-    private void sendEmailConfirmationCanceledJob(CancelJobRequest request) {
-        //WIP
+    private void sendEmailConfirmationCanceledJob(JobEntity requestedCancel) {
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setFrom("order.cleanbookings@gmail.com");
+        msg.setTo(requestedCancel.getCustomer().getEmailAddress());
+        msg.setSubject("Avbokad städning");
+        msg.setText("Hej " + requestedCancel.getCustomer().getFirstName() + "! Er bokning av " + requestedCancel.getType() + " på " + requestedCancel.getBookedDate() + " är nu avbokad. /n" +
+                "Varmt välkommen åter!");
+        try {
+            mailSender.send(msg);
+        } catch (MailException exception) {
+            System.out.println("Email couldn't be sent: " + exception.getMessage());
+        }
     }
 
     private CreateJobResponse toDTO(JobEntity job) {

@@ -42,7 +42,6 @@ public class CustomerService {
         }
     }
 
-
     //###### DTO #######
     public static CustomerResponseDTO toDTO(CustomerEntity response) {
         return new CustomerResponseDTO(
@@ -70,34 +69,25 @@ public class CustomerService {
     private void validateCustomerInputData(CustomerRegistrationDTO request) throws ValidationException {
         if (request.firstName().isBlank())
             throw new ValidationException("First name is required");
-
         if (request.lastName().isBlank())
             throw new ValidationException("Last name is required.");
-
         if (request.customerType() == null)
             throw new ValidationException("Type is required.");
-
         if (request.streetAddress().isBlank())
             throw new ValidationException("Adress is required");
-
         if (request.postalCode() == null)
             throw new ValidationException("Postal code is required.");
-
         if (request.city().isBlank())
             throw new ValidationException("City is required");
-
         if (request.phoneNumber().isBlank())
             throw new ValidationException("Phone number is required.");
-
         if (request.emailAddress().isBlank())
             throw new ValidationException("Email is required");
-
         if (request.password().isBlank())
             throw new ValidationException("Password is required.");
     }
 
     // ##### Builder #####
-
     public CustomerEntity customerBuilder(CustomerRegistrationDTO request) {
         return new CustomerEntity(
                 null,
