@@ -2,11 +2,12 @@ package com.example.cleanbookingsbackend.service;
 
 import com.example.cleanbookingsbackend.dto.CustomerRegistrationDTO;
 import com.example.cleanbookingsbackend.dto.CustomerResponseDTO;
-import com.example.cleanbookingsbackend.enums.CustomerType;
+import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
 import com.example.cleanbookingsbackend.exception.UsernameIsTakenException;
 import com.example.cleanbookingsbackend.exception.ValidationException;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
 import com.example.cleanbookingsbackend.repository.CustomerRepository;
+import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,17 @@ public class CustomerService {
         } catch (Exception e) {
             throw new RuntimeException("Could not save customer");
         }
+    }
+
+    public String login(String email, String password) throws CustomerNotFoundException, AuthException {
+        if (customerRepository.findByEmailAddress(email).isEmpty())
+            throw new CustomerNotFoundException("There is no customer registered with email: " + email);
+
+        CustomerEntity customer = customerRepository.findByEmailAddress(email).get();
+        if (!passwordEncoder.matches(password, customer.getPassword()))
+            throw new AuthException("The password is incorrect");
+
+        return "Yeah! You're the real deal " + customer.getFirstName();
     }
 
     //###### DTO #######

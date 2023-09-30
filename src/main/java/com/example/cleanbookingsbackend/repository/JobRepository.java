@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface JobRepository extends JpaRepository <JobEntity, String> {
-    Optional<JobEntity> findJobEntityByBookedDateAndType(Date date, JobType type);
+    Optional<JobEntity> findByBookedDateAndType(Date date, JobType type);
 
     List<JobEntity> findByCustomerAndStatusNot(CustomerEntity customer, JobStatus status);
 

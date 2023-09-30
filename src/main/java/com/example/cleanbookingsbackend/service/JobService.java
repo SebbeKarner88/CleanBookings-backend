@@ -44,7 +44,7 @@ public class JobService {
         CustomerEntity customer = validateCustomerId(request.customerId());
         JobType type = validateJobType(request.type());
         Date date = new SimpleDateFormat("yyyy-MM-dd").parse(request.date());
-        if (jobRepository.findJobEntityByBookedDateAndType(date, type).isPresent())
+        if (jobRepository.findByBookedDateAndType(date, type).isPresent())
             throw new IllegalArgumentException("There is already a job of type " + type + " requested on " + date);
 
         JobEntity requestedJob = new JobEntity(customer, type, date, request.message());
@@ -52,7 +52,7 @@ public class JobService {
 
         sendEmailConfirmationBookedJob(requestedJob);
 
-        return toDTO(requestedJob);
+        return convertToCreateJobResponseDTO(requestedJob);
     }
 
     public boolean cancelJobRequest(CancelJobRequest request)
@@ -178,7 +178,7 @@ public class JobService {
         }
     }
 
-    private CreateJobResponse toDTO(JobEntity job) {
+    private CreateJobResponse convertToCreateJobResponseDTO(JobEntity job) {
         CustomerEntity customer = job.getCustomer();
         CreateJobResponse.Adress adressDto = new CreateJobResponse.Adress(
                 customer.getStreetAddress(),
