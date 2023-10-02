@@ -1,13 +1,7 @@
 package com.example.cleanbookingsbackend.controller;
 
-import com.example.cleanbookingsbackend.dto.CancelJobRequest;
-import com.example.cleanbookingsbackend.dto.CreateJobRequest;
-import com.example.cleanbookingsbackend.dto.CreateJobResponse;
-import com.example.cleanbookingsbackend.dto.JobDto;
-import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
-import com.example.cleanbookingsbackend.exception.JobNotFoundException;
-import com.example.cleanbookingsbackend.exception.NotFoundException;
-import com.example.cleanbookingsbackend.exception.UnauthorizedCallException;
+import com.example.cleanbookingsbackend.dto.*;
+import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.service.JobService;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +34,20 @@ public class JobController {
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
         } catch (CustomerNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
+        }
+    }
+
+    @PutMapping("/assign-cleaners")
+    public ResponseEntity<?> assignCleanerRequest(@RequestBody AssignCleanerRequest request) {
+        try {
+            jobService.assignCleanerRequest(request);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        } catch (ValidationException | NotFoundException | UnauthorizedCallException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");

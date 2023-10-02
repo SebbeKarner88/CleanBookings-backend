@@ -1,15 +1,13 @@
 package com.example.cleanbookingsbackend.service;
 
+import com.example.cleanbookingsbackend.dto.AssignCleanerRequest;
 import com.example.cleanbookingsbackend.dto.CancelJobRequest;
 import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.JobType;
 import com.example.cleanbookingsbackend.dto.CreateJobRequest;
 import com.example.cleanbookingsbackend.dto.CreateJobResponse;
 import com.example.cleanbookingsbackend.enums.Role;
-import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
-import com.example.cleanbookingsbackend.exception.JobNotFoundException;
-import com.example.cleanbookingsbackend.exception.NotFoundException;
-import com.example.cleanbookingsbackend.exception.UnauthorizedCallException;
+import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
@@ -24,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -65,6 +64,14 @@ public class JobService {
         return true;
     }
 
+    public void assignCleanerRequest(AssignCleanerRequest request) throws NotFoundException, ValidationException, UnauthorizedCallException {
+
+        validateAssignCleanerInputData(request);
+        assignCleaners(request);
+
+    }
+
+
 //    TODO: Keeping this for future use. Will be needed in PUT-request to update a job when assigned.
     //    private List<EmployeeEntity> validateEmployeeIds(List<String> ids) {
 //        List<EmployeeEntity> employees;
@@ -75,6 +82,20 @@ public class JobService {
 //        employees = employeeRepository.findAllById(ids);
 //        return employees;
 //    }
+
+    private void assignCleaners(AssignCleanerRequest request) {
+
+        JobEntity job = jobRepository.findById(request.jobId()).get();
+        List<EmployeeEntity> cleaners = new ArrayList<>();
+
+        for (String id: request.cleanerId() ) {
+            EmployeeEntity cleaner = employeeRepository.findById(id).get();
+            cleaners.add(cleaner);
+            cleanerEmailConfirmationOnAssignedJob(cleaner, job);
+        }
+        job.setEmployee(cleaners);
+
+    }
 
     private void authorizedCancellation(CancelJobRequest request) throws UnauthorizedCallException, NotFoundException {
         Optional<CustomerEntity> customerOptional = customerRepository.findById(request.userId());
@@ -93,7 +114,6 @@ public class JobService {
                 throw new UnauthorizedCallException("You are not authorized to perform this action." +
                         "\nThe customer who booked the job is the only one allowed to cancel this booked cleaning.");
             }
-
             if (job.getStatus() != JobStatus.OPEN && job.getStatus() != JobStatus.ASSIGNED) {
                 throw new UnauthorizedCallException("You may not cancel a completed job.");
             }
@@ -107,10 +127,35 @@ public class JobService {
         jobRepository.deleteById(request.jobId());
     }
 
+    private void validateAssignCleanerInputData(AssignCleanerRequest request) throws NotFoundException, ValidationException, UnauthorizedCallException {
+        if (request.adminId().isBlank())
+            throw new IllegalArgumentException("A admin id is required");
+        if (!employeeRepository.existsById(request.adminId()))
+            throw new NotFoundException("No admin found with id: " + request.adminId());
+        if (employeeRepository.findById(request.adminId()).get().getRole() != Role.ADMIN)
+            throw new ValidationException("Only a admin can assign a cleaner to a job.");
+
+        if (request.cleanerId().isEmpty())
+            throw new IllegalArgumentException("At least one cleaner id is required");
+        for (String id : request.cleanerId()) {
+            if (!employeeRepository.existsById(id))
+                throw new NotFoundException("No cleaner found with id: " + request.cleanerId());
+            if (employeeRepository.findById(id).get().getRole() != Role.CLEANER)
+                throw new ValidationException("A admin can not be assigned to a job");
+        }
+
+        if (request.jobId().isBlank())
+            throw new IllegalArgumentException("A job id is required.");
+        if (!jobRepository.existsById(request.jobId()))
+            throw new NotFoundException("No job found with id: " +request.jobId());
+        if (!(jobRepository.findById(request.jobId()).get().getStatus() == JobStatus.OPEN))
+            throw new UnauthorizedCallException("This job already has assigned cleaner(s).");
+        // AT THIS MOMENT WE CAN ONLY ASSIGN CLEANERS AT THE JOBSTATUS.OPEN STATE.
+    }
+
     private void validateCancelJobInputData(CancelJobRequest request) {
         if (request.userId().isBlank())
             throw new IllegalArgumentException("A customer or admin id is required");
-
         if (request.jobId().isBlank())
             throw new IllegalArgumentException("A job id is required.");
     }
@@ -118,10 +163,8 @@ public class JobService {
     private void validateJobRequestInputData(CreateJobRequest request) {
         if (request.customerId().isBlank())
             throw new IllegalArgumentException("Customer id is required");
-
         if (request.type().isBlank())
             throw new IllegalArgumentException("Job type is required.");
-
         if (request.date().isBlank())
             throw new IllegalArgumentException("Date is required.");
 
@@ -176,6 +219,20 @@ public class JobService {
         } catch (MailException exception) {
             System.out.println("Email couldn't be sent: " + exception.getMessage());
         }
+    }
+
+    private void cleanerEmailConfirmationOnAssignedJob(EmployeeEntity cleaner, JobEntity job) {
+            SimpleMailMessage msg = new SimpleMailMessage();
+            msg.setFrom("order.cleanbookings@gmail.com");
+            msg.setTo(cleaner.getEmailAddress());
+            msg.setSubject("Nytt städjobb för " + cleaner.getFirstName() + "!");
+            msg.setText("Hej " + cleaner.getFirstName() + "! /n/nDu har fått ett nytt städjobb inbokat: "
+                + job.getBookedDate() + ", " + job.getType() + "Meddelande: " + job.getMessage() + "/n/nFör mer information logga in på CleanBookings.");
+            try {
+                mailSender.send(msg);
+            } catch (MailException exception) {
+                System.out.println("Email couldn't be sent: " + exception.getMessage());
+            }
     }
 
     private CreateJobResponse convertToCreateJobResponseDTO(JobEntity job) {
