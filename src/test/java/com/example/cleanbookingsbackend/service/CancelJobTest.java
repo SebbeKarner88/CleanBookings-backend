@@ -16,14 +16,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
-class JobServiceTest {
+class CancelJobTest {
 
     @InjectMocks
     private JobService jobService;
@@ -33,6 +36,9 @@ class JobServiceTest {
     private EmployeeRepository employeeRepository;
     @Mock
     private JobRepository jobRepository;
+    @Mock
+    private JavaMailSender mailSender;
+
 
     @Test
     void testCancelJobRequest_WithValidRequest_ShouldCancelJob() throws Exception {
@@ -132,5 +138,38 @@ class JobServiceTest {
         verify(jobRepository, never()).deleteById(anyString());
     }
 
+    @Test
+    void sendEmailConfirmationCanceledJob_EmailSentSuccessfully() {
+        // Arrange
+        JobEntity requestedCancel = new JobEntity(
+                null,
+                new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 5),
+                new CustomerEntity(
+                        null,
+                        "Jane",
+                        "Doe",
+                        CustomerType.PRIVATE,
+                        "Jane Street 1",
+                        12345,
+                        "Jane City",
+                        "076-250 90 80",
+                        "jane.doe@janecity.com",
+                        "password",
+                        null
+                ),
+                List.of(),
+                JobType.BASIC_CLEANING,
+                "I want you to clean my car aswell",
+                JobStatus.OPEN,
+                null
+        );
+
+        // Act
+        jobService.sendEmailConfirmationCanceledJob(requestedCancel);
+
+        // Assert
+        // Verify that the mailSender.send method is called once
+        verify(mailSender, times(1)).send(any(SimpleMailMessage.class));
+    }
 
 }

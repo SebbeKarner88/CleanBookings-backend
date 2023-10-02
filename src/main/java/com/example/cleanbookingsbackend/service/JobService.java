@@ -206,7 +206,7 @@ public class JobService {
         }
     }
 
-    private void sendEmailConfirmationCanceledJob(JobEntity requestedCancel) {
+    void sendEmailConfirmationCanceledJob(JobEntity requestedCancel) {
         SimpleMailMessage msg = new SimpleMailMessage();
         msg.setFrom("order.cleanbookings@gmail.com");
         msg.setTo(requestedCancel.getCustomer().getEmailAddress());
