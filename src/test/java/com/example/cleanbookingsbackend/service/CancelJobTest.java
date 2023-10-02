@@ -11,6 +11,7 @@ import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.repository.CustomerRepository;
 import com.example.cleanbookingsbackend.repository.EmployeeRepository;
 import com.example.cleanbookingsbackend.repository.JobRepository;
+import com.example.cleanbookingsbackend.service.utils.MailSenderService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,7 +39,8 @@ class CancelJobTest {
     private JobRepository jobRepository;
     @Mock
     private JavaMailSender mailSender;
-
+    @Mock
+    private MailSenderService mailSenderService;
 
     @Test
     void testCancelJobRequest_WithValidRequest_ShouldCancelJob() throws Exception {
@@ -140,7 +142,7 @@ class CancelJobTest {
 
     @Test
     void sendEmailConfirmationCanceledJob_EmailSentSuccessfully() {
-        // Arrange
+
         JobEntity requestedCancel = new JobEntity(
                 null,
                 new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 5),
@@ -164,12 +166,8 @@ class CancelJobTest {
                 null
         );
 
-        // Act
-        jobService.sendEmailConfirmationCanceledJob(requestedCancel);
+        mailSenderService.sendEmailConfirmationCanceledJob(requestedCancel);
 
-        // Assert
-        // Verify that the mailSender.send method is called once
-        verify(mailSender, times(1)).send(any(SimpleMailMessage.class));
+        verify(mailSenderService, times(1)).sendEmailConfirmationBookedJob(requestedCancel);
     }
-
 }
