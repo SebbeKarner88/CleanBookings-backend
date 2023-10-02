@@ -3,6 +3,7 @@ package com.example.cleanbookingsbackend.service;
 import com.example.cleanbookingsbackend.dto.CustomerRegistrationDTO;
 import com.example.cleanbookingsbackend.dto.CustomerResponseDTO;
 import com.example.cleanbookingsbackend.enums.CustomerType;
+import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
 import com.example.cleanbookingsbackend.exception.UsernameIsTakenException;
 import com.example.cleanbookingsbackend.exception.ValidationException;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
@@ -102,5 +103,10 @@ public class CustomerService {
                 passwordEncoder.encode(request.password()),
                 null
         );
+    }
+
+    public CustomerEntity getCustomerById(String customerId) {
+        return customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with ID: " + customerId));
     }
 }

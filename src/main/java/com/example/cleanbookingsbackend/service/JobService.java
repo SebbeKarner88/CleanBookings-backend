@@ -205,7 +205,8 @@ public class JobService {
 
     public List<JobEntity> getBookedCleaningsForCustomer(String customerId) {
 
-        return jobRepository.findByCustomer_Id(customerId);
+//        return jobRepository.findByCustomer_Id(customerId);
+        return jobRepository.findJobsByCustomerIdAndStatusNotClosed(customerId);
     }
 
 }
