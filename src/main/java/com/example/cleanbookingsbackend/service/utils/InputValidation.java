@@ -49,7 +49,7 @@ public class InputValidation {
         NUMERIC,
     }
 
-    public void validateInputDataField(DataField field, DataType dataType, String value)
+    public static void validateInputDataField(DataField field, DataType dataType, String value)
             throws IllegalArgumentException {
         switch (dataType) {
             case STRING -> {
@@ -63,7 +63,7 @@ public class InputValidation {
         }
     }
 
-    public JobType validateJobType(String requestedType) {
+    public static JobType validateJobType(String requestedType) {
         JobType type;
         switch (requestedType.toUpperCase()) {
             case "BASIC" -> type = JobType.BASIC_CLEANING;

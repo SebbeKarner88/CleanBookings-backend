@@ -27,6 +27,8 @@ import java.util.Optional;
 
 import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataField.*;
 import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataType.*;
+import static com.example.cleanbookingsbackend.service.utils.InputValidation.validateInputDataField;
+import static com.example.cleanbookingsbackend.service.utils.InputValidation.validateJobType;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +50,7 @@ public class JobService {
 
         validateJobRequestInputData(request);
         CustomerEntity customer = input.validateCustomerId(request.customerId());
-        JobType type = input.validateJobType(request.type());
+        JobType type = validateJobType(request.type());
         Date date = DATE_FORMAT.parse(request.date());
         if (jobRepository.findByBookedDateAndType(date, type).isPresent())
             throw new IllegalArgumentException("There is already a job of type " + type + " requested on " + date);
@@ -76,10 +78,10 @@ public class JobService {
     }
 
     private void validateAssignCleanerInputData(AssignCleanerRequest request) throws JobNotFoundException {
-        input.validateInputDataField(EMPLOYEE_ID, STRING, request.adminId());
-        input.validateInputDataField(JOB_ID, STRING, request.jobId());
+        validateInputDataField(EMPLOYEE_ID, STRING, request.adminId());
+        validateInputDataField(JOB_ID, STRING, request.jobId());
         for (String id : request.cleanerId()) {
-            input.validateInputDataField(EMPLOYEE_ID, STRING, id);
+            validateInputDataField(EMPLOYEE_ID, STRING, id);
             EmployeeEntity cleaner = input.validateEmployeeId(id);
             if (!cleaner.getRole().equals(Role.CLEANER))
                 throw new IllegalArgumentException(INVALID_ROLE_MESSAGE);
@@ -140,12 +142,12 @@ public class JobService {
     private void validateCancelJobInputData(CancelJobRequest request) {
         if (request.userId().isBlank())
             throw new IllegalArgumentException(USER_ID_REQUIRED_MESSAGE);
-        input.validateInputDataField(JOB_ID, STRING, request.jobId());
+        validateInputDataField(JOB_ID, STRING, request.jobId());
     }
 
     private void validateJobRequestInputData(CreateJobRequest request) {
-        input.validateInputDataField(CUSTOMER_ID, STRING, request.customerId());
-        input.validateInputDataField(DATE, STRING, request.date());
+        validateInputDataField(CUSTOMER_ID, STRING, request.customerId());
+        validateInputDataField(DATE, STRING, request.date());
     }
 
     private CreateJobResponse convertToCreateJobResponseDTO(JobEntity job) {
