@@ -86,15 +86,18 @@ public class JobService {
     private void assignCleaners(AssignCleanerRequest request) {
 
         JobEntity job = jobRepository.findById(request.jobId()).get();
-        List<EmployeeEntity> cleaners = new ArrayList<>();
+        List<EmployeeEntity> cleaners = job.getEmployee();
 
-        for (String id: request.cleanerId() ) {
+        for (String id : request.cleanerId()) {
             EmployeeEntity cleaner = employeeRepository.findById(id).get();
+            if (cleaners.contains(cleaner))
+                continue;
             cleaners.add(cleaner);
             cleanerEmailConfirmationOnAssignedJob(cleaner, job);
         }
         job.setEmployee(cleaners);
-        job.setStatus(JobStatus.ASSIGNED);
+        if (job.getStatus() == JobStatus.OPEN)
+            job.setStatus(JobStatus.ASSIGNED);
         jobRepository.save(job);
     }
 
@@ -148,9 +151,9 @@ public class JobService {
         if (request.jobId().isBlank())
             throw new IllegalArgumentException("A job id is required.");
         if (!jobRepository.existsById(request.jobId()))
-            throw new NotFoundException("No job found with id: " +request.jobId());
-        if (!(jobRepository.findById(request.jobId()).get().getStatus() == JobStatus.OPEN))
-            throw new UnauthorizedCallException("This job already has assigned cleaner(s).");
+            throw new NotFoundException("No job found with id: " + request.jobId());
+        if (jobRepository.findById(request.jobId()).get().getStatus() == JobStatus.CLOSED)
+            throw new UnauthorizedCallException("This job is finished.");
         // AT THIS MOMENT WE CAN ONLY ASSIGN CLEANERS AT THE JOBSTATUS.OPEN STATE.
     }
 
@@ -223,17 +226,17 @@ public class JobService {
     }
 
     private void cleanerEmailConfirmationOnAssignedJob(EmployeeEntity cleaner, JobEntity job) {
-            SimpleMailMessage msg = new SimpleMailMessage();
-            msg.setFrom("order.cleanbookings@gmail.com");
-            msg.setTo(cleaner.getEmailAddress());
-            msg.setSubject("Nytt städjobb för " + cleaner.getFirstName() + "!");
-            msg.setText("Hej " + cleaner.getFirstName() + "! /n/nDu har fått ett nytt städjobb inbokat: "
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setFrom("order.cleanbookings@gmail.com");
+        msg.setTo(cleaner.getEmailAddress());
+        msg.setSubject("Nytt städjobb för " + cleaner.getFirstName() + "!");
+        msg.setText("Hej " + cleaner.getFirstName() + "! /n/nDu har fått ett nytt städjobb inbokat: "
                 + job.getBookedDate() + ", " + job.getType() + "Meddelande: " + job.getMessage() + "/n/nFör mer information logga in på CleanBookings.");
-            try {
-                mailSender.send(msg);
-            } catch (MailException exception) {
-                System.out.println("Email couldn't be sent: " + exception.getMessage());
-            }
+        try {
+            mailSender.send(msg);
+        } catch (MailException exception) {
+            System.out.println("Email couldn't be sent: " + exception.getMessage());
+        }
     }
 
     private CreateJobResponse convertToCreateJobResponseDTO(JobEntity job) {
