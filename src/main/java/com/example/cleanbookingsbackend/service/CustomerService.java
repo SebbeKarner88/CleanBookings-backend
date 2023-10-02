@@ -1,5 +1,6 @@
 package com.example.cleanbookingsbackend.service;
 
+import com.example.cleanbookingsbackend.dto.AuthenticationResponse;
 import com.example.cleanbookingsbackend.dto.CustomerRegistrationDTO;
 import com.example.cleanbookingsbackend.dto.CustomerResponseDTO;
 import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
@@ -43,7 +44,7 @@ public class CustomerService {
         }
     }
 
-    public String login(String email, String password) throws CustomerNotFoundException, AuthException {
+    public AuthenticationResponse login(String email, String password) throws CustomerNotFoundException, AuthException {
         if (customerRepository.findByEmailAddress(email).isEmpty())
             throw new CustomerNotFoundException("There is no customer registered with email: " + email);
 
@@ -51,7 +52,7 @@ public class CustomerService {
         if (!passwordEncoder.matches(password, customer.getPassword()))
             throw new AuthException("The password is incorrect");
 
-        return "Yeah! You're the real deal " + customer.getFirstName();
+        return new AuthenticationResponse(customer.getId(), customer.getFirstName());
     }
 
     //###### DTO #######
