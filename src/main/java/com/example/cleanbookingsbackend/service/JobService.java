@@ -56,19 +56,15 @@ public class JobService {
 
     public boolean cancelJobRequest(CancelJobRequest request)
             throws IllegalArgumentException, JobNotFoundException, NotFoundException, UnauthorizedCallException {
-
         validateCancelJobInputData(request);
         authorizedCancellation(request);
         sendEmailConfirmationCanceledJob(jobRepository.findById(request.jobId()).get());
-
         return true;
     }
 
     public void assignCleanerRequest(AssignCleanerRequest request) throws NotFoundException, ValidationException, UnauthorizedCallException {
-
         validateAssignCleanerInputData(request);
         assignCleaners(request);
-
     }
 
 
@@ -154,7 +150,6 @@ public class JobService {
             throw new NotFoundException("No job found with id: " + request.jobId());
         if (jobRepository.findById(request.jobId()).get().getStatus() == JobStatus.CLOSED)
             throw new UnauthorizedCallException("This job is finished.");
-        // AT THIS MOMENT WE CAN ONLY ASSIGN CLEANERS AT THE JOBSTATUS.OPEN STATE.
     }
 
     private void validateCancelJobInputData(CancelJobRequest request) {
