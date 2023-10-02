@@ -94,7 +94,8 @@ public class JobService {
             cleanerEmailConfirmationOnAssignedJob(cleaner, job);
         }
         job.setEmployee(cleaners);
-
+        job.setStatus(JobStatus.ASSIGNED);
+        jobRepository.save(job);
     }
 
     private void authorizedCancellation(CancelJobRequest request) throws UnauthorizedCallException, NotFoundException {
@@ -139,7 +140,7 @@ public class JobService {
             throw new IllegalArgumentException("At least one cleaner id is required");
         for (String id : request.cleanerId()) {
             if (!employeeRepository.existsById(id))
-                throw new NotFoundException("No cleaner found with id: " + request.cleanerId());
+                throw new NotFoundException("No cleaner found with id: " + id);
             if (employeeRepository.findById(id).get().getRole() != Role.CLEANER)
                 throw new ValidationException("A admin can not be assigned to a job");
         }
