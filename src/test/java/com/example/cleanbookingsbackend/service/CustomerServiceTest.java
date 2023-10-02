@@ -64,7 +64,6 @@ class CustomerServiceTest {
                 "076-250 90 80",
                 "",
                 passwordEncoder.encode("password"));
-
         // Then
         assertThrows(ValidationException.class, () -> customerService.create(request));
     }
