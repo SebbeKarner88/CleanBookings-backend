@@ -44,30 +44,33 @@ public class JobService {
 
     public CreateJobResponse createJobRequest(CreateJobRequest request)
             throws IllegalArgumentException, CustomerNotFoundException, ParseException {
-        validateJobRequestInputData(request);
-        CustomerEntity customer = input.validateCustomerId(request.customerId());
-        JobType type = validateJobType(request.type());
-        Date date = DATE_FORMAT.parse(request.date());
-        if (jobRepository.findByBookedDateAndType(date, type).isPresent())
-            throw new IllegalArgumentException("There is already a job of type " + type + " requested on " + date);
-        JobEntity requestedJob = new JobEntity(customer, type, date, request.message());
-        jobRepository.save(requestedJob);
-        mailSender.sendEmailConfirmationBookedJob(requestedJob);
-
+        JobEntity requestedJob = new JobEntity();
+        if (isValidCreateJobRequest(request)) {
+            CustomerEntity customer = input.validateCustomerId(request.customerId());
+            JobType type = validateJobType(request.type());
+            Date date = DATE_FORMAT.parse(request.date());
+            if (jobRepository.findByBookedDateAndType(date, type).isPresent())
+                throw new IllegalArgumentException("There is already a job of type " + type + " requested on " + date);
+            requestedJob = new JobEntity(customer, type, date, request.message());
+            jobRepository.save(requestedJob);
+            mailSender.sendEmailConfirmationBookedJob(requestedJob);
+        }
         return convertToCreateJobResponseDTO(requestedJob);
+
     }
 
     public boolean cancelJobRequest(JobUserRequest request)
             throws IllegalArgumentException, JobNotFoundException, NotFoundException, UnauthorizedCallException {
-        validateCancelJobInputData(request);
-        authorizedCancellation(request);
-        mailSender.sendEmailConfirmationCanceledJob(jobRepository.findById(request.jobId()).get());
+        if(isValidCancelJobRequest(request)){
+            authorizedCancellation(request);
+            mailSender.sendEmailConfirmationCanceledJob(jobRepository.findById(request.jobId()).get());
+        }
         return true;
     }
 
     public void assignCleanerRequest(AssignCleanerRequest request)
             throws EmployeeNotFoundException, JobNotFoundException, IllegalArgumentException {
-        if (isValidAssignRequest(request))
+        if (isValidAssignCleanerRequest(request))
             assignCleanersAndSendEmailConfirmation(request.jobId(), request.cleanerIds());
     }
 
@@ -110,20 +113,21 @@ public class JobService {
 
     public void executedCleaningRequest(JobUserRequest request)
             throws IllegalArgumentException, EmployeeNotFoundException, JobNotFoundException {
-        validateExecutedCleaningInputData(request);
-        reportExecutedCleaning(request);
+        if(isValidExecutedCleaningRequest(request))
+            reportExecutedCleaning(request);
     }
 
     public void approveDeclineCleaningRequest(JobApproveRequest request)
             throws IllegalArgumentException, EmployeeNotFoundException, JobNotFoundException, CustomerNotFoundException, UnauthorizedCallException {
-        validateApprovedCleaningInputData(request);
-        approveDeclineCleaning(request);
+        if(isValidApproveDeclineCleaningRequest(request))
+            updateJobStatusAndMessage(request);
     }
 
-    private void approveDeclineCleaning(JobApproveRequest request)
+    private void updateJobStatusAndMessage(JobApproveRequest request)
             throws JobNotFoundException {
         JobEntity job = input.validateJobId(request.jobId());
 
+//        TODO: Add a if-statement to check if there's a message and if so concat with old?
         job.setMessage(request.message()); // Setting a message to let cleaner/admin know what needs to be supplemented for an approval etc.
 
         if (request.isApproved()) {
@@ -173,7 +177,7 @@ public class JobService {
         jobRepository.deleteById(request.jobId());
     }
 
-    private void validateApprovedCleaningInputData(JobApproveRequest request)
+    private boolean isValidApproveDeclineCleaningRequest(JobApproveRequest request)
             throws JobNotFoundException, UnauthorizedCallException, CustomerNotFoundException {
         validateInputDataField(JOB_ID, STRING, request.jobId());
         validateInputDataField(CUSTOMER_ID, STRING, request.customerId());
@@ -181,9 +185,10 @@ public class JobService {
         CustomerEntity customer = input.validateCustomerId(request.customerId());
         if (!Objects.equals(customer.getId(), job.getCustomer().getId()))
             throw new UnauthorizedCallException("Only the customer who booked the cleaning can approve or deny.");
+        return true;
     }
 
-    private void validateExecutedCleaningInputData(JobUserRequest request)
+    private boolean isValidExecutedCleaningRequest(JobUserRequest request)
             throws JobNotFoundException, EmployeeNotFoundException, IllegalArgumentException {
         validateInputDataField(EMPLOYEE_ID, STRING, request.userId());
         validateInputDataField(JOB_ID, STRING, request.jobId());
@@ -191,9 +196,10 @@ public class JobService {
         JobEntity job = input.validateJobId(request.jobId());
         if(job.getStatus() == JobStatus.OPEN || job.getStatus() == JobStatus.CLOSED)
             throw new IllegalArgumentException("A unassigned or finished job cant be marked as executed.");
+        return true;
     }
 
-    private boolean isValidAssignRequest(AssignCleanerRequest request)
+    private boolean isValidAssignCleanerRequest(AssignCleanerRequest request)
             throws EmployeeNotFoundException, JobNotFoundException, IllegalArgumentException {
         validateInputDataField(EMPLOYEE_ID, STRING, request.adminId());
         EmployeeEntity admin = input.validateEmployeeId(request.adminId());
@@ -216,15 +222,17 @@ public class JobService {
         return true;
     }
 
-    private void validateCancelJobInputData(JobUserRequest request) {
+    private boolean isValidCancelJobRequest(JobUserRequest request) {
         if (request.userId().isBlank())
             throw new IllegalArgumentException(USER_ID_REQUIRED_MESSAGE);
         validateInputDataField(JOB_ID, STRING, request.jobId());
+        return true;
     }
 
-    private void validateJobRequestInputData(CreateJobRequest request) {
+    private boolean isValidCreateJobRequest(CreateJobRequest request) {
         validateInputDataField(CUSTOMER_ID, STRING, request.customerId());
         validateInputDataField(DATE, STRING, request.date());
+        return true;
     }
 
     private static void checkCustomerAuthorization(CustomerEntity customer, JobEntity job)
