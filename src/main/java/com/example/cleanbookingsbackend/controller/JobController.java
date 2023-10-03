@@ -57,16 +57,16 @@ public class JobController {
     @PutMapping("/executed-cleaning")
     public ResponseEntity<?> executedCleaningRequest(@RequestBody JobRequest request) {
 
-       /* try {
-            jobService.assignCleanerRequest(request);
+        try {
+            jobService.executedCleaningRequest(request);
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
-        } catch (NotFoundException exception) {
+        } catch (EmployeeNotFoundException | JobNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
-        }*/
+        }
     }
 
     @DeleteMapping

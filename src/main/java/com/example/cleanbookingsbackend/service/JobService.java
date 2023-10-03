@@ -72,9 +72,34 @@ public class JobService {
         return true;
     }
 
-    public void assignCleanerRequest(AssignCleanerRequest request) throws NotFoundException, ValidationException, UnauthorizedCallException, JobNotFoundException {
+    public void assignCleanerRequest(AssignCleanerRequest request)
+            throws NotFoundException, ValidationException, UnauthorizedCallException, JobNotFoundException {
         validateAssignCleanerInputData(request);
         assignCleaners(request.jobId(), request.cleanerId());
+    }
+
+    public void executedCleaningRequest(JobRequest request)
+            throws IllegalArgumentException, EmployeeNotFoundException, JobNotFoundException {
+        validateExecutedCleaningInputData(request);
+        reportExecutedCleaning(request);
+    }
+
+    private void reportExecutedCleaning(JobRequest request) {
+
+        // WIP
+
+    }
+
+    private void validateExecutedCleaningInputData(JobRequest request)
+            throws JobNotFoundException, EmployeeNotFoundException, IllegalArgumentException {
+        validateInputDataField(EMPLOYEE_ID, STRING, request.userId());
+        validateInputDataField(JOB_ID, STRING, request.jobId());
+
+        EmployeeEntity cleaner = input.validateEmployeeId(request.userId());
+        JobEntity job = input.validateJobId(request.jobId());
+
+        if(job.getStatus() == JobStatus.OPEN || job.getStatus() == JobStatus.CLOSED)
+            throw new IllegalArgumentException("A unassigned or finished job cant be marked as executed.");
     }
 
     private void validateAssignCleanerInputData(AssignCleanerRequest request) throws JobNotFoundException {
@@ -88,7 +113,7 @@ public class JobService {
         }
         JobEntity job = input.validateJobId(request.jobId());
         if (job.getStatus().equals(JobStatus.CLOSED))
-            throw new IllegalArgumentException("The job with id " + request.jobId() + " has already been executed.");
+            throw new IllegalArgumentException("The job with id " + request.jobId() + " has already been executed and closed.");
         EmployeeEntity admin = input.validateEmployeeId(request.adminId());
         if (!admin.getRole().equals(Role.ADMIN))
             throw new IllegalArgumentException("Only an admin can assign a cleaner to a job.");
@@ -179,5 +204,4 @@ public class JobService {
 
         return jobRepository.findByCustomer_Id(customerId);
     }
-
 }
