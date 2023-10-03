@@ -47,17 +47,14 @@ public class JobService {
 
     public CreateJobResponse createJobRequest(CreateJobRequest request)
             throws IllegalArgumentException, CustomerNotFoundException, ParseException {
-
         validateJobRequestInputData(request);
         CustomerEntity customer = input.validateCustomerId(request.customerId());
         JobType type = validateJobType(request.type());
         Date date = DATE_FORMAT.parse(request.date());
         if (jobRepository.findByBookedDateAndType(date, type).isPresent())
             throw new IllegalArgumentException("There is already a job of type " + type + " requested on " + date);
-
         JobEntity requestedJob = new JobEntity(customer, type, date, request.message());
         jobRepository.save(requestedJob);
-
         mailSender.sendEmailConfirmationBookedJob(requestedJob);
 
         return convertToCreateJobResponseDTO(requestedJob);
@@ -65,7 +62,6 @@ public class JobService {
 
     public boolean cancelJobRequest(JobRequest request)
             throws IllegalArgumentException, JobNotFoundException, NotFoundException, UnauthorizedCallException {
-
         validateCancelJobInputData(request);
         authorizedCancellation(request);
         mailSender.sendEmailConfirmationCanceledJob(jobRepository.findById(request.jobId()).get());
@@ -84,15 +80,16 @@ public class JobService {
         reportExecutedCleaning(request);
     }
 
+    public List<JobEntity> getBookedCleaningsForCustomer(String customerId) {
+        return jobRepository.findByCustomer_Id(customerId);
+    }
+
     private void reportExecutedCleaning(JobRequest request)
             throws JobNotFoundException {
-
         JobEntity job = input.validateJobId(request.jobId());
         EmployeeEntity cleaner = input.validateEmployeeId(request.userId());
-
         if (!job.getEmployee().contains(cleaner))
             throw new IllegalArgumentException("You can only report jobs you are assigned to.");
-
         job.setStatus(JobStatus.WAITING_FOR_APPROVAL);
         jobRepository.save(job);
         mailSender.sendEmailConfirmationExecutedJob(job, cleaner);
@@ -102,10 +99,8 @@ public class JobService {
             throws JobNotFoundException, EmployeeNotFoundException, IllegalArgumentException {
         validateInputDataField(EMPLOYEE_ID, STRING, request.userId());
         validateInputDataField(JOB_ID, STRING, request.jobId());
-
         input.validateEmployeeId(request.userId()); // JUST FOR VALIDATION.
         JobEntity job = input.validateJobId(request.jobId());
-
         if(job.getStatus() == JobStatus.OPEN || job.getStatus() == JobStatus.CLOSED)
             throw new IllegalArgumentException("A unassigned or finished job cant be marked as executed.");
     }
@@ -205,11 +200,5 @@ public class JobService {
                 .customer(customerDto)
                 .message(job.getMessage())
                 .build();
-    }
-
-
-    public List<JobEntity> getBookedCleaningsForCustomer(String customerId) {
-
-        return jobRepository.findByCustomer_Id(customerId);
     }
 }
