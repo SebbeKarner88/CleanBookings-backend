@@ -55,8 +55,7 @@ public class JobController {
     }
 
     @PutMapping("/executed-cleaning")
-    public ResponseEntity<?> executedCleaningRequest(@RequestBody JobRequest request) {
-
+    public ResponseEntity<?> executedCleaningRequest(@RequestBody JobUserRequest request) {
         try {
             jobService.executedCleaningRequest(request);
             return ResponseEntity.status(HttpStatus.OK).build();
@@ -69,8 +68,23 @@ public class JobController {
         }
     }
 
+    @PutMapping("/approved-cleaning")
+    public ResponseEntity<?> approvedCleaningRequest(@RequestBody JobCustomerRequest request) {
+
+      /*  try { WIP
+            jobService.approvedCleaningRequest(request);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        } catch (CustomerNotFoundException | JobNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
+        }*/
+    }
+
     @DeleteMapping
-    public ResponseEntity<?> cancelJobRequest(@RequestBody JobRequest request) {
+    public ResponseEntity<?> cancelJobRequest(@RequestBody JobUserRequest request) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(jobService.cancelJobRequest(request));
         } catch (IllegalArgumentException | UnauthorizedCallException exception) {
@@ -81,7 +95,6 @@ public class JobController {
             return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
         }
     }
-
 
     @GetMapping("/booked-cleanings/{customerId}")
     public ResponseEntity<List<JobDto>> getBookedCleanings(@PathVariable String customerId) {

@@ -1,7 +1,7 @@
 package com.example.cleanbookingsbackend.service;
 
 import com.example.cleanbookingsbackend.dto.AssignCleanerRequest;
-import com.example.cleanbookingsbackend.dto.JobRequest;
+import com.example.cleanbookingsbackend.dto.JobUserRequest;
 import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.JobType;
 import com.example.cleanbookingsbackend.dto.CreateJobRequest;
@@ -60,7 +60,7 @@ public class JobService {
         return convertToCreateJobResponseDTO(requestedJob);
     }
 
-    public boolean cancelJobRequest(JobRequest request)
+    public boolean cancelJobRequest(JobUserRequest request)
             throws IllegalArgumentException, JobNotFoundException, NotFoundException, UnauthorizedCallException {
         validateCancelJobInputData(request);
         authorizedCancellation(request);
@@ -74,7 +74,7 @@ public class JobService {
         assignCleaners(request.jobId(), request.cleanerId());
     }
 
-    public void executedCleaningRequest(JobRequest request)
+    public void executedCleaningRequest(JobUserRequest request)
             throws IllegalArgumentException, EmployeeNotFoundException, JobNotFoundException {
         validateExecutedCleaningInputData(request);
         reportExecutedCleaning(request);
@@ -84,7 +84,7 @@ public class JobService {
         return jobRepository.findByCustomer_Id(customerId);
     }
 
-    private void reportExecutedCleaning(JobRequest request)
+    private void reportExecutedCleaning(JobUserRequest request)
             throws JobNotFoundException {
         JobEntity job = input.validateJobId(request.jobId());
         EmployeeEntity cleaner = input.validateEmployeeId(request.userId());
@@ -110,7 +110,7 @@ public class JobService {
         jobRepository.save(job);
     }
 
-    private void authorizedCancellation(JobRequest request) throws UnauthorizedCallException, NotFoundException, JobNotFoundException {
+    private void authorizedCancellation(JobUserRequest request) throws UnauthorizedCallException, NotFoundException, JobNotFoundException {
         Optional<CustomerEntity> customerOptional = customerRepository.findById(request.userId());
         Optional<EmployeeEntity> employeeOptional = employeeRepository.findById(request.userId());
 
@@ -130,7 +130,7 @@ public class JobService {
         jobRepository.deleteById(request.jobId());
     }
 
-    private void validateExecutedCleaningInputData(JobRequest request)
+    private void validateExecutedCleaningInputData(JobUserRequest request)
             throws JobNotFoundException, EmployeeNotFoundException, IllegalArgumentException {
         validateInputDataField(EMPLOYEE_ID, STRING, request.userId());
         validateInputDataField(JOB_ID, STRING, request.jobId());
@@ -157,7 +157,7 @@ public class JobService {
             throw new IllegalArgumentException("Only an admin can assign a cleaner to a job.");
     }
 
-    private void validateCancelJobInputData(JobRequest request) {
+    private void validateCancelJobInputData(JobUserRequest request) {
         if (request.userId().isBlank())
             throw new IllegalArgumentException(USER_ID_REQUIRED_MESSAGE);
         validateInputDataField(JOB_ID, STRING, request.jobId());
