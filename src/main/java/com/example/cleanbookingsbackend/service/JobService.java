@@ -1,11 +1,8 @@
 package com.example.cleanbookingsbackend.service;
 
-import com.example.cleanbookingsbackend.dto.AssignCleanerRequest;
-import com.example.cleanbookingsbackend.dto.JobUserRequest;
+import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.JobType;
-import com.example.cleanbookingsbackend.dto.CreateJobRequest;
-import com.example.cleanbookingsbackend.dto.CreateJobResponse;
 import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
@@ -78,6 +75,16 @@ public class JobService {
             throws IllegalArgumentException, EmployeeNotFoundException, JobNotFoundException {
         validateExecutedCleaningInputData(request);
         reportExecutedCleaning(request);
+    }
+
+    public void approvedCleaningRequest(JobApproveRequest request)
+    throws IllegalArgumentException, EmployeeNotFoundException, JobNotFoundException {
+        validateApprovedCleaningInputData(request);
+
+    }
+
+    private void validateApprovedCleaningInputData(JobApproveRequest request) {
+        //WIP
     }
 
     public List<JobEntity> getBookedCleaningsForCustomer(String customerId) {

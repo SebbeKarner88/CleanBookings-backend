@@ -69,9 +69,9 @@ public class JobController {
     }
 
     @PutMapping("/approved-cleaning")
-    public ResponseEntity<?> approvedCleaningRequest(@RequestBody JobCustomerRequest request) {
+    public ResponseEntity<?> approvedCleaningRequest(@RequestBody JobApproveRequest request) {
 
-      /*  try { WIP
+        try {
             jobService.approvedCleaningRequest(request);
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (IllegalArgumentException exception) {
@@ -80,7 +80,7 @@ public class JobController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
-        }*/
+        }
     }
 
     @DeleteMapping
