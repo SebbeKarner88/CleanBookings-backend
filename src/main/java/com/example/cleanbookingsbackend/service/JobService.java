@@ -20,6 +20,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataField.*;
@@ -78,13 +79,18 @@ public class JobService {
     }
 
     public void approveDeclineCleaningRequest(JobApproveRequest request)
-    throws IllegalArgumentException, EmployeeNotFoundException, JobNotFoundException {
+            throws IllegalArgumentException, EmployeeNotFoundException, JobNotFoundException, CustomerNotFoundException, UnauthorizedCallException {
         validateApprovedCleaningInputData(request);
         approveDeclineCleaning(request);
     }
 
-    private void approveDeclineCleaning(JobApproveRequest request) {
+    private void approveDeclineCleaning(JobApproveRequest request)
+            throws JobNotFoundException {
+        JobEntity job = input.validateJobId(request.jobId());
+
         // WIP
+
+
     }
 
     public List<JobEntity> getBookedCleaningsForCustomer(String customerId) {
@@ -102,7 +108,8 @@ public class JobService {
         mailSender.sendEmailConfirmationExecutedJob(job, cleaner);
     }
 
-    private void assignCleaners(String jobId, List<String> cleanerIds) throws JobNotFoundException {
+    private void assignCleaners(String jobId, List<String> cleanerIds)
+            throws JobNotFoundException {
         JobEntity job = input.validateJobId(jobId);
         List<EmployeeEntity> cleaners = cleanerIds
                 .stream()
@@ -117,7 +124,8 @@ public class JobService {
         jobRepository.save(job);
     }
 
-    private void authorizedCancellation(JobUserRequest request) throws UnauthorizedCallException, NotFoundException, JobNotFoundException {
+    private void authorizedCancellation(JobUserRequest request)
+            throws UnauthorizedCallException, NotFoundException, JobNotFoundException {
         Optional<CustomerEntity> customerOptional = customerRepository.findById(request.userId());
         Optional<EmployeeEntity> employeeOptional = employeeRepository.findById(request.userId());
 
@@ -138,9 +146,13 @@ public class JobService {
     }
 
     private void validateApprovedCleaningInputData(JobApproveRequest request)
-            throws JobNotFoundException {
+            throws JobNotFoundException, UnauthorizedCallException, CustomerNotFoundException {
         validateInputDataField(JOB_ID, STRING, request.jobId());
+        validateInputDataField(CUSTOMER_ID, STRING, request.customerId());
         JobEntity job = input.validateJobId(request.jobId());
+        CustomerEntity customer = input.validateCustomerId(request.customerId());
+        if (!Objects.equals(customer.getId(), job.getCustomer().getId()))
+            throw new UnauthorizedCallException("Only the customer who booked the cleaning can approve or deny.");
     }
 
     private void validateExecutedCleaningInputData(JobUserRequest request)
@@ -153,7 +165,8 @@ public class JobService {
             throw new IllegalArgumentException("A unassigned or finished job cant be marked as executed.");
     }
 
-    private void validateAssignCleanerInputData(AssignCleanerRequest request) throws JobNotFoundException {
+    private void validateAssignCleanerInputData(AssignCleanerRequest request)
+            throws JobNotFoundException {
         validateInputDataField(EMPLOYEE_ID, STRING, request.adminId());
         validateInputDataField(JOB_ID, STRING, request.jobId());
         for (String id : request.cleanerId()) {
@@ -181,7 +194,8 @@ public class JobService {
         validateInputDataField(DATE, STRING, request.date());
     }
 
-    private static void checkCustomerAuthorization(CustomerEntity customer, JobEntity job) throws UnauthorizedCallException {
+    private static void checkCustomerAuthorization(CustomerEntity customer, JobEntity job)
+            throws UnauthorizedCallException {
         if (job.getCustomer() != customer) {
             throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE +
                     "\nThe customer who booked the job is the only one allowed to cancel this booked cleaning.");
