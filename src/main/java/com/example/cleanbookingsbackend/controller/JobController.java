@@ -54,8 +54,23 @@ public class JobController {
         }
     }
 
+    @PutMapping("/executed-cleaning")
+    public ResponseEntity<?> executedCleaningRequest(@RequestBody JobRequest request) {
+
+       /* try {
+            jobService.assignCleanerRequest(request);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        } catch (NotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
+        }*/
+    }
+
     @DeleteMapping
-    public ResponseEntity<?> cancelJobRequest(@RequestBody CancelJobRequest request) {
+    public ResponseEntity<?> cancelJobRequest(@RequestBody JobRequest request) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(jobService.cancelJobRequest(request));
         } catch (IllegalArgumentException | UnauthorizedCallException exception) {

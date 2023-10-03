@@ -1,7 +1,7 @@
 package com.example.cleanbookingsbackend.service;
 
 import com.example.cleanbookingsbackend.dto.AssignCleanerRequest;
-import com.example.cleanbookingsbackend.dto.CancelJobRequest;
+import com.example.cleanbookingsbackend.dto.JobRequest;
 import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.JobType;
 import com.example.cleanbookingsbackend.dto.CreateJobRequest;
@@ -63,7 +63,7 @@ public class JobService {
         return convertToCreateJobResponseDTO(requestedJob);
     }
 
-    public boolean cancelJobRequest(CancelJobRequest request)
+    public boolean cancelJobRequest(JobRequest request)
             throws IllegalArgumentException, JobNotFoundException, NotFoundException, UnauthorizedCallException {
 
         validateCancelJobInputData(request);
@@ -109,7 +109,7 @@ public class JobService {
         jobRepository.save(job);
     }
 
-    private void authorizedCancellation(CancelJobRequest request) throws UnauthorizedCallException, NotFoundException, JobNotFoundException {
+    private void authorizedCancellation(JobRequest request) throws UnauthorizedCallException, NotFoundException, JobNotFoundException {
         Optional<CustomerEntity> customerOptional = customerRepository.findById(request.userId());
         Optional<EmployeeEntity> employeeOptional = employeeRepository.findById(request.userId());
 
@@ -139,7 +139,7 @@ public class JobService {
         }
     }
 
-    private void validateCancelJobInputData(CancelJobRequest request) {
+    private void validateCancelJobInputData(JobRequest request) {
         if (request.userId().isBlank())
             throw new IllegalArgumentException(USER_ID_REQUIRED_MESSAGE);
         validateInputDataField(JOB_ID, STRING, request.jobId());
