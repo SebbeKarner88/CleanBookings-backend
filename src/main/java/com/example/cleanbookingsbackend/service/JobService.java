@@ -95,33 +95,6 @@ public class JobService {
         mailSender.sendEmailConfirmationExecutedJob(job, cleaner);
     }
 
-    private void validateExecutedCleaningInputData(JobRequest request)
-            throws JobNotFoundException, EmployeeNotFoundException, IllegalArgumentException {
-        validateInputDataField(EMPLOYEE_ID, STRING, request.userId());
-        validateInputDataField(JOB_ID, STRING, request.jobId());
-        input.validateEmployeeId(request.userId()); // JUST FOR VALIDATION.
-        JobEntity job = input.validateJobId(request.jobId());
-        if(job.getStatus() == JobStatus.OPEN || job.getStatus() == JobStatus.CLOSED)
-            throw new IllegalArgumentException("A unassigned or finished job cant be marked as executed.");
-    }
-
-    private void validateAssignCleanerInputData(AssignCleanerRequest request) throws JobNotFoundException {
-        validateInputDataField(EMPLOYEE_ID, STRING, request.adminId());
-        validateInputDataField(JOB_ID, STRING, request.jobId());
-        for (String id : request.cleanerId()) {
-            validateInputDataField(EMPLOYEE_ID, STRING, id);
-            EmployeeEntity cleaner = input.validateEmployeeId(id);
-            if (!cleaner.getRole().equals(Role.CLEANER))
-                throw new IllegalArgumentException(INVALID_ROLE_MESSAGE);
-        }
-        JobEntity job = input.validateJobId(request.jobId());
-        if (job.getStatus().equals(JobStatus.CLOSED))
-            throw new IllegalArgumentException("The job with id " + request.jobId() + " has already been executed and closed.");
-        EmployeeEntity admin = input.validateEmployeeId(request.adminId());
-        if (!admin.getRole().equals(Role.ADMIN))
-            throw new IllegalArgumentException("Only an admin can assign a cleaner to a job.");
-    }
-
     private void assignCleaners(String jobId, List<String> cleanerIds) throws JobNotFoundException {
         JobEntity job = input.validateJobId(jobId);
         List<EmployeeEntity> cleaners = cleanerIds
@@ -157,14 +130,31 @@ public class JobService {
         jobRepository.deleteById(request.jobId());
     }
 
-    private static void checkCustomerAuthorization(CustomerEntity customer, JobEntity job) throws UnauthorizedCallException {
-        if (job.getCustomer() != customer) {
-            throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE +
-                    "\nThe customer who booked the job is the only one allowed to cancel this booked cleaning.");
+    private void validateExecutedCleaningInputData(JobRequest request)
+            throws JobNotFoundException, EmployeeNotFoundException, IllegalArgumentException {
+        validateInputDataField(EMPLOYEE_ID, STRING, request.userId());
+        validateInputDataField(JOB_ID, STRING, request.jobId());
+        input.validateEmployeeId(request.userId()); // JUST FOR VALIDATION.
+        JobEntity job = input.validateJobId(request.jobId());
+        if(job.getStatus() == JobStatus.OPEN || job.getStatus() == JobStatus.CLOSED)
+            throw new IllegalArgumentException("A unassigned or finished job cant be marked as executed.");
+    }
+
+    private void validateAssignCleanerInputData(AssignCleanerRequest request) throws JobNotFoundException {
+        validateInputDataField(EMPLOYEE_ID, STRING, request.adminId());
+        validateInputDataField(JOB_ID, STRING, request.jobId());
+        for (String id : request.cleanerId()) {
+            validateInputDataField(EMPLOYEE_ID, STRING, id);
+            EmployeeEntity cleaner = input.validateEmployeeId(id);
+            if (!cleaner.getRole().equals(Role.CLEANER))
+                throw new IllegalArgumentException(INVALID_ROLE_MESSAGE);
         }
-        if (job.getStatus() != JobStatus.OPEN && job.getStatus() != JobStatus.ASSIGNED) {
-            throw new UnauthorizedCallException(CANCEL_COMPLETED_JOB_MESSAGE);
-        }
+        JobEntity job = input.validateJobId(request.jobId());
+        if (job.getStatus().equals(JobStatus.CLOSED))
+            throw new IllegalArgumentException("The job with id " + request.jobId() + " has already been executed and closed.");
+        EmployeeEntity admin = input.validateEmployeeId(request.adminId());
+        if (!admin.getRole().equals(Role.ADMIN))
+            throw new IllegalArgumentException("Only an admin can assign a cleaner to a job.");
     }
 
     private void validateCancelJobInputData(JobRequest request) {
@@ -176,6 +166,16 @@ public class JobService {
     private void validateJobRequestInputData(CreateJobRequest request) {
         validateInputDataField(CUSTOMER_ID, STRING, request.customerId());
         validateInputDataField(DATE, STRING, request.date());
+    }
+
+    private static void checkCustomerAuthorization(CustomerEntity customer, JobEntity job) throws UnauthorizedCallException {
+        if (job.getCustomer() != customer) {
+            throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE +
+                    "\nThe customer who booked the job is the only one allowed to cancel this booked cleaning.");
+        }
+        if (job.getStatus() != JobStatus.OPEN && job.getStatus() != JobStatus.ASSIGNED) {
+            throw new UnauthorizedCallException(CANCEL_COMPLETED_JOB_MESSAGE);
+        }
     }
 
     private CreateJobResponse convertToCreateJobResponseDTO(JobEntity job) {
