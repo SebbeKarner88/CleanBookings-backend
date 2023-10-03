@@ -84,10 +84,18 @@ public class JobService {
         reportExecutedCleaning(request);
     }
 
-    private void reportExecutedCleaning(JobRequest request) {
+    private void reportExecutedCleaning(JobRequest request)
+            throws JobNotFoundException {
 
-        // WIP
+        JobEntity job = input.validateJobId(request.jobId());
+        EmployeeEntity cleaner = input.validateEmployeeId(request.userId());
 
+        if (!job.getEmployee().contains(cleaner))
+            throw new IllegalArgumentException("You can only report jobs you are assigned to.");
+
+        job.setStatus(JobStatus.WAITING_FOR_APPROVAL);
+        jobRepository.save(job);
+        mailSender.sendEmailConfirmationExecutedJob(job, cleaner);
     }
 
     private void validateExecutedCleaningInputData(JobRequest request)
@@ -95,7 +103,7 @@ public class JobService {
         validateInputDataField(EMPLOYEE_ID, STRING, request.userId());
         validateInputDataField(JOB_ID, STRING, request.jobId());
 
-        EmployeeEntity cleaner = input.validateEmployeeId(request.userId());
+        input.validateEmployeeId(request.userId()); // JUST FOR VALIDATION.
         JobEntity job = input.validateJobId(request.jobId());
 
         if(job.getStatus() == JobStatus.OPEN || job.getStatus() == JobStatus.CLOSED)

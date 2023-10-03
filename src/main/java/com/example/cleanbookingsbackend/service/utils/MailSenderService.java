@@ -54,4 +54,17 @@ public class MailSenderService {
         }
     }
 
+    public void sendEmailConfirmationExecutedJob(JobEntity job, EmployeeEntity cleaner) {
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setFrom("order.cleanbookings@gmail.com");
+        msg.setTo(job.getCustomer().getEmailAddress());
+        msg.setSubject("Städning Slutförd!");
+        msg.setText("Hej " + job.getCustomer().getFirstName() + "! /n/nNu har " + cleaner.getFirstName() + " slutfört sin städning hos dig." +
+                "/n/nVi hoppas att ni är nöjd med arbetet, navigera till CleanBookings för att godkänna/underkänna städningen.");
+        try {
+            mailSender.send(msg);
+        } catch (MailException exception) {
+            System.out.println("Email couldn't be sent: " + exception.getMessage());
+        }
+    }
 }
