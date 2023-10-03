@@ -17,14 +17,15 @@ public class GDPRController {
         this.customerService = customerService;
     }
 
-    @GetMapping("/customer-data/{customerId}")
-    public ResponseEntity<CustomerDataResponse> getCustomerData(@PathVariable String customerId) {
-        try {
-            CustomerEntity customer = customerService.getCustomerById(customerId);
-            CustomerDataResponse response = CustomerDataResponse.fromEntity(customer);
-            return ResponseEntity.ok(response);
-        } catch (CustomerNotFoundException ex) {
-            return ResponseEntity.notFound().build();
-        }
-    }
+//    TODO: This is commented-out since it won't compile when the methods referenced doesn't exist
+//    @GetMapping("/customer-data/{customerId}")
+//    public ResponseEntity<CustomerDataResponse> getCustomerData(@PathVariable String customerId) {
+//        try {
+//            CustomerEntity customer = customerService.getCustomerById(customerId);
+//            CustomerDataResponse response = CustomerDataResponse.fromEntity(customer);
+//            return ResponseEntity.ok(response);
+//        } catch (CustomerNotFoundException ex) {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
 }

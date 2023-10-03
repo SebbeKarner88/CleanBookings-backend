@@ -3,6 +3,8 @@ package com.example.cleanbookingsbackend.service;
 import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.JobType;
+import com.example.cleanbookingsbackend.dto.CreateJobRequest;
+import com.example.cleanbookingsbackend.dto.CreateJobResponse;
 import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
@@ -18,10 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataField.*;
 import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataType.*;
@@ -67,9 +66,46 @@ public class JobService {
     }
 
     public void assignCleanerRequest(AssignCleanerRequest request)
-            throws NotFoundException, ValidationException, UnauthorizedCallException, JobNotFoundException {
-        validateAssignCleanerInputData(request);
-        assignCleaners(request.jobId(), request.cleanerId());
+            throws EmployeeNotFoundException, JobNotFoundException, IllegalArgumentException {
+        if (isValidAssignRequest(request))
+            assignCleanersAndSendEmailConfirmation(request.jobId(), request.cleanerIds());
+    }
+
+    private void assignCleanersAndSendEmailConfirmation(String jobId, List<String> cleanerIds) throws JobNotFoundException {
+        JobEntity job = input.validateJobId(jobId);
+        List<EmployeeEntity> assignedCleaners = job.getEmployee();
+
+        // Filter out cleaners that are already assigned to the requested job
+        List<String> newCleanerIds = cleanerIds
+                .stream()
+                .filter(id -> assignedCleaners
+                        .stream()
+                        .noneMatch(assignedCleaner -> assignedCleaner.getId().equals(id)))
+                .toList();
+
+        // Send email notifications to the newly assigned cleaners
+        newCleanerIds.forEach(id -> {
+            EmployeeEntity cleaner = input.validateEmployeeId(id);
+            mailSender.sendEmailConfirmationOnAssignedJob(cleaner, job);
+        });
+
+        // Combine the old and new cleaners
+        List<EmployeeEntity> updatedListOfCleaners = new ArrayList<>(assignedCleaners);
+        updatedListOfCleaners.addAll(
+                newCleanerIds
+                        .stream()
+                        .map(input::validateEmployeeId)
+                        .toList()
+        );
+
+        // Update the JobEntity with the combined list of cleaners
+        job.setEmployee(updatedListOfCleaners);
+
+        // Set the status to ASSIGNED if this is the first time
+        if (job.getStatus() == JobStatus.OPEN)
+            job.setStatus(JobStatus.ASSIGNED);
+
+        jobRepository.save(job);
     }
 
     public void executedCleaningRequest(JobUserRequest request)
@@ -116,22 +152,6 @@ public class JobService {
         mailSender.sendEmailConfirmationExecutedJob(job, cleaner);
     }
 
-    private void assignCleaners(String jobId, List<String> cleanerIds)
-            throws JobNotFoundException {
-        JobEntity job = input.validateJobId(jobId);
-        List<EmployeeEntity> cleaners = cleanerIds
-                .stream()
-                .map(id -> {
-                    EmployeeEntity cleaner = input.validateEmployeeId(id);
-                    mailSender.sendEmailConfirmationOnAssignedJob(cleaner, job);
-                    return cleaner;
-                })
-                .toList();
-        job.setEmployee(cleaners);
-        job.setStatus(JobStatus.ASSIGNED);
-        jobRepository.save(job);
-    }
-
     private void authorizedCancellation(JobUserRequest request)
             throws UnauthorizedCallException, NotFoundException, JobNotFoundException {
         Optional<CustomerEntity> customerOptional = customerRepository.findById(request.userId());
@@ -173,22 +193,27 @@ public class JobService {
             throw new IllegalArgumentException("A unassigned or finished job cant be marked as executed.");
     }
 
-    private void validateAssignCleanerInputData(AssignCleanerRequest request)
-            throws JobNotFoundException {
+    private boolean isValidAssignRequest(AssignCleanerRequest request)
+            throws EmployeeNotFoundException, JobNotFoundException, IllegalArgumentException {
         validateInputDataField(EMPLOYEE_ID, STRING, request.adminId());
-        validateInputDataField(JOB_ID, STRING, request.jobId());
-        for (String id : request.cleanerId()) {
-            validateInputDataField(EMPLOYEE_ID, STRING, id);
-            EmployeeEntity cleaner = input.validateEmployeeId(id);
-            if (!cleaner.getRole().equals(Role.CLEANER))
-                throw new IllegalArgumentException(INVALID_ROLE_MESSAGE);
-        }
-        JobEntity job = input.validateJobId(request.jobId());
-        if (job.getStatus().equals(JobStatus.CLOSED))
-            throw new IllegalArgumentException("The job with id " + request.jobId() + " has already been executed and closed.");
         EmployeeEntity admin = input.validateEmployeeId(request.adminId());
         if (!admin.getRole().equals(Role.ADMIN))
             throw new IllegalArgumentException("Only an admin can assign a cleaner to a job.");
+
+        validateInputDataField(JOB_ID, STRING, request.jobId());
+        JobEntity job = input.validateJobId(request.jobId());
+        if (job.getStatus().equals(JobStatus.CLOSED)) {
+            throw new IllegalArgumentException("The job with id " + request.jobId() + " has already been executed and closed.");
+        }
+
+        for (String id : request.cleanerIds()) {
+            validateInputDataField(EMPLOYEE_ID, STRING, id);
+            EmployeeEntity cleaner = input.validateEmployeeId(id);
+            if (!cleaner.getRole().equals(Role.CLEANER)) {
+                throw new IllegalArgumentException(INVALID_ROLE_MESSAGE);
+            }
+        }
+        return true;
     }
 
     private void validateCancelJobInputData(JobUserRequest request) {

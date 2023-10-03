@@ -47,7 +47,7 @@ public class JobController {
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
-        } catch (ValidationException | NotFoundException | UnauthorizedCallException exception) {
+        } catch (EmployeeNotFoundException | JobNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
@@ -109,18 +109,19 @@ public class JobController {
         return ResponseEntity.ok(jobDtos);
     }
 
-    @GetMapping("/booking-history/{customerId}")
-    public ResponseEntity<List<JobDto>> getBookingHistory(@PathVariable String customerId) {
-        System.out.println("Received customerId: " + customerId);
-        List<JobEntity> jobs = jobService.getBookingHistoryForCustomer(customerId);
-
-        // Convert JobEntity objects to JobDto objects
-        List<JobDto> jobDtos = jobs.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(jobDtos);
-    }
+//    TODO: Commented-out since it won't compile
+//    @GetMapping("/booking-history/{customerId}")
+//    public ResponseEntity<List<JobDto>> getBookingHistory(@PathVariable String customerId) {
+//        System.out.println("Received customerId: " + customerId);
+//        List<JobEntity> jobs = jobService.getBookingHistoryForCustomer(customerId);
+//
+//        // Convert JobEntity objects to JobDto objects
+//        List<JobDto> jobDtos = jobs.stream()
+//                .map(this::convertToDto)
+//                .collect(Collectors.toList());
+//
+//        return ResponseEntity.ok(jobDtos);
+//    }
 
     private JobDto convertToDto(JobEntity jobEntity) {
         JobDto jobDto = new JobDto();
