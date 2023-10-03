@@ -88,9 +88,17 @@ public class JobService {
             throws JobNotFoundException {
         JobEntity job = input.validateJobId(request.jobId());
 
-        // WIP
+        job.setMessage(request.message()); // Setting a message to let cleaner/admin know what needs to be supplemented for an approval etc.
 
-
+        if (request.isApproved()) {
+            job.setStatus(JobStatus.APPROVED);
+            // WIP mailSender.sendEmailConfirmationApprovedJob(request);
+            jobRepository.save(job);
+        } else {
+            job.setStatus(JobStatus.NOT_APPROVED);
+            // WIP mailSender.sendEmailConfirmationFailedJob(request);
+            jobRepository.save(job);
+        }
     }
 
     public List<JobEntity> getBookedCleaningsForCustomer(String customerId) {
