@@ -72,7 +72,7 @@ public class JobController {
     public ResponseEntity<?> approvedCleaningRequest(@RequestBody JobApproveRequest request) {
 
         try {
-            jobService.approvedCleaningRequest(request);
+            jobService.approveDeclineCleaningRequest(request);
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());

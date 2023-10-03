@@ -77,14 +77,14 @@ public class JobService {
         reportExecutedCleaning(request);
     }
 
-    public void approvedCleaningRequest(JobApproveRequest request)
+    public void approveDeclineCleaningRequest(JobApproveRequest request)
     throws IllegalArgumentException, EmployeeNotFoundException, JobNotFoundException {
         validateApprovedCleaningInputData(request);
-
+        approveDeclineCleaning(request);
     }
 
-    private void validateApprovedCleaningInputData(JobApproveRequest request) {
-        //WIP
+    private void approveDeclineCleaning(JobApproveRequest request) {
+        // WIP
     }
 
     public List<JobEntity> getBookedCleaningsForCustomer(String customerId) {
@@ -135,6 +135,12 @@ public class JobService {
                     "\nOnly " + Role.ADMIN + " are allowed to cancel a booked cleaning.");
         }
         jobRepository.deleteById(request.jobId());
+    }
+
+    private void validateApprovedCleaningInputData(JobApproveRequest request)
+            throws JobNotFoundException {
+        validateInputDataField(JOB_ID, STRING, request.jobId());
+        JobEntity job = input.validateJobId(request.jobId());
     }
 
     private void validateExecutedCleaningInputData(JobUserRequest request)
