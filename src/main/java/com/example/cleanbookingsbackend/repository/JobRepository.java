@@ -23,4 +23,7 @@ public interface JobRepository extends JpaRepository <JobEntity, String> {
     List<JobEntity> findJobsByCustomerIdAndStatusNotClosed(@Param("customerId") String customerId);
 
     List<JobEntity> findByCustomer_Id(String customerId);
+
+    @Query("SELECT j FROM JobEntity j WHERE j.customer.id = :customerId AND j.status = 'CLOSED'")
+    List<JobEntity> findJobsByCustomerIdAndStatusClosed(@Param("customerId") String customerId);
 }

@@ -209,4 +209,10 @@ public class JobService {
         return jobRepository.findJobsByCustomerIdAndStatusNotClosed(customerId);
     }
 
+    public List<JobEntity> getBookingHistoryForCustomer(String customerId) {
+
+//        return jobRepository.findByCustomer_Id(customerId);
+        return jobRepository.findJobsByCustomerIdAndStatusClosed(customerId);
+    }
+
 }
