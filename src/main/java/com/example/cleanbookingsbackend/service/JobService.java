@@ -214,6 +214,9 @@ public class JobService {
             throw new IllegalArgumentException("The job with id " + request.jobId() + " has already been executed and closed.");
         }
 
+        if (request.cleanerIds() == null)
+            throw new IllegalArgumentException("A list of employee ids is required.");
+
         for (String id : request.cleanerIds()) {
             validateInputDataField(EMPLOYEE_ID, STRING, id);
             EmployeeEntity cleaner = input.validateEmployeeId(id);
