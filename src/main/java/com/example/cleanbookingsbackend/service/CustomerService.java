@@ -21,7 +21,7 @@ public class CustomerService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public CustomerResponseDTO create(CustomerRegistrationDTO request)
+    public AuthenticationResponse create(CustomerRegistrationDTO request)
             throws ValidationException,
             UsernameIsTakenException,
             RuntimeException {
@@ -38,7 +38,7 @@ public class CustomerService {
 
         try {
             customerRepository.save(customer);
-            return toDTO(customer);
+            return new AuthenticationResponse(customer.getId(), customer.getFirstName());
         } catch (Exception e) {
             throw new RuntimeException("Could not save customer");
         }
@@ -53,21 +53,6 @@ public class CustomerService {
             throw new AuthException("The password is incorrect");
 
         return new AuthenticationResponse(customer.getId(), customer.getFirstName());
-    }
-
-    //###### DTO #######
-    public static CustomerResponseDTO toDTO(CustomerEntity response) {
-        return new CustomerResponseDTO(
-                response.getId(),
-                response.getFirstName(),
-                response.getLastName(),
-                response.getCustomerType(),
-                response.getStreetAddress(),
-                response.getPostalCode(),
-                response.getCity(),
-                response.getPhoneNumber(),
-                response.getEmailAddress()
-        );
     }
 
     // ##### Validation #####

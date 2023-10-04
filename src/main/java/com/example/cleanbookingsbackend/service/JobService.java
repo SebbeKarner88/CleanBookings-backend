@@ -269,7 +269,7 @@ public class JobService {
                 .builder()
                 .jobId(job.getId())
                 .jobType(job.getType())
-                .date(DATE_FORMAT.format(job.getBookedDate()))
+                .date(new SimpleDateFormat("yyyy-MM-dd hh:mm").format(job.getBookedDate()))
                 .customer(customerDto)
                 .message(job.getMessage())
                 .build();
