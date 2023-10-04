@@ -89,22 +89,10 @@ public class JobService {
 
     public void reissueFailedCleaningRequest(JobUserRequest request)
             throws JobNotFoundException, EmployeeNotFoundException, UnauthorizedCallException {
-        isValidreissueFailedCleaningRequest(request);
+        isValidReissueFailedCleaningRequest(request);
 
         // Todo: Write logic for re-issuing a job that has been failed by customer
 
-    }
-
-    private void isValidreissueFailedCleaningRequest(JobUserRequest request)
-            throws JobNotFoundException, EmployeeNotFoundException, UnauthorizedCallException {
-        validateInputDataField(EMPLOYEE_ID, STRING, request.userId());
-        validateInputDataField(JOB_ID, STRING, request.jobId());
-        EmployeeEntity admin = input.validateEmployeeId(request.userId());
-        JobEntity job = input.validateJobId(request.jobId());
-        if (admin.getRole() != Role.ADMIN)
-            throw new UnauthorizedCallException("Only an administrator can re-issue failed jobs.");
-        if (job.getStatus() != JobStatus.NOT_APPROVED)
-            throw new UnauthorizedCallException("Only NOT_APPROVED jobs can be re-issued.");
     }
 
     public List<JobEntity> getBookedCleaningsForCustomer(String customerId) {
@@ -198,6 +186,18 @@ public class JobService {
                     "\nOnly " + Role.ADMIN + " are allowed to cancel a booked cleaning.");
         }
         jobRepository.deleteById(request.jobId());
+    }
+
+    private void isValidReissueFailedCleaningRequest(JobUserRequest request)
+            throws JobNotFoundException, EmployeeNotFoundException, UnauthorizedCallException {
+        validateInputDataField(EMPLOYEE_ID, STRING, request.userId());
+        validateInputDataField(JOB_ID, STRING, request.jobId());
+        EmployeeEntity admin = input.validateEmployeeId(request.userId());
+        JobEntity job = input.validateJobId(request.jobId());
+        if (admin.getRole() != Role.ADMIN)
+            throw new UnauthorizedCallException("Only an administrator can re-issue failed jobs.");
+        if (job.getStatus() != JobStatus.NOT_APPROVED)
+            throw new UnauthorizedCallException("Only NOT_APPROVED jobs can be re-issued.");
     }
 
     private boolean isValidApproveDeclineCleaningRequest(JobApproveRequest request)
