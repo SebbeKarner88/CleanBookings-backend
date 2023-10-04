@@ -202,9 +202,9 @@ public class JobService {
         validateInputDataField(EMPLOYEE_ID, STRING, request.userId());
         validateInputDataField(JOB_ID, STRING, request.jobId());
         EmployeeEntity admin = input.validateEmployeeId(request.userId());
-        JobEntity job = input.validateJobId(request.jobId());
         if (admin.getRole() != Role.ADMIN)
             throw new UnauthorizedCallException("Only an administrator can re-issue failed jobs.");
+        JobEntity job = input.validateJobId(request.jobId());
         if (job.getStatus() != JobStatus.NOT_APPROVED)
             throw new UnauthorizedCallException("Only NOT_APPROVED jobs can be re-issued.");
     }

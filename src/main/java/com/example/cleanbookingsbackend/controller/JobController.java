@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/job")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class JobController {
     private final JobService jobService;
 
