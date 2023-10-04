@@ -107,4 +107,20 @@ public class MailSenderService {
             System.out.println("Email couldn't be sent: " + exception.getMessage());
         }
     }
+
+    public void sendEmailConfirmationReissuedJob(JobEntity job) {
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setFrom("order.cleanbookings@gmail.com");
+        msg.setSubject("Backjobb på jobb" + job.getType() + " hos " + job.getCustomer().getFirstName() + " " + job.getCustomer().getLastName() + ".");
+        msg.setText("Kärna Kollega! \n\nVi har tyvärr fått ett backjobb på " + job.getType() + " hos " + job.getCustomer().getFirstName() + " " + job.getCustomer().getLastName() + ".\n\n" +
+                "Vi ber dig därför att så snart som möjligt åtgärda de punkter kunden kommenterat i svaret. Tack!\n\n" + job.getMessage() + "\n\n Städafint AB.");
+        try {
+            for (EmployeeEntity cleaner : job.getEmployee()) {
+                msg.setTo(cleaner.getEmailAddress());
+                mailSender.send(msg);
+            }
+        } catch (MailException exception) {
+            System.out.println("Email couldn't be sent: " + exception.getMessage());
+        }
+    }
 }

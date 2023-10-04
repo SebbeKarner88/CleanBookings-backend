@@ -90,9 +90,14 @@ public class JobService {
     public void reissueFailedCleaningRequest(JobUserRequest request)
             throws JobNotFoundException, EmployeeNotFoundException, UnauthorizedCallException {
         isValidReissueFailedCleaningRequest(request);
+        reissueCleaning(request);
+    }
 
-        // Todo: Write logic for re-issuing a job that has been failed by customer
-
+    private void reissueCleaning(JobUserRequest request) throws JobNotFoundException {
+        JobEntity reIssuedJob = input.validateJobId(request.jobId());
+        reIssuedJob.setStatus(JobStatus.ASSIGNED);
+        jobRepository.save(reIssuedJob);
+        mailSender.sendEmailConfirmationReissuedJob(reIssuedJob);
     }
 
     public List<JobEntity> getBookedCleaningsForCustomer(String customerId) {
