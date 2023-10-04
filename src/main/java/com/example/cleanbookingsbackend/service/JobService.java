@@ -99,6 +99,10 @@ public class JobService {
         return jobRepository.findByCustomer_Id(customerId);
     }
 
+    public List<JobEntity> getBookingHistoryForCustomer(String customerId) {
+        return jobRepository.findJobsByCustomerIdAndStatusClosed(customerId);
+    }
+
     private void updateJobStatusAndMessage(JobApproveRequest request)
             throws JobNotFoundException {
         JobEntity job = input.validateJobId(request.jobId());

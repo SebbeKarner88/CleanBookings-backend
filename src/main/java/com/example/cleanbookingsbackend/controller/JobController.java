@@ -122,18 +122,18 @@ public class JobController {
     }
 
 //    TODO: Commented-out since it won't compile
-//    @GetMapping("/booking-history/{customerId}")
-//    public ResponseEntity<List<JobDto>> getBookingHistory(@PathVariable String customerId) {
-//        System.out.println("Received customerId: " + customerId);
-//        List<JobEntity> jobs = jobService.getBookingHistoryForCustomer(customerId);
-//
-//        // Convert JobEntity objects to JobDto objects
-//        List<JobDto> jobDtos = jobs.stream()
-//                .map(this::convertToDto)
-//                .collect(Collectors.toList());
-//
-//        return ResponseEntity.ok(jobDtos);
-//    }
+    @GetMapping("/booking-history/{customerId}")
+    public ResponseEntity<List<JobDto>> getBookingHistory(@PathVariable String customerId) {
+        System.out.println("Received customerId: " + customerId);
+        List<JobEntity> jobs = jobService.getBookingHistoryForCustomer(customerId);
+
+        // Convert JobEntity objects to JobDto objects
+        List<JobDto> jobDtos = jobs.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(jobDtos);
+    }
 
     private JobDto convertToDto(JobEntity jobEntity) {
         JobDto jobDto = new JobDto();

@@ -55,6 +55,7 @@ public class CustomerService {
         return new AuthenticationResponse(customer.getId(), customer.getFirstName());
     }
 
+
     // ##### Validation #####
     private boolean isValidEmailAddress(String email) {
         return email.length() >= 5 && email.contains("@");
@@ -100,5 +101,10 @@ public class CustomerService {
                 passwordEncoder.encode(request.password()),
                 null
         );
+    }
+
+    public CustomerEntity getCustomerById(String customerId) {
+        return customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with ID: " + customerId));
     }
 }
