@@ -61,7 +61,7 @@ public class JobService {
 
     public boolean cancelJobRequest(JobUserRequest request)
             throws IllegalArgumentException, JobNotFoundException, NotFoundException, UnauthorizedCallException {
-        if(isValidCancelJobRequest(request)){
+        if (isValidCancelJobRequest(request)) {
             authorizedCancellation(request);
             mailSender.sendEmailConfirmationCanceledJob(jobRepository.findById(request.jobId()).get());
         }
@@ -113,13 +113,13 @@ public class JobService {
 
     public void executedCleaningRequest(JobUserRequest request)
             throws IllegalArgumentException, EmployeeNotFoundException, JobNotFoundException {
-        if(isValidExecutedCleaningRequest(request))
+        if (isValidExecutedCleaningRequest(request))
             reportExecutedCleaning(request);
     }
 
     public void approveDeclineCleaningRequest(JobApproveRequest request)
             throws IllegalArgumentException, EmployeeNotFoundException, JobNotFoundException, CustomerNotFoundException, UnauthorizedCallException {
-        if(isValidApproveDeclineCleaningRequest(request))
+        if (isValidApproveDeclineCleaningRequest(request))
             updateJobStatusAndMessage(request);
     }
 
@@ -127,16 +127,18 @@ public class JobService {
             throws JobNotFoundException {
         JobEntity job = input.validateJobId(request.jobId());
 
-//        TODO: Add a if-statement to check if there's a message and if so concat with old?
-        job.setMessage(request.message()); // Setting a message to let cleaner/admin know what needs to be supplemented for an approval etc.
+        if (!request.message().isBlank()) {
+            String addedMessage = "/n/nCustomer message " + new Date(System.currentTimeMillis()) + "/n/nMessage: -" + request.message() + ".";
+            job.setMessage(request.message().concat(addedMessage));
+        }
 
         if (request.isApproved()) {
             job.setStatus(JobStatus.APPROVED);
-            // WIP mailSender.sendEmailConfirmationApprovedJob(request);
+            mailSender.sendEmailConfirmationApprovedJob(job);
             jobRepository.save(job);
         } else {
             job.setStatus(JobStatus.NOT_APPROVED);
-            // WIP mailSender.sendEmailConfirmationFailedJob(request);
+            mailSender.sendEmailConfirmationFailedJob(job);
             jobRepository.save(job);
         }
     }
@@ -194,7 +196,7 @@ public class JobService {
         validateInputDataField(JOB_ID, STRING, request.jobId());
         input.validateEmployeeId(request.userId()); // JUST FOR VALIDATION.
         JobEntity job = input.validateJobId(request.jobId());
-        if(job.getStatus() == JobStatus.OPEN || job.getStatus() == JobStatus.CLOSED)
+        if (job.getStatus() == JobStatus.OPEN || job.getStatus() == JobStatus.CLOSED)
             throw new IllegalArgumentException("A unassigned or finished job cant be marked as executed.");
         return true;
     }
