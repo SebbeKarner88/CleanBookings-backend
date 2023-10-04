@@ -128,8 +128,8 @@ public class JobService {
         JobEntity job = input.validateJobId(request.jobId());
 
         if (!request.message().isBlank()) {
-            String addedMessage = "/n/nCustomer message " + new Date(System.currentTimeMillis()) + "/n/nMessage: -" + request.message() + ".";
-            job.setMessage(request.message().concat(addedMessage));
+            String addedMessage = "/n/nCustomer message " + new Date(System.currentTimeMillis()) + "/nMessage: " + request.message() + ".";
+            job.setMessage(job.getMessage().concat(addedMessage));
         }
 
         if (request.isApproved()) {

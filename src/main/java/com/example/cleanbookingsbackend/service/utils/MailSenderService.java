@@ -102,12 +102,10 @@ public class MailSenderService {
         msg.setText("Hej " + job.getCustomer().getFirstName() + "! /n/nHär kommer en bekräftelse på att vi mottagit ert meddelande." +
                 "/n/nVi ber om ursäkt att vårat jobb inte levde upp till era förväntningar. /nVi har meddelat våra städare och åtgärd kommer att utföras inom kort. /n/n" +
                 "StädaFint AB");
-
         try {
             mailSender.send(msg);
         } catch (MailException exception) {
             System.out.println("Email couldn't be sent: " + exception.getMessage());
         }
-
     }
 }
