@@ -70,7 +70,6 @@ public class JobController {
 
     @PutMapping("/approved-cleaning")
     public ResponseEntity<?> approvedCleaningRequest(@RequestBody JobApproveRequest request) {
-
         try {
             jobService.approveDeclineCleaningRequest(request);
             return ResponseEntity.status(HttpStatus.OK).build();
@@ -100,7 +99,6 @@ public class JobController {
     public ResponseEntity<List<JobDto>> getBookedCleanings(@PathVariable String customerId) {
         System.out.println("Received customerId: " + customerId);
         List<JobEntity> jobs = jobService.getBookedCleaningsForCustomer(customerId);
-
         // Convert JobEntity objects to JobDto objects
         List<JobDto> jobDtos = jobs.stream()
                 .map(this::convertToDto)
@@ -133,6 +131,4 @@ public class JobController {
 
         return jobDto;
     }
-
-
 }
