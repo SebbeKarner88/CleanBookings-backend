@@ -16,6 +16,7 @@ import com.example.cleanbookingsbackend.repository.JobRepository;
 import com.example.cleanbookingsbackend.service.utils.InputValidation;
 import com.example.cleanbookingsbackend.service.utils.MailSenderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.batch.BatchProperties;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -74,6 +75,62 @@ public class JobService {
             assignCleanersAndSendEmailConfirmation(request.jobId(), request.cleanerIds());
     }
 
+    public void executedCleaningRequest(JobUserRequest request)
+            throws IllegalArgumentException, EmployeeNotFoundException, JobNotFoundException {
+        if (isValidExecutedCleaningRequest(request))
+            reportExecutedCleaning(request);
+    }
+
+    public void approveDeclineCleaningRequest(JobApproveRequest request)
+            throws IllegalArgumentException, EmployeeNotFoundException, JobNotFoundException, CustomerNotFoundException, UnauthorizedCallException {
+        if (isValidApproveDeclineCleaningRequest(request))
+            updateJobStatusAndMessage(request);
+    }
+
+    public void reissueFailedCleaningRequest(JobUserRequest request)
+            throws JobNotFoundException, EmployeeNotFoundException, UnauthorizedCallException {
+        isValidreissueFailedCleaningRequest(request);
+
+        // Todo: Write logic for re-issuing a job that has been failed by customer
+
+    }
+
+    private void isValidreissueFailedCleaningRequest(JobUserRequest request)
+            throws JobNotFoundException, EmployeeNotFoundException, UnauthorizedCallException {
+        validateInputDataField(EMPLOYEE_ID, STRING, request.userId());
+        validateInputDataField(JOB_ID, STRING, request.jobId());
+        EmployeeEntity admin = input.validateEmployeeId(request.userId());
+        JobEntity job = input.validateJobId(request.jobId());
+        if (admin.getRole() != Role.ADMIN)
+            throw new UnauthorizedCallException("Only an administrator can re-issue failed jobs.");
+        if (job.getStatus() != JobStatus.NOT_APPROVED)
+            throw new UnauthorizedCallException("Only NOT_APPROVED jobs can be re-issued.");
+    }
+
+    public List<JobEntity> getBookedCleaningsForCustomer(String customerId) {
+        return jobRepository.findByCustomer_Id(customerId);
+    }
+
+    private void updateJobStatusAndMessage(JobApproveRequest request)
+            throws JobNotFoundException {
+        JobEntity job = input.validateJobId(request.jobId());
+
+        if (!request.message().isBlank()) {
+            String addedMessage = "\n\nCustomer message " + new SimpleDateFormat("yyyy-MM-dd hh:mm").format(System.currentTimeMillis()) + "\nMessage: " + request.message() + ".";
+            job.setMessage(job.getMessage().concat(addedMessage));
+        }
+
+        if (request.isApproved()) {
+            job.setStatus(JobStatus.APPROVED);
+            mailSender.sendEmailConfirmationApprovedJob(job);
+            jobRepository.save(job);
+        } else {
+            job.setStatus(JobStatus.NOT_APPROVED);
+            mailSender.sendEmailConfirmationFailedJob(job);
+            jobRepository.save(job);
+        }
+    }
+
     private void assignCleanersAndSendEmailConfirmation(String jobId, List<String> cleanerIds) throws JobNotFoundException {
         JobEntity job = input.validateJobId(jobId);
         List<EmployeeEntity> assignedCleaners = job.getEmployee();
@@ -109,42 +166,6 @@ public class JobService {
             job.setStatus(JobStatus.ASSIGNED);
 
         jobRepository.save(job);
-    }
-
-    public void executedCleaningRequest(JobUserRequest request)
-            throws IllegalArgumentException, EmployeeNotFoundException, JobNotFoundException {
-        if (isValidExecutedCleaningRequest(request))
-            reportExecutedCleaning(request);
-    }
-
-    public void approveDeclineCleaningRequest(JobApproveRequest request)
-            throws IllegalArgumentException, EmployeeNotFoundException, JobNotFoundException, CustomerNotFoundException, UnauthorizedCallException {
-        if (isValidApproveDeclineCleaningRequest(request))
-            updateJobStatusAndMessage(request);
-    }
-
-    private void updateJobStatusAndMessage(JobApproveRequest request)
-            throws JobNotFoundException {
-        JobEntity job = input.validateJobId(request.jobId());
-
-        if (!request.message().isBlank()) {
-            String addedMessage = "\n\nCustomer message " + new SimpleDateFormat("yyyy-MM-dd hh:mm").format(System.currentTimeMillis()) + "\nMessage: " + request.message() + ".";
-            job.setMessage(job.getMessage().concat(addedMessage));
-        }
-
-        if (request.isApproved()) {
-            job.setStatus(JobStatus.APPROVED);
-            mailSender.sendEmailConfirmationApprovedJob(job);
-            jobRepository.save(job);
-        } else {
-            job.setStatus(JobStatus.NOT_APPROVED);
-            mailSender.sendEmailConfirmationFailedJob(job);
-            jobRepository.save(job);
-        }
-    }
-
-    public List<JobEntity> getBookedCleaningsForCustomer(String customerId) {
-        return jobRepository.findByCustomer_Id(customerId);
     }
 
     private void reportExecutedCleaning(JobUserRequest request)

@@ -82,6 +82,20 @@ public class JobController {
         }
     }
 
+    @PutMapping("/reissue-failed-cleaning")
+    public ResponseEntity<?> reissueFailedCleaningRequest(@RequestBody JobUserRequest request) {
+        try {
+            jobService.reissueFailedCleaningRequest(request);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (IllegalArgumentException | UnauthorizedCallException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        } catch (JobNotFoundException | EmployeeNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
+        }
+    }
+
     @DeleteMapping
     public ResponseEntity<?> cancelJobRequest(@RequestBody JobUserRequest request) {
         try {
