@@ -4,8 +4,9 @@ import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface EmployeeRepository extends JpaRepository<EmployeeEntity, String> {
-
-    EmployeeEntity findByEmailAddress(String email);
+    Optional<EmployeeEntity> findByEmailAddress(String email);
 }
