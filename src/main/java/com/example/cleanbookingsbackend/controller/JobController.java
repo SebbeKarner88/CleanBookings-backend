@@ -67,7 +67,7 @@ public class JobController {
         }
     }
 
-    @PutMapping("/approved-cleaning")
+    @PutMapping("/approve-fail-cleaning")
     public ResponseEntity<?> approvedCleaningRequest(@RequestBody JobApproveRequest request) {
         try {
             jobService.approveDeclineCleaningRequest(request);
