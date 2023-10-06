@@ -52,16 +52,24 @@ public class CustomerController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<CustomerDataResponse>> listAllCustomers() {
-            List<CustomerEntity> customers = customerService.listAllCustomers();
-            List<CustomerDataResponse> customerDTOList = customers
-                    .stream()
-                    .map(this::toDTO)
-                    .collect(Collectors.toList());
+    public ResponseEntity<?> listAllCustomers() {
+        try {
+            List<CustomerDataResponse> customerDTOList =
+                    customerService.listAllCustomers()
+                            .stream()
+                            .map(this::toDTO)
+                            .collect(Collectors.toList());
 
             return ResponseEntity.ok(customerDTOList);
-            /* TODO: wrap code in try/catch */
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
+        }
     }
+
+/*    @PutMapping("/updateCustomer")
+    public ResponseEntity<?> */
 
     private CustomerDataResponse toDTO(CustomerEntity customerEntity) {
         return new CustomerDataResponse(

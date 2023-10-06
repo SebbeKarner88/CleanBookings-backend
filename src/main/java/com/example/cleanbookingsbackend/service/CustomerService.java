@@ -58,7 +58,7 @@ public class CustomerService {
     }
 
     public List<CustomerEntity> listAllCustomers() {
-        /* TODO: check if user is admin or else list won't be generated */
+        /* TODO: check if user is admin or else list won't be generated?? */
         return customerRepository.findAll();
     }
 
