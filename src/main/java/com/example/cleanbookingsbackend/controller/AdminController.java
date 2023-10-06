@@ -1,9 +1,12 @@
 package com.example.cleanbookingsbackend.controller;
 
+import com.example.cleanbookingsbackend.dto.AdminUserRequest;
 import com.example.cleanbookingsbackend.dto.CustomerDataResponse;
 import com.example.cleanbookingsbackend.dto.CustomerResponseDTO;
 import com.example.cleanbookingsbackend.dto.JobResponseDTO;
+import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
 import com.example.cleanbookingsbackend.exception.EmployeeNotFoundException;
+import com.example.cleanbookingsbackend.exception.NotFoundException;
 import com.example.cleanbookingsbackend.exception.UnauthorizedCallException;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
 import com.example.cleanbookingsbackend.service.CustomerService;
@@ -41,6 +44,17 @@ public class AdminController {
             List<CustomerResponseDTO> customerDTOList = customerService.listAllCustomers(employeeId);
             return ResponseEntity.ok().body(customerDTOList);
         } catch (EmployeeNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        } catch (UnauthorizedCallException exception) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<?> deleteCustomer(@RequestBody AdminUserRequest request) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(customerService.deleteCustomer(request));
+        } catch (EmployeeNotFoundException | CustomerNotFoundException | NotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (UnauthorizedCallException exception) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());

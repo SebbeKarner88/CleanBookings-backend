@@ -1,5 +1,6 @@
 package com.example.cleanbookingsbackend.service;
 
+import com.example.cleanbookingsbackend.dto.AdminUserRequest;
 import com.example.cleanbookingsbackend.dto.AuthenticationResponse;
 import com.example.cleanbookingsbackend.dto.CustomerRegistrationDTO;
 import com.example.cleanbookingsbackend.dto.CustomerResponseDTO;
@@ -8,6 +9,7 @@ import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.repository.CustomerRepository;
+import com.example.cleanbookingsbackend.repository.EmployeeRepository;
 import com.example.cleanbookingsbackend.service.utils.InputValidation;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataField.EMPLOYEE_ID;
 import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataType.STRING;
@@ -29,6 +31,7 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
     private final InputValidation input;
+    private final EmployeeRepository employeeRepository;
 
 
     public AuthenticationResponse create(CustomerRegistrationDTO request)
@@ -68,13 +71,21 @@ public class CustomerService {
     public List<CustomerResponseDTO> listAllCustomers(String id)
             throws EmployeeNotFoundException, UnauthorizedCallException {
         List<CustomerResponseDTO> customers = new ArrayList<>();
-        if (isValidGetAllCustomersRequest(id))
+        if (isAdmin(id))
             customers = customerRepository
                     .findAll()
                     .stream()
                     .map(this::toDTO)
                     .toList();
         return customers;
+    }
+
+    public boolean deleteCustomer(AdminUserRequest request)
+            throws EmployeeNotFoundException, CustomerNotFoundException, UnauthorizedCallException, NotFoundException {
+        if (isAdmin(request.adminId())) {
+            authorizedDelete(request);
+        }
+        return true;
     }
 
     // ##### Validation #####
@@ -107,12 +118,22 @@ public class CustomerService {
             throw new ValidationException("Password is required.");
     }
 
-    private boolean isValidGetAllCustomersRequest(String id) throws UnauthorizedCallException {
-        validateInputDataField(EMPLOYEE_ID, STRING, id);
+    private boolean isAdmin(String id) throws UnauthorizedCallException {
         EmployeeEntity employee = input.validateEmployeeId(id);
         if (!employee.getRole().equals(Role.ADMIN))
             throw new UnauthorizedCallException("You are not authorized to perform this action.");
         return true;
+    }
+
+    private void authorizedDelete(AdminUserRequest request) throws NotFoundException {
+        Optional<CustomerEntity> customer = customerRepository.findById(request.customerId());
+        Optional<EmployeeEntity> employee = employeeRepository.findById(request.adminId());
+
+        if (customer.isEmpty() && employee.isEmpty()) {
+            throw new NotFoundException("No Customer or Administrator exists by id: " + request.customerId());
+        }
+
+        customerRepository.deleteById(request.customerId());
     }
 
     // ##### Builder #####
