@@ -16,7 +16,6 @@ import com.example.cleanbookingsbackend.repository.JobRepository;
 import com.example.cleanbookingsbackend.service.utils.InputValidation;
 import com.example.cleanbookingsbackend.service.utils.MailSenderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.batch.BatchProperties;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -98,6 +97,25 @@ public class JobService {
         reIssuedJob.setStatus(JobStatus.ASSIGNED);
         jobRepository.save(reIssuedJob);
         mailSender.sendEmailConfirmationReissuedJob(reIssuedJob);
+    }
+
+    public List<JobResponseDTO> getAllJobs(String id) throws EmployeeNotFoundException, UnauthorizedCallException {
+        List<JobResponseDTO> jobs = new ArrayList<>();
+        if (isValidGetAllJobsRequest(id))
+            jobs = jobRepository
+                    .findAll()
+                    .stream()
+                    .map(this::convertToJobResponseDTO)
+                    .toList();
+        return jobs;
+    }
+
+    private boolean isValidGetAllJobsRequest(String id) throws UnauthorizedCallException {
+        validateInputDataField(EMPLOYEE_ID, STRING, id);
+        EmployeeEntity employee = input.validateEmployeeId(id);
+        if (!employee.getRole().equals(Role.ADMIN))
+            throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE);
+        return true;
     }
 
     public List<JobEntity> getBookedCleaningsForCustomer(String customerId) {
@@ -303,5 +321,16 @@ public class JobService {
                 .customer(customerDto)
                 .message(job.getMessage())
                 .build();
+    }
+
+    private JobResponseDTO convertToJobResponseDTO(JobEntity job) {
+        return new JobResponseDTO(
+                job.getId(),
+                job.getType().toString(),
+                job.getStatus().toString(),
+                job.getMessage(),
+                job.getCustomer().getId(),
+                job.getEmployee().stream().map(EmployeeEntity::getId).toList()
+        );
     }
 }

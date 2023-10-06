@@ -1,11 +1,8 @@
 package com.example.cleanbookingsbackend.controller;
 
-import com.example.cleanbookingsbackend.dto.AuthenticationRequest;
-import com.example.cleanbookingsbackend.dto.AuthenticationResponse;
-import com.example.cleanbookingsbackend.dto.CustomerRegistrationDTO;
-import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
-import com.example.cleanbookingsbackend.exception.UsernameIsTakenException;
-import com.example.cleanbookingsbackend.exception.ValidationException;
+import com.example.cleanbookingsbackend.dto.*;
+import com.example.cleanbookingsbackend.exception.*;
+import com.example.cleanbookingsbackend.model.CustomerEntity;
 import com.example.cleanbookingsbackend.service.CustomerService;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor

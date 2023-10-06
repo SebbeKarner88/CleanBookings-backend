@@ -21,8 +21,10 @@ public class MailSenderService {
     public void sendEmailConfirmationBookedJob(JobEntity requestedJob) {
         msg.setFrom(CLEAN_BOOKINGS);
         msg.setTo(getCustomerEmailAdress(requestedJob));
-        msg.setSubject("Din bokningsbekräftelse");
-        msg.setText("Hej " + getCustomerName(requestedJob) + "! Din bokning av " + requestedJob.getType() + " den " + getFormattedDate(requestedJob) + " har bekräftats.\n\n" + "StädaFint AB");
+        msg.setSubject("Din bokningsförfrågan.");
+        msg.setText("Hej " + getCustomerName(requestedJob) + "! Er bokning av " + requestedJob.getType() + " den "
+                + getFormattedDate(requestedJob) + " har tagits emot av oss.\n\nNi kommer att få en bekräftelse på " +
+                "bokningen när vi bokat in en städare på ert jobb.\n\n" + "StädaFint AB");
         try {
             mailSender.send(msg);
         } catch (MailException exception) {
@@ -34,7 +36,8 @@ public class MailSenderService {
         msg.setFrom(CLEAN_BOOKINGS);
         msg.setTo(getCustomerEmailAdress(requestedCancel));
         msg.setSubject("Avbokad städning");
-        msg.setText("Hej " + getCustomerName(requestedCancel) + "! Er bokning av " + requestedCancel.getType() + " den " + getFormattedDate(requestedCancel) + " är nu avbokad. \n\n" +
+        msg.setText("Hej " + getCustomerName(requestedCancel) + "! Er bokning av " + requestedCancel.getType() +
+                " den " + getFormattedDate(requestedCancel) + " är nu avbokad. \n\n" +
                 "Varmt välkommen åter!\n" +
                 "StädaFint AB");
         try {
@@ -45,12 +48,23 @@ public class MailSenderService {
     }
 
     public void sendEmailConfirmationOnAssignedJob(EmployeeEntity cleaner, JobEntity job) {
-        // Todo: Should we send a mail to the customer aswell??
+        // CLEANER
         msg.setFrom(CLEAN_BOOKINGS);
         msg.setTo(cleaner.getEmailAddress());
         msg.setSubject("Nytt städjobb för " + cleaner.getFirstName() + "!");
         msg.setText("Hej " + cleaner.getFirstName() + "! \n\nDu har fått ett nytt städjobb inbokat: "
-                + getFormattedDate(job) + ", " + job.getType() + "Meddelande: " + job.getMessage() + "\n\nFör mer information logga in på CleanBookings.");
+                + getFormattedDate(job) + ", " + job.getType() + "Meddelande: " + job.getMessage() +
+                "\n\nFör mer information logga in på CleanBookings.");
+        try {
+            mailSender.send(msg);
+        } catch (MailException exception) {
+            System.out.println(EMAIL_NOT_SENT + exception.getMessage());
+        }
+        // CUSTOMER
+        msg.setTo(job.getCustomer().getEmailAddress());
+        msg.setSubject("Bokningsbekräftelse på " + job.getType() + ".");
+        msg.setText("Hej " + job.getCustomer().getFirstName() + "! \n\nHär kommer en bekräftelse på att er bokningsförfrågan nu har tilldelats en städare och är inbokat. \n\n" +
+                cleaner.getFirstName() + " " + cleaner.getLastName() + " från Städafint AB kommer att utföra er städning den " + job.getBookedDate());
         try {
             mailSender.send(msg);
         } catch (MailException exception) {
