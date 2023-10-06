@@ -3,17 +3,24 @@ package com.example.cleanbookingsbackend.service;
 import com.example.cleanbookingsbackend.dto.AuthenticationResponse;
 import com.example.cleanbookingsbackend.dto.CustomerRegistrationDTO;
 import com.example.cleanbookingsbackend.dto.CustomerResponseDTO;
-import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
-import com.example.cleanbookingsbackend.exception.UsernameIsTakenException;
-import com.example.cleanbookingsbackend.exception.ValidationException;
+import com.example.cleanbookingsbackend.enums.Role;
+import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
+import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.repository.CustomerRepository;
+import com.example.cleanbookingsbackend.service.utils.InputValidation;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataField.EMPLOYEE_ID;
+import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataType.STRING;
+import static com.example.cleanbookingsbackend.service.utils.InputValidation.validateInputDataField;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +28,7 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final InputValidation input;
 
 
     public AuthenticationResponse create(CustomerRegistrationDTO request)
@@ -57,9 +65,16 @@ public class CustomerService {
         return new AuthenticationResponse(customer.getId(), customer.getFirstName());
     }
 
-    public List<CustomerEntity> listAllCustomers() {
-        /* TODO: check if user is admin or else list won't be generated?? */
-        return customerRepository.findAll();
+    public List<CustomerResponseDTO> listAllCustomers(String id)
+            throws EmployeeNotFoundException, UnauthorizedCallException {
+        List<CustomerResponseDTO> customers = new ArrayList<>();
+        if (isValidGetAllCustomersRequest(id))
+            customers = customerRepository
+                    .findAll()
+                    .stream()
+                    .map(this::toDTO)
+                    .toList();
+        return customers;
     }
 
     // ##### Validation #####
@@ -92,6 +107,14 @@ public class CustomerService {
             throw new ValidationException("Password is required.");
     }
 
+    private boolean isValidGetAllCustomersRequest(String id) throws UnauthorizedCallException {
+        validateInputDataField(EMPLOYEE_ID, STRING, id);
+        EmployeeEntity employee = input.validateEmployeeId(id);
+        if (!employee.getRole().equals(Role.ADMIN))
+            throw new UnauthorizedCallException("You are not authorized to perform this action.");
+        return true;
+    }
+
     // ##### Builder #####
     public CustomerEntity customerBuilder(CustomerRegistrationDTO request) {
         return new CustomerEntity(
@@ -106,6 +129,20 @@ public class CustomerService {
                 request.emailAddress(),
                 passwordEncoder.encode(request.password()),
                 null
+        );
+    }
+
+    private CustomerResponseDTO toDTO(CustomerEntity customer) {
+        return new CustomerResponseDTO(
+                customer.getId(),
+                customer.getFirstName(),
+                customer.getLastName(),
+                customer.getCustomerType(),
+                customer.getStreetAddress(),
+                customer.getPostalCode(),
+                customer.getCity(),
+                customer.getPhoneNumber(),
+                customer.getEmailAddress()
         );
     }
 }
