@@ -23,6 +23,6 @@ public class EmployeeService {
         if (!passwordEncoder.matches(password, employee.getPassword()))
             throw new AuthException("The password is incorrect");
 
-        return new EmployeeAuthenticationResponse(employee.getId(), employee.getRole());
+        return new EmployeeAuthenticationResponse(employee.getId(), employee.getEmailAddress(), employee.getRole());
     }
 }

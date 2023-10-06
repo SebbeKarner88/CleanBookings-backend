@@ -14,10 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -116,7 +114,7 @@ public class InitDataService {
                 null,
                 new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 5),
                 customer1,
-                List.of(cleaner1),
+                null,
                 JobType.BASIC_CLEANING,
                 "I want you to clean my car aswell",
                 JobStatus.OPEN,
