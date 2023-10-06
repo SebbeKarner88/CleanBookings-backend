@@ -1,6 +1,7 @@
 package com.example.cleanbookingsbackend.controller;
 
 import com.example.cleanbookingsbackend.dto.*;
+import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.service.JobService;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/job")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class JobController {
     private final JobService jobService;
 
@@ -106,6 +108,19 @@ public class JobController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
         }
+    }
+
+
+    @GetMapping("/cleanings/{customerId}")
+    public ResponseEntity<List<JobDto>> getCleaningsByStatus(@PathVariable String customerId, @RequestParam JobStatus status) {
+        System.out.println("Received customerId: " + customerId);
+        List<JobEntity> jobs = jobService.getCleaningsByStatusAndCustomerId(customerId, status);
+        // Convert JobEntity objects to JobDto objects
+        List<JobDto> jobDtos = jobs.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(jobDtos);
     }
 
     @GetMapping("/booked-cleanings/{customerId}")

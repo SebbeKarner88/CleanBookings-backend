@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataField.*;
 import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataType.*;
@@ -106,6 +107,10 @@ public class JobService {
 
     public List<JobEntity> getBookingHistoryForCustomer(String customerId) {
         return jobRepository.findJobsByCustomerIdAndStatusClosed(customerId);
+    }
+
+    public List<JobEntity> getCleaningsByStatusAndCustomerId(String customerId, JobStatus status) {
+        return jobRepository.findByCustomerIdAndStatus(customerId, status);
     }
 
     private void updateJobStatusAndMessage(JobApproveRequest request)
@@ -303,5 +308,16 @@ public class JobService {
                 .customer(customerDto)
                 .message(job.getMessage())
                 .build();
+    }
+
+
+
+
+    // Helper method to convert JobEntity to JobDto
+    private JobDto convertToJobDto(JobEntity jobEntity) {
+        JobDto jobDto = new JobDto();
+        jobDto.setId(jobEntity.getId());
+        // Populate other fields in JobDto based on jobEntity
+        return jobDto;
     }
 }
