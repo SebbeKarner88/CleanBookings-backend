@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
@@ -53,6 +55,11 @@ public class CustomerService {
             throw new AuthException("The password is incorrect");
 
         return new AuthenticationResponse(customer.getId(), customer.getFirstName());
+    }
+
+    public List<CustomerEntity> listAllCustomers() {
+        /* TODO: check if user is admin or else list won't be generated */
+        return customerRepository.findAll();
     }
 
     // ##### Validation #####
