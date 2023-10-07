@@ -30,4 +30,7 @@ public interface JobRepository extends JpaRepository <JobEntity, String> {
     @Query("SELECT j FROM JobEntity j WHERE j.customer.id = :customerId AND j.status = :status")
     List<JobEntity> findByCustomerIdAndStatus(String customerId, JobStatus status);
 
+    @Query("SELECT j FROM JobEntity j WHERE j.customer.id = :customerId")
+    List<JobEntity> findAllByCustomerId(String customerId);
+
 }

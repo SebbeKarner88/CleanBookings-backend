@@ -111,16 +111,30 @@ public class JobController {
     }
 
 
-    @GetMapping("/cleanings/{customerId}")
-    public ResponseEntity<List<JobDto>> getCleaningsByStatus(@PathVariable String customerId, @RequestParam JobStatus status) {
-        System.out.println("Received customerId: " + customerId);
-        List<JobEntity> jobs = jobService.getCleaningsByStatusAndCustomerId(customerId, status);
-        // Convert JobEntity objects to JobDto objects
-        List<JobDto> jobDtos = jobs.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(jobDtos);
+    @GetMapping("/cleanings/{customerId}")
+    public ResponseEntity<List<JobDto>> getCleaningsByStatus(
+            @PathVariable String customerId,
+            @RequestParam(required = false) JobStatus status) {
+        System.out.println("Received customerId: " + customerId);
+
+        // Check if the status parameter is provided
+        if (status != null) {
+            List<JobEntity> jobs = jobService.getCleaningsByStatusAndCustomerId(customerId, status);
+            // Convert JobEntity objects to JobDto objects
+            List<JobDto> jobDtos = jobs.stream()
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(jobDtos);
+        } else {
+            // Handle the "ALL" option (status parameter is not provided)
+            List<JobEntity> jobs = jobService.getAllCleaningsForCustomer(customerId);
+            // Convert JobEntity objects to JobDto objects
+            List<JobDto> jobDtos = jobs.stream()
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(jobDtos);
+        }
     }
 
     @GetMapping("/booked-cleanings/{customerId}")

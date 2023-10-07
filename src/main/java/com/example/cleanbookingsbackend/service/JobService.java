@@ -131,6 +131,10 @@ public class JobService {
         return jobRepository.findByCustomerIdAndStatus(customerId, status);
     }
 
+    public List<JobEntity> getAllCleaningsForCustomer(String customerId) {
+        return jobRepository.findAllByCustomerId(customerId);
+    }
+
     private void updateJobStatusAndMessage(JobApproveRequest request)
             throws JobNotFoundException {
         JobEntity job = input.validateJobId(request.jobId());
@@ -327,8 +331,6 @@ public class JobService {
                 .message(job.getMessage())
                 .build();
     }
-
-
 
 
     // Helper method to convert JobEntity to JobDto
