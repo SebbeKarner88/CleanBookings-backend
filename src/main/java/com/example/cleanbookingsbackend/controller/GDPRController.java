@@ -1,9 +1,13 @@
 package com.example.cleanbookingsbackend.controller;
 
 import com.example.cleanbookingsbackend.dto.CustomerDataResponse;
+import com.example.cleanbookingsbackend.dto.EmployeeDataResponse;
 import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
+import com.example.cleanbookingsbackend.exception.EmployeeNotFoundException;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
+import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.service.CustomerService;
+import com.example.cleanbookingsbackend.service.EmployeeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,9 +16,11 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class GDPRController {
     private final CustomerService customerService;
+    private final EmployeeService employeeService;
 
-    public GDPRController(CustomerService customerService) {
+    public GDPRController(CustomerService customerService, EmployeeService employeeService) {
         this.customerService = customerService;
+        this.employeeService = employeeService;
     }
 
 //    TODO: This is commented-out since it won't compile when the methods referenced doesn't exist
@@ -25,6 +31,17 @@ public class GDPRController {
             CustomerDataResponse response = CustomerDataResponse.fromEntity(customer);
             return ResponseEntity.ok(response);
         } catch (CustomerNotFoundException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/employee-data/{employeeId}")
+    public ResponseEntity<EmployeeDataResponse> getEmployeeData(@PathVariable String employeeId) {
+        try {
+            EmployeeEntity employee = employeeService.getEmployeeById(employeeId);
+            EmployeeDataResponse response = EmployeeDataResponse.fromEntity(employee);
+            return ResponseEntity.ok(response);
+        } catch (EmployeeNotFoundException ex) {
             return ResponseEntity.notFound().build();
         }
     }

@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class EmployeeService {
@@ -24,5 +26,15 @@ public class EmployeeService {
             throw new AuthException("The password is incorrect");
 
         return new EmployeeAuthenticationResponse(employee.getId(), employee.getEmailAddress(), employee.getRole());
+    }
+
+    public EmployeeEntity getEmployeeById(String employeeId) {
+        Optional<EmployeeEntity> employee = employeeRepository.findById(employeeId);
+
+        if (employee.isPresent()) {
+            return employee.get();
+        } else {
+            throw new EmployeeNotFoundException("Employee not found with ID: " + employeeId);
+        }
     }
 }
