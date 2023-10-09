@@ -140,7 +140,8 @@ public class JobService {
         JobEntity job = input.validateJobId(request.jobId());
 
         if (!request.message().isBlank()) {
-            String addedMessage = "\n\nCustomer message " + new SimpleDateFormat("yyyy-MM-dd hh:mm").format(System.currentTimeMillis()) + "\nMessage: " + request.message() + ".";
+            String addedMessage = "\n\nCustomer message " + new SimpleDateFormat("yyyy-MM-dd hh:mm")
+                    .format(System.currentTimeMillis()) + "\nMessage: " + request.message() + ".";
             job.setMessage(job.getMessage().concat(addedMessage));
         }
 
@@ -155,7 +156,8 @@ public class JobService {
         }
     }
 
-    private void assignCleanersAndSendEmailConfirmation(String jobId, List<String> cleanerIds) throws JobNotFoundException {
+    private void assignCleanersAndSendEmailConfirmation(String jobId, List<String> cleanerIds)
+            throws JobNotFoundException {
         JobEntity job = input.validateJobId(jobId);
         List<EmployeeEntity> assignedCleaners = job.getEmployee();
 
@@ -268,7 +270,8 @@ public class JobService {
         validateInputDataField(JOB_ID, STRING, request.jobId());
         JobEntity job = input.validateJobId(request.jobId());
         if (job.getStatus().equals(JobStatus.CLOSED)) {
-            throw new IllegalArgumentException("The job with id " + request.jobId() + " has already been executed and closed.");
+            throw new IllegalArgumentException("The job with id " + request.jobId()
+                    + " has already been executed and closed.");
         }
 
         if (request.cleanerIds() == null)

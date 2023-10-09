@@ -106,7 +106,8 @@ public class MailSenderService {
         msg.setTo(getCustomerEmailAdress(job));
         msg.setSubject("Tack för din feedback!");
         msg.setText("Hej " + getCustomerName(job) + "! \n\nHär kommer en bekräftelse på att vi mottagit ert meddelande." +
-                "\n\nVi ber om ursäkt att vårat jobb inte levde upp till era förväntningar. \nVi har meddelat våra städare och åtgärd kommer att utföras inom kort. \n\n" +
+                "\n\nVi ber om ursäkt att vårat jobb inte levde upp till era förväntningar. \nVi har meddelat våra städare" +
+                " och åtgärd kommer att utföras inom kort. Tack för ert tålamod!\n\n" +
                 "StädaFint AB");
         try {
             mailSender.send(msg);
