@@ -34,6 +34,7 @@ public class JobService {
     private final JobRepository jobRepository;
     private final CustomerRepository customerRepository;
     private final EmployeeRepository employeeRepository;
+    private final PaymentService paymentService;
     private final MailSenderService mailSender;
     private final InputValidation input;
 
@@ -147,6 +148,7 @@ public class JobService {
 
         if (request.isApproved()) {
             job.setStatus(JobStatus.APPROVED);
+            paymentService.createInvoiceOnJob(job);
             mailSender.sendEmailConfirmationApprovedJob(job);
             jobRepository.save(job);
         } else {
