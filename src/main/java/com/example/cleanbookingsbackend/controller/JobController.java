@@ -2,6 +2,7 @@ package com.example.cleanbookingsbackend.controller;
 
 import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.enums.JobStatus;
+import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.service.JobService;
@@ -130,6 +131,46 @@ public class JobController {
             // Handle the "ALL" option (status parameter is not provided)
             List<JobEntity> jobs = jobService.getAllCleaningsForCustomer(customerId);
             // Convert JobEntity objects to JobDto objects
+            List<JobDto> jobDtos = jobs.stream()
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(jobDtos);
+        }
+    }
+
+    @GetMapping("/cleanings/employee/{employeeId}")
+    public ResponseEntity<List<JobDto>> getCleaningsByStatusWithRole(
+            @PathVariable String employeeId,
+            @RequestParam(required = false) JobStatus status,
+            @RequestParam(required = false) Role role) {
+        System.out.println("Received employeeId: " + employeeId);
+
+        if (status != null) {
+            if (role == Role.ADMIN) {
+                // Admin can view jobs for any cleaner
+                List<JobEntity> jobs = jobService.getCleaningsByStatus(status);
+                List<JobDto> jobDtos = jobs.stream()
+                        .map(this::convertToDto)
+                        .collect(Collectors.toList());
+                return ResponseEntity.ok(jobDtos);
+            } else {
+                // Cleaners can view their own jobs
+                List<JobEntity> jobs = jobService.getCleaningsByStatusAndEmployeeId(employeeId, status);
+                List<JobDto> jobDtos = jobs.stream()
+                        .map(this::convertToDto)
+                        .collect(Collectors.toList());
+                return ResponseEntity.ok(jobDtos);
+            }
+        } else if (role == Role.ADMIN) {
+            // Admin can view all jobs for all cleaners
+            List<JobEntity> jobs = jobService.getAllCleaningsForAllCleaners();
+            List<JobDto> jobDtos = jobs.stream()
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(jobDtos);
+        } else {
+            // Cleaners can view all their jobs
+            List<JobEntity> jobs = jobService.getAllCleaningsForCleaner(employeeId);
             List<JobDto> jobDtos = jobs.stream()
                     .map(this::convertToDto)
                     .collect(Collectors.toList());

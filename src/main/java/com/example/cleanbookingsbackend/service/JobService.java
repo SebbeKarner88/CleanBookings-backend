@@ -133,6 +133,24 @@ public class JobService {
         return jobRepository.findAllByCustomerId(customerId);
     }
 
+
+    public List<JobEntity> getAllCleaningsForAllCleaners() {
+        return jobRepository.findAll(); // Retrieve all job entities
+    }
+
+    public List<JobEntity> getCleaningsByStatusAndEmployeeId(String employeeId, JobStatus status) {
+        return jobRepository.findByEmployeeIdAndStatus(employeeId, status);
+    }
+
+    public List<JobEntity> getCleaningsByStatus(JobStatus status) {
+        return jobRepository.findByStatus(status);
+    }
+
+    public List<JobEntity> getAllCleaningsForCleaner(String employeeId) {
+        return jobRepository.findByEmployeeId(employeeId);
+    }
+
+
     private void updateJobStatusAndMessage(JobApproveRequest request)
             throws JobNotFoundException {
         JobEntity job = input.validateJobId(request.jobId());
@@ -353,4 +371,6 @@ public class JobService {
                 job.getEmployee().stream().map(employee -> employee.getFirstName().concat(" ").concat(employee.getLastName())).toList()
         );
     }
+
+
 }
