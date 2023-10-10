@@ -2,7 +2,6 @@ package com.example.cleanbookingsbackend.service.utils;
 
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
-import com.example.cleanbookingsbackend.model.PaymentEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;

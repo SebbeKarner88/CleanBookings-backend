@@ -160,12 +160,23 @@ public class InitDataService {
                 JobStatus.APPROVED,
                 null
         );
+        JobEntity job6Customer2Cleaner2 = new JobEntity(
+                null,
+                new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7),
+                customer2,
+                List.of(cleaner2),
+                JobType.TOPP_CLEANING,
+                "Waiting for my approval are you?!",
+                JobStatus.WAITING_FOR_APPROVAL,
+                null
+        );
 
         jobRepository.saveAll(List.of(  job1Customer1Cleaner1,
                                         job2Customer2Cleaner1And2,
                                         job3Customer2Cleaner2,
                                         job4Customer1Cleaner1And2,
-                                        job5Customer2Cleaner1
+                                        job5Customer2Cleaner1,
+                                        job6Customer2Cleaner2
                 ));
 
         // ##### Payment #####

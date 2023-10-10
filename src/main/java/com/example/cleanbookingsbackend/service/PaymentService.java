@@ -30,9 +30,9 @@ public class PaymentService {
         PaymentEntity invoice = createInvoice(job);
         JobEntity updatedJob = input.validateJobId(job.getId());
         updatedJob.setPayment(invoice);
-        jobRepository.save((updatedJob));
-        paymentRepository.save(invoice);
-        mailSender.sendInvoice(job);
+            paymentRepository.save(invoice);
+            jobRepository.save(updatedJob);
+            mailSender.sendInvoice(job);
     }
 
     private static PaymentEntity createInvoice(JobEntity job) {
