@@ -166,7 +166,7 @@ public class CustomerService {
         }
     }
 
-    private void authorizedDelete(String adminId, String customerId) throws NotFoundException {
+    private void authorizedDelete(String adminId, String customerId) throws NotFoundException, UnauthorizedCallException {
         Optional<CustomerEntity> customer = customerRepository.findById(customerId);
         Optional<EmployeeEntity> employee = employeeRepository.findById(adminId);
 
@@ -174,7 +174,13 @@ public class CustomerService {
             throw new NotFoundException("No Customer or Administrator exists by id: " + customerId);
         }
 
-        customerRepository.deleteById(customerId);
+        if (customer.isPresent() && employee.isPresent()) {
+            if (customer.get().getJobs() != null) {
+                throw new UnauthorizedCallException("This customer has one or more active bookings!");
+            } else {
+                customerRepository.deleteById(customerId);
+            }
+        }
     }
 
     // ##### Builder #####
