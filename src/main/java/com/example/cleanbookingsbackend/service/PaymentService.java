@@ -8,12 +8,16 @@ import com.example.cleanbookingsbackend.repository.JobRepository;
 import com.example.cleanbookingsbackend.repository.PaymentRepository;
 import com.example.cleanbookingsbackend.service.utils.InputValidation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@EnableScheduling
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
@@ -43,6 +47,16 @@ public class PaymentService {
             case DIAMOND_CLEANING -> 2495d;
             case WINDOW_CLEANING -> 495d;
         };
+    }
+
+    @Scheduled(cron = "0 0 0 * * *") // Runs every day at midnight
+    public void updatePaymentStatusForDuePayments() {
+        List<PaymentEntity> payments = paymentRepository.findByDueDateBeforeAndStatus(new Date(), PaymentStatus.INVOICED);
+
+        for (PaymentEntity payment : payments) {
+            payment.setStatus(PaymentStatus.OVERDUE);
+            paymentRepository.save(payment);
+        }
     }
 }
 
