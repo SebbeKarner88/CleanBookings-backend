@@ -1,9 +1,6 @@
 package com.example.cleanbookingsbackend.service;
 
-import com.example.cleanbookingsbackend.dto.AdminUserRequest;
-import com.example.cleanbookingsbackend.dto.AuthenticationResponse;
-import com.example.cleanbookingsbackend.dto.CustomerRegistrationDTO;
-import com.example.cleanbookingsbackend.dto.CustomerResponseDTO;
+import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
@@ -80,12 +77,14 @@ public class CustomerService {
         return customers;
     }
 
-    public void updateCustomer(AdminUserRequest request, CustomerResponseDTO response)
+    public boolean updateCustomer(AdminUserUpdateRequest request)
             throws EmployeeNotFoundException, CustomerNotFoundException, UnauthorizedCallException, NotFoundException {
 
         if (isAdmin(request.adminId())) {
-            authorizedUpdate(request, response);
+            authorizedUpdate(request);
         }
+
+        return true;
     }
 
     public boolean deleteCustomer(AdminUserRequest request)
@@ -134,23 +133,42 @@ public class CustomerService {
         return true;
     }
 
-    private void authorizedUpdate(AdminUserRequest request, CustomerResponseDTO response) throws NotFoundException {
-        Optional<CustomerEntity> customer = customerRepository.findById(request.customerId());
-        Optional<EmployeeEntity> employee = employeeRepository.findById(request.adminId());
+    private void authorizedUpdate(AdminUserUpdateRequest request) throws NotFoundException {
+        Optional<CustomerEntity> customerOptional = customerRepository.findById(request.customerId());
+        Optional<EmployeeEntity> employeeOptional = employeeRepository.findById(request.adminId());
 
-        if (customer.isEmpty() && employee.isEmpty()) {
+        if (customerOptional.isEmpty() && employeeOptional.isEmpty()) {
             throw new NotFoundException("No Customer or Administrator exists by id: " + request.customerId());
         }
 
-        if (customer.isPresent() && employee.isPresent()) {
-            customer.get().setFirstName(response.firstName());
-            customer.get().setLastName(response.lastName());
-            customer.get().setCustomerType(response.customerType());
-            customer.get().setStreetAddress(response.streetAddress());
-            customer.get().setPostalCode(response.postalCode());
-            customer.get().setCity(response.city());
-            customer.get().setPhoneNumber(response.phoneNumber());
-            customer.get().setEmailAddress(response.emailAddress());
+        if (customerOptional.isPresent() && employeeOptional.isPresent()) {
+            CustomerEntity customer = customerOptional.orElse(null);
+            // check if response fields are not null before updating
+            if (request.firstName() != null) {
+                customer.setFirstName(request.firstName());
+            }
+            if (request.lastName() != null) {
+                customer.setLastName(request.lastName());
+            }
+            if (request.customerType() != null) {
+                customer.setCustomerType(request.customerType());
+            }
+            if (request.streetAddress() != null) {
+                customer.setStreetAddress(request.streetAddress());
+            }
+            if (request.postalCode() != null) {
+                customer.setPostalCode(request.postalCode());
+            }
+            if (request.city() != null) {
+                customer.setCity(request.city());
+            }
+            if (request.phoneNumber() != null) {
+                customer.setPhoneNumber(request.phoneNumber());
+            }
+            if (request.emailAddress() != null) {
+                customer.setEmailAddress(request.emailAddress());
+            }
+            customerRepository.save(customer);
         }
     }
 

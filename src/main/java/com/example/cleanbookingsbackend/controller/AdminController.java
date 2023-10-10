@@ -1,6 +1,7 @@
 package com.example.cleanbookingsbackend.controller;
 
 import com.example.cleanbookingsbackend.dto.AdminUserRequest;
+import com.example.cleanbookingsbackend.dto.AdminUserUpdateRequest;
 import com.example.cleanbookingsbackend.dto.CustomerResponseDTO;
 import com.example.cleanbookingsbackend.dto.JobResponseDTO;
 import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
@@ -48,11 +49,9 @@ public class AdminController {
     }
 
     @PutMapping("/updateCustomer")
-    public ResponseEntity<?> updateCustomer(@RequestBody AdminUserRequest request,
-                                            @RequestBody CustomerResponseDTO response) {
+    public ResponseEntity<?> updateCustomer(@RequestBody AdminUserUpdateRequest request) {
         try {
-            customerService.updateCustomer(request, response);
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.status(HttpStatus.OK).body(customerService.updateCustomer(request));
         } catch (EmployeeNotFoundException | CustomerNotFoundException | NotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (UnauthorizedCallException exception) {
