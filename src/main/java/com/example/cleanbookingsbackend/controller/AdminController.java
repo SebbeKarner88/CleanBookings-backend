@@ -47,6 +47,19 @@ public class AdminController {
         }
     }
 
+    @PutMapping("/updateCustomer")
+    public ResponseEntity<?> updateCustomer(@RequestBody AdminUserRequest request,
+                                            @RequestBody CustomerResponseDTO response) {
+        try {
+            customerService.updateCustomer(request, response);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (EmployeeNotFoundException | CustomerNotFoundException | NotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        } catch (UnauthorizedCallException exception) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+        }
+    }
+
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteCustomer(@RequestBody AdminUserRequest request) {
         try {

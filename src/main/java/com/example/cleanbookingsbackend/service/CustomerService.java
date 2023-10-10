@@ -80,6 +80,14 @@ public class CustomerService {
         return customers;
     }
 
+    public void updateCustomer(AdminUserRequest request, CustomerResponseDTO response)
+            throws EmployeeNotFoundException, CustomerNotFoundException, UnauthorizedCallException, NotFoundException {
+
+        if (isAdmin(request.adminId())) {
+            authorizedUpdate(request, response);
+        }
+    }
+
     public boolean deleteCustomer(AdminUserRequest request)
             throws EmployeeNotFoundException, CustomerNotFoundException, UnauthorizedCallException, NotFoundException {
         if (isAdmin(request.adminId())) {
@@ -124,6 +132,26 @@ public class CustomerService {
         if (!employee.getRole().equals(Role.ADMIN))
             throw new UnauthorizedCallException("You are not authorized to perform this action.");
         return true;
+    }
+
+    private void authorizedUpdate(AdminUserRequest request, CustomerResponseDTO response) throws NotFoundException {
+        Optional<CustomerEntity> customer = customerRepository.findById(request.customerId());
+        Optional<EmployeeEntity> employee = employeeRepository.findById(request.adminId());
+
+        if (customer.isEmpty() && employee.isEmpty()) {
+            throw new NotFoundException("No Customer or Administrator exists by id: " + request.customerId());
+        }
+
+        if (customer.isPresent() && employee.isPresent()) {
+            customer.get().setFirstName(response.firstName());
+            customer.get().setLastName(response.lastName());
+            customer.get().setCustomerType(response.customerType());
+            customer.get().setStreetAddress(response.streetAddress());
+            customer.get().setPostalCode(response.postalCode());
+            customer.get().setCity(response.city());
+            customer.get().setPhoneNumber(response.phoneNumber());
+            customer.get().setEmailAddress(response.emailAddress());
+        }
     }
 
     private void authorizedDelete(AdminUserRequest request) throws NotFoundException {
