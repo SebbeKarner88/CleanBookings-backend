@@ -18,6 +18,8 @@ public class MailSenderService {
     private final static String CLEAN_BOOKINGS = "order.cleanbookings@gmail.com";
     private final static String EMAIL_NOT_SENT = "Email couldn't be sent: ";
 
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
     public void sendEmailConfirmationBookedJob(JobEntity requestedJob) {
         msg.setFrom(CLEAN_BOOKINGS);
         msg.setTo(getCustomerEmailAdress(requestedJob));
@@ -137,11 +139,11 @@ public class MailSenderService {
         msg.setSubject("Faktura på utförd städning");
         msg.setText("Faktura StädaFint AB                              Fakturanummer: " + job.getPayment().getId() + "\n\n\n\n" +
                 "Betalvillkor: 30 dagar netto                      Betalsätt: Faktura\n" +
-                "Fakturadatum: " + job.getPayment().getIssueDate() + "                          Förfallodag: " + job.getPayment().getDueDate() + "\n\n" +
+                "Fakturadatum: " + sdf.format(job.getPayment().getIssueDate()) + "                          Förfallodag: " + sdf.format(job.getPayment().getDueDate()) + "\n\n" +
                 "________________________________________________________________________\n" +
-                job.getType() + "            Antal: 1             Pris: " + job.getPayment().getPrice() + "kr ink. moms.\n" +
+                job.getType() + "                  Antal: 1                   Pris: " + job.getPayment().getPrice() + "kr ink. moms.\n" +
                 "________________________________________________________________________\n" +
-                "                                                Total: " + job.getPayment().getPrice() + "kr ink. moms.\n\n\n\n" +
+                "                                                             Total: " + job.getPayment().getPrice() + "kr ink. moms.\n\n\n\n" +
                 "Vid betalning vänligen uppge fakturanummer som meddelande.\n\n" +
                 "Tack så mycket för att ni anlitade oss, vi hoppas att vi snart ses igen!\n\n" +
                 "//Städafint AB" );
