@@ -1,6 +1,5 @@
 package com.example.cleanbookingsbackend.controller;
 
-import com.example.cleanbookingsbackend.dto.AdminUserRequest;
 import com.example.cleanbookingsbackend.dto.AdminUserUpdateRequest;
 import com.example.cleanbookingsbackend.dto.CustomerResponseDTO;
 import com.example.cleanbookingsbackend.dto.JobResponseDTO;
