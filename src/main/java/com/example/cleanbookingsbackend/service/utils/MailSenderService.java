@@ -134,10 +134,19 @@ public class MailSenderService {
 
     public void sendInvoice(JobEntity job) {
         msg.setFrom(CLEAN_BOOKINGS);
+        msg.setTo(getCustomerEmailAdress(job));
         msg.setSubject("Faktura på utförd städning");
-        msg.setText("!!!Fakturatext!!!");
+        msg.setText("Faktura StädaFint AB                              Fakturanummer: " + job.getPayment().getId() + "\n\n\n\n" +
+                "Betalvillkor: 30 dagar netto                      Betalsätt: Faktura\n" +
+                "Fakturadatum: " + job.getPayment().getIssueDate() + "                          Förfallodag: " + job.getPayment().getDueDate() + "\n\n" +
+                "________________________________________________________________________\n" +
+                job.getType() + "            Antal: 1             Pris: " + job.getPayment().getPrice() + "kr ink. moms.\n" +
+                "________________________________________________________________________\n" +
+                "                                                Total: " + job.getPayment().getPrice() + "kr ink. moms.\n\n\n\n" +
+                "Vid betalning vänligen uppge fakturanummer som meddelande.\n\n" +
+                "Tack så mycket för att ni anlitade oss, vi hoppas att vi snart ses igen!\n\n" +
+                "//Städafint AB" );
         try {
-            msg.setTo(getCustomerEmailAdress(job));
             mailSender.send(msg);
         } catch (MailException exception) {
             System.out.println(EMAIL_NOT_SENT + exception.getMessage());
