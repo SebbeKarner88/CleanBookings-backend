@@ -1,6 +1,5 @@
 package com.example.cleanbookingsbackend.controller;
 
-import com.example.cleanbookingsbackend.dto.AdminUserRequest;
 import com.example.cleanbookingsbackend.dto.AdminUserUpdateRequest;
 import com.example.cleanbookingsbackend.dto.CustomerResponseDTO;
 import com.example.cleanbookingsbackend.dto.JobResponseDTO;
@@ -60,9 +59,11 @@ public class AdminController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> deleteCustomer(@RequestBody AdminUserRequest request) {
+    public ResponseEntity<?> deleteCustomer(@RequestParam String adminId,
+                                            @RequestParam String customerId) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(customerService.deleteCustomer(request));
+            customerService.deleteCustomer(adminId, customerId);
+            return ResponseEntity.status(HttpStatus.OK).build();
         } catch (EmployeeNotFoundException | CustomerNotFoundException | NotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (UnauthorizedCallException exception) {

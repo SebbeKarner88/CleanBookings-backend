@@ -17,10 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataField.EMPLOYEE_ID;
-import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataType.STRING;
-import static com.example.cleanbookingsbackend.service.utils.InputValidation.validateInputDataField;
-
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
@@ -83,16 +79,14 @@ public class CustomerService {
         if (isAdmin(request.adminId())) {
             authorizedUpdate(request);
         }
-
         return true;
     }
 
-    public boolean deleteCustomer(AdminUserRequest request)
+    public void deleteCustomer(String adminId, String customerId)
             throws EmployeeNotFoundException, CustomerNotFoundException, UnauthorizedCallException, NotFoundException {
-        if (isAdmin(request.adminId())) {
-            authorizedDelete(request);
+        if (isAdmin(adminId)) {
+            authorizedDelete(adminId, customerId);
         }
-        return true;
     }
 
 
@@ -172,15 +166,15 @@ public class CustomerService {
         }
     }
 
-    private void authorizedDelete(AdminUserRequest request) throws NotFoundException {
-        Optional<CustomerEntity> customer = customerRepository.findById(request.customerId());
-        Optional<EmployeeEntity> employee = employeeRepository.findById(request.adminId());
+    private void authorizedDelete(String adminId, String customerId) throws NotFoundException {
+        Optional<CustomerEntity> customer = customerRepository.findById(customerId);
+        Optional<EmployeeEntity> employee = employeeRepository.findById(adminId);
 
         if (customer.isEmpty() && employee.isEmpty()) {
-            throw new NotFoundException("No Customer or Administrator exists by id: " + request.customerId());
+            throw new NotFoundException("No Customer or Administrator exists by id: " + customerId);
         }
 
-        customerRepository.deleteById(request.customerId());
+        customerRepository.deleteById(customerId);
     }
 
     // ##### Builder #####
