@@ -3,8 +3,6 @@ package com.example.cleanbookingsbackend.service;
 import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.JobType;
-import com.example.cleanbookingsbackend.dto.CreateJobRequest;
-import com.example.cleanbookingsbackend.dto.CreateJobResponse;
 import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.model.CustomerEntity;
@@ -21,10 +19,9 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataField.*;
-import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataType.*;
+import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataType.STRING;
 import static com.example.cleanbookingsbackend.service.utils.InputValidation.validateInputDataField;
 import static com.example.cleanbookingsbackend.service.utils.InputValidation.validateJobType;
 
@@ -189,8 +186,8 @@ public class JobService {
         // Update the JobEntity with the combined list of cleaners
         job.setEmployee(updatedListOfCleaners);
 
-        // Set the status to ASSIGNED if this is the first time
-        if (job.getStatus() == JobStatus.OPEN)
+        // Set the status to ASSIGNED if this is the first time or the job was rejected before
+        if (job.getStatus().equals(JobStatus.OPEN) || job.getStatus().equals(JobStatus.NOT_APPROVED))
             job.setStatus(JobStatus.ASSIGNED);
 
         jobRepository.save(job);
@@ -353,7 +350,7 @@ public class JobService {
                 job.getStatus().toString(),
                 job.getMessage(),
                 job.getCustomer().getId(),
-                job.getEmployee().stream().map(EmployeeEntity::getId).toList()
+                job.getEmployee().stream().map(employee -> employee.getFirstName().concat(" ").concat(employee.getLastName())).toList()
         );
     }
 }

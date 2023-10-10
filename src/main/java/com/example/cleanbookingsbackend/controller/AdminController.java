@@ -1,14 +1,12 @@
 package com.example.cleanbookingsbackend.controller;
 
 import com.example.cleanbookingsbackend.dto.AdminUserRequest;
-import com.example.cleanbookingsbackend.dto.CustomerDataResponse;
 import com.example.cleanbookingsbackend.dto.CustomerResponseDTO;
 import com.example.cleanbookingsbackend.dto.JobResponseDTO;
 import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
 import com.example.cleanbookingsbackend.exception.EmployeeNotFoundException;
 import com.example.cleanbookingsbackend.exception.NotFoundException;
 import com.example.cleanbookingsbackend.exception.UnauthorizedCallException;
-import com.example.cleanbookingsbackend.model.CustomerEntity;
 import com.example.cleanbookingsbackend.service.CustomerService;
 import com.example.cleanbookingsbackend.service.JobService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
