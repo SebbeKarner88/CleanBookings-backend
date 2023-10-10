@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import java.util.Calendar;
 import java.util.Date;
 
+import static jakarta.persistence.GenerationType.SEQUENCE;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -17,11 +19,17 @@ import java.util.Date;
 public class PaymentEntity {
 
     @Id
+    @SequenceGenerator(
+            name = "bill_seq",
+            sequenceName = "bill_seq",
+            allocationSize = 1
+    )
     @GeneratedValue(
-            strategy = GenerationType.UUID
+            strategy = SEQUENCE,
+            generator = "bill_seq"
     )
     @Column(name = "id", columnDefinition = "text")
-    private String id;
+    private Integer id;
 
     @Column(name = "issue_date", columnDefinition = "varchar")
     @Temporal(TemporalType.DATE)

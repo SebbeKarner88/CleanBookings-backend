@@ -7,6 +7,7 @@ import com.example.cleanbookingsbackend.model.PaymentEntity;
 import com.example.cleanbookingsbackend.repository.JobRepository;
 import com.example.cleanbookingsbackend.repository.PaymentRepository;
 import com.example.cleanbookingsbackend.service.utils.InputValidation;
+import com.example.cleanbookingsbackend.service.utils.MailSenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,9 +24,19 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final JobRepository jobRepository;
     private final InputValidation input;
+    private final MailSenderService mailSender;
 
     public void createInvoiceOnJob(JobEntity job) throws JobNotFoundException {
-        PaymentEntity invoice = new PaymentEntity(
+        PaymentEntity invoice = createInvoice(job);
+        JobEntity updatedJob = input.validateJobId(job.getId());
+        updatedJob.setPayment(invoice);
+        jobRepository.save((updatedJob));
+        paymentRepository.save(invoice);
+        mailSender.sendInvoice(job);
+    }
+
+    private static PaymentEntity createInvoice(JobEntity job) {
+        return new PaymentEntity(
                 null,
                 new Date(System.currentTimeMillis()),
                 null,
@@ -33,11 +44,6 @@ public class PaymentService {
                 PaymentStatus.INVOICED,
                 solvePrice(job)
         );
-        paymentRepository.save(invoice);
-
-        JobEntity updatedJob = input.validateJobId(job.getId());
-        updatedJob.setPayment(invoice);
-        jobRepository.save((updatedJob));
     }
 
     private static double solvePrice(JobEntity job) {

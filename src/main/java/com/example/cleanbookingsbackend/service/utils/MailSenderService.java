@@ -2,6 +2,7 @@ package com.example.cleanbookingsbackend.service.utils;
 
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
+import com.example.cleanbookingsbackend.model.PaymentEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -126,6 +127,18 @@ public class MailSenderService {
                 msg.setTo(cleaner.getEmailAddress());
                 mailSender.send(msg);
             }
+        } catch (MailException exception) {
+            System.out.println(EMAIL_NOT_SENT + exception.getMessage());
+        }
+    }
+
+    public void sendInvoice(JobEntity job) {
+        msg.setFrom(CLEAN_BOOKINGS);
+        msg.setSubject("Faktura på utförd städning");
+        msg.setText("!!!Fakturatext!!!");
+        try {
+            msg.setTo(getCustomerEmailAdress(job));
+            mailSender.send(msg);
         } catch (MailException exception) {
             System.out.println(EMAIL_NOT_SENT + exception.getMessage());
         }
