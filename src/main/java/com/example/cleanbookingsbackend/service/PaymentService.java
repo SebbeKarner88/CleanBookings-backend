@@ -1,13 +1,16 @@
 package com.example.cleanbookingsbackend.service;
 
-import com.example.cleanbookingsbackend.enums.JobType;
 import com.example.cleanbookingsbackend.enums.PaymentStatus;
+import com.example.cleanbookingsbackend.exception.JobNotFoundException;
 import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.model.PaymentEntity;
 import com.example.cleanbookingsbackend.repository.JobRepository;
 import com.example.cleanbookingsbackend.repository.PaymentRepository;
+import com.example.cleanbookingsbackend.service.utils.InputValidation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -15,10 +18,12 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final JobRepository jobRepository;
+    private final InputValidation input;
 
-    public void createInvoiceOnJob(JobEntity job) {
-
+    public void createInvoiceOnJob(JobEntity job) throws JobNotFoundException {
         PaymentEntity invoice = new PaymentEntity(
+                null,
+                new Date(System.currentTimeMillis()),
                 null,
                 job,
                 PaymentStatus.INVOICED,
@@ -26,9 +31,9 @@ public class PaymentService {
         );
         paymentRepository.save(invoice);
 
-        JobEntity updatedJob = jobRepository.findById(job.getId()).get();
+        JobEntity updatedJob = input.validateJobId(job.getId());
         updatedJob.setPayment(invoice);
-        jobRepository.save(updatedJob);
+        jobRepository.save((updatedJob));
     }
 
     private static double solvePrice(JobEntity job) {

@@ -172,12 +172,16 @@ public class InitDataService {
 
         PaymentEntity paymentJob3 = new PaymentEntity(
                 null,
+                new Date(System.currentTimeMillis()),
+                null,
                 job3Customer2Cleaner2,
                 PaymentStatus.INVOICED,
                 795.50
         );
 
         PaymentEntity paymentJob5 = new PaymentEntity(
+                null,
+                new Date(System.currentTimeMillis()- 1000L *60*60*24*34),
                 null,
                 job5Customer2Cleaner1,
                 PaymentStatus.OVERDUE,

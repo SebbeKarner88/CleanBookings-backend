@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Calendar;
+import java.util.Date;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -20,6 +23,14 @@ public class PaymentEntity {
     @Column(name = "id", columnDefinition = "text")
     private String id;
 
+    @Column(name = "issue_date", columnDefinition = "varchar")
+    @Temporal(TemporalType.DATE)
+    private Date issueDate;
+
+    @Column(name = "due_date", columnDefinition = "varchar")
+    @Temporal(TemporalType.DATE)
+    private Date dueDate;
+
     @OneToOne
     @JoinColumn(name = "job_id", foreignKey = @ForeignKey(name = "fk_job_id"))
     private JobEntity job;
@@ -31,4 +42,13 @@ public class PaymentEntity {
     @Column(name = "price", columnDefinition = "numeric")
     private Double price;
 
+    @PrePersist
+    public void setDueDate() {
+        if (issueDate != null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(issueDate);
+            calendar.add(Calendar.DAY_OF_MONTH, 30);
+            dueDate = calendar.getTime();
+        }
+    }
 }
