@@ -94,4 +94,12 @@ public class InputValidation {
         return paymentRepository.findById(id)
                 .orElseThrow(() -> new PaymentNotFoundException("There is no payment with id: " + id));
     }
+
+    public boolean isValidEmailAddress(String email) {
+        return email.length() >= 5 && email.contains("@");
+    }
+
+    public boolean isValidPassword(String password) {
+        return password.length() >= 3;
+    }
 }

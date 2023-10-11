@@ -34,7 +34,7 @@ public class CustomerService {
 
         validateCustomerInputData(request);
 
-        if (!isValidEmailAddress(request.emailAddress()) || !isValidPassword(request.password()))
+        if (!input.isValidEmailAddress(request.emailAddress()) || !input.isValidPassword(request.password()))
             throw new ValidationException("Invalid email/password data");
 
         if (customerRepository.existsByEmailAddress(request.emailAddress()))
@@ -89,15 +89,7 @@ public class CustomerService {
         }
     }
 
-
     // ##### Validation #####
-    private boolean isValidEmailAddress(String email) {
-        return email.length() >= 5 && email.contains("@");
-    }
-
-    private boolean isValidPassword(String password) {
-        return password.length() >= 3;
-    }
 
     private void validateCustomerInputData(CustomerRegistrationDTO request) throws ValidationException {
         if (request.firstName().isBlank())

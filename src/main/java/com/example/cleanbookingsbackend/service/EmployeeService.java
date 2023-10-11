@@ -1,13 +1,9 @@
 package com.example.cleanbookingsbackend.service;
 
-import com.example.cleanbookingsbackend.dto.CreateEmployeeRequest;
-import com.example.cleanbookingsbackend.dto.CreateEmployeeResponse;
-import com.example.cleanbookingsbackend.dto.EmployeeAuthenticationResponse;
-import com.example.cleanbookingsbackend.dto.EmployeeDTO;
+import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.enums.Role;
-import com.example.cleanbookingsbackend.exception.EmployeeNotFoundException;
-import com.example.cleanbookingsbackend.exception.JobNotFoundException;
-import com.example.cleanbookingsbackend.exception.UnauthorizedCallException;
+import com.example.cleanbookingsbackend.exception.*;
+import com.example.cleanbookingsbackend.model.CustomerEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.repository.EmployeeRepository;
@@ -47,9 +43,59 @@ public class EmployeeService {
         return new EmployeeAuthenticationResponse(employee.getId(), employee.getEmailAddress(), employee.getRole());
     }
 
-    public CreateEmployeeResponse createEmployeeRequest(CreateEmployeeRequest request) {
-        return null;
-        //WIP
+    public CreateEmployeeResponse createEmployeeRequest(CreateEmployeeRequest request)
+            throws ValidationException, UsernameIsTakenException, RuntimeException {
+
+        validateEmployeeInputData(request);
+
+        if (!input.isValidEmailAddress(request.emailAddress()) || !input.isValidPassword(request.password()))
+            throw new ValidationException("Invalid email/password data");
+
+        if (employeeRepository.existsByEmailAddress(request.emailAddress()))
+            throw new UsernameIsTakenException("Username is already taken");
+
+        EmployeeEntity employee = employeeBuilder(request);
+
+        try {
+            employeeRepository.save(employee);
+            return new CreateEmployeeResponse(
+                    employee.getId(),
+                    employee.getFirstName(),
+                    employee.getLastName(),
+                    employee.getPhoneNumber(),
+                    employee.getRole(),
+                    employee.getEmailAddress());
+        } catch (Exception e) {
+            throw new RuntimeException("Could not save customer");
+        }
+    }
+
+
+    private EmployeeEntity employeeBuilder(CreateEmployeeRequest request) {
+        return new EmployeeEntity(
+                null,
+                request.firstName(),
+                request.lastName(),
+                request.phoneNumber(),
+                request.role(),
+                request.emailAddress(),
+                passwordEncoder.encode(request.password()),
+                null
+        );
+    }
+
+    private void validateEmployeeInputData(CreateEmployeeRequest request)
+            throws ValidationException {
+        if (request.firstName().isBlank())
+            throw new ValidationException("First name is required");
+        if (request.lastName().isBlank())
+            throw new ValidationException("Last name is required.");
+        if (request.phoneNumber().isBlank())
+            throw new ValidationException("Phone number is required.");
+        if (request.emailAddress().isBlank())
+            throw new ValidationException("Email is required");
+        if (request.password().isBlank())
+            throw new ValidationException("Password is required.");
     }
 
     public EmployeeEntity getEmployeeById(String employeeId) {

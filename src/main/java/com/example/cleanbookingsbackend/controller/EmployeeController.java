@@ -41,7 +41,7 @@ public class EmployeeController {
                     .buildAndExpand(response.id())
                     .toUri();
             return ResponseEntity.created(location).body(response);
-        } catch (IllegalArgumentException /*| UsernameIsTakenException | UnauthorizedCallException*/ exception) {
+        } catch (UsernameIsTakenException | RuntimeException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
