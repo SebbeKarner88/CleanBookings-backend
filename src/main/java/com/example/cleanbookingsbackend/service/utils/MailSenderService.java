@@ -155,7 +155,17 @@ public class MailSenderService {
     }
 
     public void sendEmailConfirmationOnPaidInvoice(JobEntity job) {
-        // WIP
+        msg.setFrom(CLEAN_BOOKINGS);
+        msg.setTo(getCustomerEmailAdress(job));
+        msg.setSubject("Tack för din betalning");
+        msg.setText("Hej " + getCustomerName(job) + "! \n\nHär kommer en bekräftelse på att vi mottagit betalning på jobb: ." + job.getType() +
+                "\n\nVi tackar så mycket för ert förtroende och vi hoppas att ni är nöjda med vårat arbete. På återseende!\n\n" +
+                "StädaFint AB");
+        try {
+            mailSender.send(msg);
+        } catch (MailException exception) {
+            System.out.println(EMAIL_NOT_SENT + exception.getMessage());
+        }
     }
 
     private static String getCustomerEmailAdress(JobEntity requestedJob) {
