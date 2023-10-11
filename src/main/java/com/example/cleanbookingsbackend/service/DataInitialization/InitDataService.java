@@ -70,7 +70,20 @@ public class InitDataService {
                 passwordEncoder.encode("password"),
                 null);
 
-        customerRepository.saveAll(List.of(customer1, customer2, customer3));
+        CustomerEntity customer4 = new CustomerEntity(
+                null,
+                "Maj-Britt",
+                "Hemmafrusson",
+                CustomerType.PRIVATE,
+                "Adress 2",
+                11111,
+                "Staden",
+                "070777777",
+                "majsan@hotmail.se",
+                passwordEncoder.encode("password"),
+                null);
+
+        customerRepository.saveAll(List.of(customer1, customer2, customer3, customer4));
 
         // ##### Cleaner/admin #####
 
@@ -171,13 +184,13 @@ public class InitDataService {
                 null
         );
 
-        jobRepository.saveAll(List.of(  job1Customer1Cleaner1,
-                                        job2Customer2Cleaner1And2,
-                                        job3Customer2Cleaner2,
-                                        job4Customer1Cleaner1And2,
-                                        job5Customer2Cleaner1,
-                                        job6Customer2Cleaner2
-                ));
+        jobRepository.saveAll(List.of(job1Customer1Cleaner1,
+                job2Customer2Cleaner1And2,
+                job3Customer2Cleaner2,
+                job4Customer1Cleaner1And2,
+                job5Customer2Cleaner1,
+                job6Customer2Cleaner2
+        ));
 
         // ##### Payment #####
 
@@ -192,7 +205,7 @@ public class InitDataService {
 
         PaymentEntity paymentJob5 = new PaymentEntity(
                 null,
-                new Date(System.currentTimeMillis()- 1000L *60*60*24*34),
+                new Date(System.currentTimeMillis() - 1000L * 60 * 60 * 24 * 34),
                 null,
                 job5Customer2Cleaner1,
                 PaymentStatus.OVERDUE,

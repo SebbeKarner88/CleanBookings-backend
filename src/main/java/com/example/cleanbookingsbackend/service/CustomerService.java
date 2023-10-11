@@ -172,13 +172,11 @@ public class CustomerService {
 
         if (customer.isEmpty() && employee.isEmpty()) {
             throw new NotFoundException("No Customer or Administrator exists by id: " + customerId);
-        }
-
-        if (customer.isPresent() && employee.isPresent()) {
-            if (customer.get().getJobs() != null) {
-                throw new UnauthorizedCallException("This customer has one or more active bookings!");
-            } else {
+        } else if (customer.isPresent()) {
+            if (customer.get().getJobs().isEmpty()) {
                 customerRepository.deleteById(customerId);
+            } else {
+                throw new UnauthorizedCallException("This customer has one or more active bookings.");
             }
         }
     }
