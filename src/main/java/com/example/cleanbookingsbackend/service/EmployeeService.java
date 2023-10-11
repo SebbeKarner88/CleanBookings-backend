@@ -1,5 +1,7 @@
 package com.example.cleanbookingsbackend.service;
 
+import com.example.cleanbookingsbackend.dto.CreateEmployeeRequest;
+import com.example.cleanbookingsbackend.dto.CreateEmployeeResponse;
 import com.example.cleanbookingsbackend.dto.EmployeeAuthenticationResponse;
 import com.example.cleanbookingsbackend.dto.EmployeeDTO;
 import com.example.cleanbookingsbackend.enums.Role;
@@ -43,6 +45,11 @@ public class EmployeeService {
             throw new AuthException("The password is incorrect");
 
         return new EmployeeAuthenticationResponse(employee.getId(), employee.getEmailAddress(), employee.getRole());
+    }
+
+    public CreateEmployeeResponse createEmployeeRequest(CreateEmployeeRequest request) {
+        return null;
+        //WIP
     }
 
     public EmployeeEntity getEmployeeById(String employeeId) {

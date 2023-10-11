@@ -1,18 +1,16 @@
 package com.example.cleanbookingsbackend.controller;
 
-import com.example.cleanbookingsbackend.dto.AuthenticationRequest;
-import com.example.cleanbookingsbackend.dto.EmployeeDTO;
-import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
-import com.example.cleanbookingsbackend.exception.EmployeeNotFoundException;
-import com.example.cleanbookingsbackend.exception.JobNotFoundException;
-import com.example.cleanbookingsbackend.exception.UnauthorizedCallException;
+import com.example.cleanbookingsbackend.dto.*;
+import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.service.EmployeeService;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -30,6 +28,23 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (AuthException exception) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+        }
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody CreateEmployeeRequest request) {
+        try {
+            CreateEmployeeResponse response = employeeService.createEmployeeRequest(request);
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(response.id())
+                    .toUri();
+            return ResponseEntity.created(location).body(response);
+        } catch (IllegalArgumentException /*| UsernameIsTakenException | UnauthorizedCallException*/ exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
         }
     }
 

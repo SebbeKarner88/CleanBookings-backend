@@ -140,10 +140,10 @@ public class MailSenderService {
         msg.setText("Faktura StädaFint AB                              Fakturanummer: " + job.getPayment().getId() + "\n\n\n\n" +
                 "Betalvillkor: 30 dagar netto                      Betalsätt: Faktura\n" +
                 "Fakturadatum: " + sdf.format(job.getPayment().getIssueDate()) + "                          Förfallodag: " + sdf.format(job.getPayment().getDueDate()) + "\n\n" +
-                "________________________________________________________________________\n" +
-                job.getType() + "                  Antal: 1                   Pris: " + job.getPayment().getPrice() + "kr ink. moms.\n" +
-                "________________________________________________________________________\n" +
-                "                                                             Total: " + job.getPayment().getPrice() + "kr ink. moms.\n\n\n\n" +
+                "____________________________________________________________________\n" +
+                job.getType() + "                Antal: 1                 Pris: " + job.getPayment().getPrice() + "kr ink. moms.\n" +
+                "____________________________________________________________________\n" +
+                "                                                         Total: " + job.getPayment().getPrice() + "kr ink. moms.\n\n\n\n" +
                 "Vid betalning vänligen uppge fakturanummer som meddelande.\n\n" +
                 "Tack så mycket för att ni anlitade oss, vi hoppas att vi snart ses igen!\n\n" +
                 "//Städafint AB" );
