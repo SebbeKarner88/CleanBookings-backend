@@ -48,7 +48,7 @@ public class EmployeeService {
 
         validateEmployeeInputData(request);
 
-        if (!input.isValidEmailAddress(request.emailAddress()) || !input.isValidPassword(request.password()))
+        if (!input.isValidEmailAddress(request.emailAddress()))
             throw new ValidationException("Invalid email/password data");
 
         if (employeeRepository.existsByEmailAddress(request.emailAddress()))
@@ -79,7 +79,7 @@ public class EmployeeService {
                 request.phoneNumber(),
                 request.role(),
                 request.emailAddress(),
-                passwordEncoder.encode(request.password()),
+                passwordEncoder.encode("password"),
                 null
         );
     }
@@ -94,8 +94,6 @@ public class EmployeeService {
             throw new ValidationException("Phone number is required.");
         if (request.emailAddress().isBlank())
             throw new ValidationException("Email is required");
-        if (request.password().isBlank())
-            throw new ValidationException("Password is required.");
     }
 
     public EmployeeEntity getEmployeeById(String employeeId) {
