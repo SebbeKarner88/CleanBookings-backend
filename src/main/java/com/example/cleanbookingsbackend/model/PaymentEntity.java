@@ -28,7 +28,7 @@ public class PaymentEntity {
             strategy = SEQUENCE,
             generator = "bill_seq"
     )
-    @Column(name = "id", columnDefinition = "text")
+    @Column(name = "id", columnDefinition = "numeric")
     private Integer id;
 
     @Column(name = "issue_date", columnDefinition = "varchar")

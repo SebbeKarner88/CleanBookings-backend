@@ -21,9 +21,7 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CustomerController {
 
-
     private final CustomerService customerService;
-
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody CustomerRegistrationDTO request) {
@@ -37,6 +35,8 @@ public class CustomerController {
             return ResponseEntity.created(location).body(response);
         } catch (ValidationException | UsernameIsTakenException | RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
         }
     }
 

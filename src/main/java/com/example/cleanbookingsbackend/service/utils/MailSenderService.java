@@ -154,6 +154,10 @@ public class MailSenderService {
         }
     }
 
+    public void sendEmailConfirmationOnPaidInvoice(JobEntity job) {
+        // WIP
+    }
+
     private static String getCustomerEmailAdress(JobEntity requestedJob) {
         return requestedJob.getCustomer().getEmailAddress();
     }

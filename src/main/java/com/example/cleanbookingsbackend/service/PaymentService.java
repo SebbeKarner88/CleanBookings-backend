@@ -1,7 +1,13 @@
 package com.example.cleanbookingsbackend.service;
 
+import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.PaymentStatus;
+import com.example.cleanbookingsbackend.enums.Role;
+import com.example.cleanbookingsbackend.exception.EmployeeNotFoundException;
 import com.example.cleanbookingsbackend.exception.JobNotFoundException;
+import com.example.cleanbookingsbackend.exception.PaymentNotFoundException;
+import com.example.cleanbookingsbackend.exception.UnauthorizedCallException;
+import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.model.PaymentEntity;
 import com.example.cleanbookingsbackend.repository.JobRepository;
@@ -33,6 +39,22 @@ public class PaymentService {
             paymentRepository.save(invoice);
             jobRepository.save(updatedJob);
             mailSender.sendInvoice(job);
+    }
+
+    public void markInvoiceAsPaid(String adminId, String invoiceId)
+            throws UnauthorizedCallException, JobNotFoundException, EmployeeNotFoundException, PaymentNotFoundException {
+        EmployeeEntity admin = input.validateEmployeeId(adminId);
+        PaymentEntity invoice = input.validatePaymentId(invoiceId);
+        JobEntity job = input.validateJobId(invoice.getJob().getId());
+
+        if(!admin.getRole().equals(Role.ADMIN))
+            throw new UnauthorizedCallException("Only a Admin can mark invoices as paid");
+
+        invoice.setStatus(PaymentStatus.PAID);
+        paymentRepository.save(invoice);
+        job.setStatus(JobStatus.CLOSED);
+        jobRepository.save(job);
+        mailSender.sendEmailConfirmationOnPaidInvoice(job);
     }
 
     private static PaymentEntity createInvoice(JobEntity job) {
