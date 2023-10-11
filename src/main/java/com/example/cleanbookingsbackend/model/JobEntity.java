@@ -30,7 +30,7 @@ public class JobEntity {
     @Column(name = "booked_date", columnDefinition = "varchar")
     private Date bookedDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private CustomerEntity customer;
 

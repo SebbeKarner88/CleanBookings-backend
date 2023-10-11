@@ -190,7 +190,6 @@ public class JobController {
         return ResponseEntity.ok(jobDtos);
     }
 
-//    TODO: Commented-out since it won't compile
     @GetMapping("/booking-history/{customerId}")
     public ResponseEntity<List<JobDto>> getBookingHistory(@PathVariable String customerId) {
         System.out.println("Received customerId: " + customerId);
@@ -202,6 +201,21 @@ public class JobController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(jobDtos);
+    }
+
+    @DeleteMapping("/{jobId}")
+    public ResponseEntity<?> deleteJob(
+            @PathVariable String jobId,
+            @RequestParam String employeeId
+    ) {
+        try {
+            jobService.deleteJob(employeeId, jobId);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (EmployeeNotFoundException | JobNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        } catch (IllegalArgumentException | UnauthorizedCallException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
+        }
     }
 
     private JobDto convertToDto(JobEntity jobEntity) {

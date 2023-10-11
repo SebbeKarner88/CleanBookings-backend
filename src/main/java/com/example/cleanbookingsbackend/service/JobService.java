@@ -150,6 +150,12 @@ public class JobService {
         return jobRepository.findByEmployeeId(employeeId);
     }
 
+    public void deleteJob(String employeeId, String jobId)
+            throws EmployeeNotFoundException, UnauthorizedCallException, JobNotFoundException {
+        if (isValidDeleteRequest(employeeId, jobId)) {
+            jobRepository.deleteById(jobId);
+        }
+    }
 
     private void updateJobStatusAndMessage(JobApproveRequest request)
             throws JobNotFoundException {
@@ -317,6 +323,18 @@ public class JobService {
         return true;
     }
 
+    private boolean isValidDeleteRequest(String employeeId, String jobId) throws JobNotFoundException, UnauthorizedCallException {
+        validateInputDataField(EMPLOYEE_ID, STRING, employeeId);
+        validateInputDataField(JOB_ID, STRING, jobId);
+        EmployeeEntity admin = input.validateEmployeeId(employeeId);
+        JobEntity job = input.validateJobId(jobId);
+        if (!admin.getRole().equals(Role.ADMIN))
+            throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE);
+        if (job.getStatus().equals(JobStatus.APPROVED) || job.getStatus().equals(JobStatus.CLOSED))
+            throw new IllegalArgumentException("You can't remove a job that has already been approved or closed.");
+        return true;
+    }
+
     private static void checkCustomerAuthorization(CustomerEntity customer, JobEntity job)
             throws UnauthorizedCallException {
         if (job.getCustomer() != customer) {
@@ -371,6 +389,4 @@ public class JobService {
                 job.getEmployee().stream().map(employee -> employee.getFirstName().concat(" ").concat(employee.getLastName())).toList()
         );
     }
-
-
 }
