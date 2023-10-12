@@ -61,6 +61,44 @@ public class CustomerService {
         return new AuthenticationResponse(customer.getId(), customer.getFirstName());
     }
 
+    public boolean updateCustomerInfo(String id, UserUpdateRequest request)
+            throws NotFoundException {
+
+        Optional<CustomerEntity> customerOptional = customerRepository.findById(id);
+
+        if (customerOptional.isEmpty()) {
+            throw new NotFoundException("No customer exists by id: " + id);
+        }
+
+        CustomerEntity customer = customerOptional.orElse(null);
+        // check if response fields are not null before updating
+        if (request.firstName() != null) {
+            customer.setFirstName(request.firstName());
+        }
+        if (request.lastName() != null) {
+            customer.setLastName(request.lastName());
+        }
+        if (request.streetAddress() != null) {
+            customer.setStreetAddress(request.streetAddress());
+        }
+        if (request.postalCode() != null) {
+            customer.setPostalCode(request.postalCode());
+        }
+        if (request.city() != null) {
+            customer.setCity(request.city());
+        }
+        if (request.phoneNumber() != null) {
+            customer.setPhoneNumber(request.phoneNumber());
+        }
+        if (request.emailAddress() != null) {
+            customer.setEmailAddress(request.emailAddress());
+        }
+
+        customerRepository.save(customer);
+
+        return true;
+    }
+
     public List<CustomerResponseDTO> listAllCustomers(String id)
             throws EmployeeNotFoundException, UnauthorizedCallException {
         List<CustomerResponseDTO> customers = new ArrayList<>();

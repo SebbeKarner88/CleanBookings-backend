@@ -2,7 +2,6 @@ package com.example.cleanbookingsbackend.controller;
 
 import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.exception.*;
-import com.example.cleanbookingsbackend.model.CustomerEntity;
 import com.example.cleanbookingsbackend.service.CustomerService;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,6 +45,16 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (AuthException exception) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+        }
+    }
+
+    @PutMapping("/updateInfo")
+    public ResponseEntity<?> updateCustomerInfo(@RequestHeader String id,
+                                                @RequestBody UserUpdateRequest request) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(customerService.updateCustomerInfo(id, request));
+        } catch (NotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         }
     }
 }
