@@ -117,6 +117,25 @@ public class JobService {
         return true;
     }
 
+    public List<JobResponseDTO> getAllJobsCleaner(String id) throws EmployeeNotFoundException, UnauthorizedCallException {
+        List<JobResponseDTO> jobs = new ArrayList<>();
+        if (isValidGetAllJobsCleanerRequest(id))
+            jobs = jobRepository
+                    .findAllByEmployeeId(id)
+                    .stream()
+                    .map(this::convertToJobResponseDTO)
+                    .toList();
+        return jobs;
+    }
+
+    private boolean isValidGetAllJobsCleanerRequest(String id) throws UnauthorizedCallException {
+        validateInputDataField(EMPLOYEE_ID, STRING, id);
+        EmployeeEntity employee = input.validateEmployeeId(id);
+        if (!employee.getRole().equals(Role.CLEANER))
+            throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE);
+        return true;
+    }
+
     public List<JobEntity> getBookedCleaningsForCustomer(String customerId) {
         return jobRepository.findByCustomer_Id(customerId);
     }
