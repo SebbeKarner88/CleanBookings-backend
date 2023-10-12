@@ -2,7 +2,9 @@ package com.example.cleanbookingsbackend.controller;
 
 import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.exception.*;
+import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.service.EmployeeService;
+import com.example.cleanbookingsbackend.service.JobService;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,8 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(path = "/api/v1/employee")
 public class EmployeeController {
-
     private final EmployeeService employeeService;
+    private final JobService jobService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {
@@ -61,6 +63,31 @@ public class EmployeeController {
         } catch (UnauthorizedCallException exception) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
         }
+    }
+
+    @GetMapping("/jobs")
+    public ResponseEntity<?> getAllJobsByEmployee(@RequestParam String employeeId) {
+        try {
+            List<JobResponseDTO> jobs = jobService
+                    .getAllCleaningsForCleaner(employeeId)
+                    .stream()
+                    .map(this::convertToJobResponseDTO)
+                    .toList();
+            return ResponseEntity.ok().body(jobs);
+        } catch (EmployeeNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        }
+    }
+
+    private JobResponseDTO convertToJobResponseDTO(JobEntity job) {
+        return new JobResponseDTO(
+                job.getId(),
+                job.getType().toString(),
+                job.getStatus().toString(),
+                job.getMessage(),
+                job.getCustomer().getId(),
+                job.getEmployee().stream().map(employee -> employee.getFirstName().concat(" ").concat(employee.getLastName())).toList()
+        );
     }
 
 }

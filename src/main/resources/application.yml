@@ -26,6 +26,6 @@ spring:
           auth: true
           starttls:
             enable: true
-  server:
+server:
     error:
       include-message: always
