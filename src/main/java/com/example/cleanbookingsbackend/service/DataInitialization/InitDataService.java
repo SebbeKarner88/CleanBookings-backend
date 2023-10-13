@@ -1,7 +1,7 @@
 package com.example.cleanbookingsbackend.service.DataInitialization;
 
 import com.example.cleanbookingsbackend.enums.*;
-import com.example.cleanbookingsbackend.model.CustomerEntity;
+import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.model.PaymentEntity;
@@ -24,63 +24,67 @@ public class InitDataService {
     private final EmployeeRepository employeeRepository;
     private final JobRepository jobRepository;
     private final PaymentRepository paymentRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder encoder;
 
     @PostConstruct
     public void initializeData() {
 
         // ##### Customers #####
 
-        CustomerEntity customer1 = new CustomerEntity(
+        PrivateCustomerEntity customer1 = new PrivateCustomerEntity(
                 null,
                 "Jane",
                 "Doe",
+                encoder.encode("880325-2456"),
                 CustomerType.PRIVATE,
                 "Jane Street 1",
                 12345,
                 "Jane City",
                 "076-250 90 80",
                 "jane.doe@janecity.com",
-                passwordEncoder.encode("password"),
+                encoder.encode("password"),
                 null);
 
-        CustomerEntity customer2 = new CustomerEntity(
+        PrivateCustomerEntity customer2 = new PrivateCustomerEntity(
                 null,
                 "Johnny",
                 "Doe",
-                CustomerType.BUSINESS,
+                encoder.encode("730623-0145"),
+                CustomerType.PRIVATE,
                 "Jhonny Street 1",
                 12345,
                 "Jhonny City",
                 "076-250 45 23",
                 "jhonny.doe@aol.com",
-                passwordEncoder.encode("password"),
+                encoder.encode("password"),
                 null);
 
-        CustomerEntity customer3 = new CustomerEntity(
+        PrivateCustomerEntity customer3 = new PrivateCustomerEntity(
                 null,
                 "Anders",
                 "Svensson",
+                encoder.encode("450919-0945"),
                 CustomerType.PRIVATE,
                 "Gatgatan 1",
                 12321,
                 "Stadstaden",
                 "076-253 45 43",
                 "anders.Svensson@google.com",
-                passwordEncoder.encode("password"),
+                encoder.encode("password"),
                 null);
 
-        CustomerEntity customer4 = new CustomerEntity(
+        PrivateCustomerEntity customer4 = new PrivateCustomerEntity(
                 null,
                 "Maj-Britt",
                 "Hemmafrusson",
+                encoder.encode("901224-0165"),
                 CustomerType.PRIVATE,
                 "Adress 2",
                 11111,
                 "Staden",
                 "070777777",
                 "majsan@hotmail.se",
-                passwordEncoder.encode("password"),
+                encoder.encode("password"),
                 null);
 
         customerRepository.saveAll(List.of(customer1, customer2, customer3, customer4));
@@ -94,7 +98,7 @@ public class InitDataService {
                 "073-9 453 843",
                 Role.CLEANER,
                 "Cleaner1@CleanBookings.com",
-                passwordEncoder.encode("password"),
+                encoder.encode("password"),
                 null
         );
         EmployeeEntity cleaner2 = new EmployeeEntity(
@@ -104,7 +108,7 @@ public class InitDataService {
                 "073-9 351 733",
                 Role.CLEANER,
                 "Cleaner2@CleanBookings.com",
-                passwordEncoder.encode("password"),
+                encoder.encode("password"),
                 null
 
         );
@@ -115,7 +119,7 @@ public class InitDataService {
                 "074-9 433 243",
                 Role.ADMIN,
                 "Admin1@CleanBookings.com",
-                passwordEncoder.encode("password"),
+                encoder.encode("password"),
                 null
         );
 

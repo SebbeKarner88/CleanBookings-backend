@@ -4,7 +4,7 @@ import com.example.cleanbookingsbackend.dto.CustomerDataResponse;
 import com.example.cleanbookingsbackend.dto.EmployeeDataResponse;
 import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
 import com.example.cleanbookingsbackend.exception.EmployeeNotFoundException;
-import com.example.cleanbookingsbackend.model.CustomerEntity;
+import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.service.CustomerService;
 import com.example.cleanbookingsbackend.service.EmployeeService;
@@ -27,7 +27,7 @@ public class GDPRController {
     @GetMapping("/customer-data/{customerId}")
     public ResponseEntity<CustomerDataResponse> getCustomerData(@PathVariable String customerId) {
         try {
-            CustomerEntity customer = customerService.getCustomerById(customerId);
+            PrivateCustomerEntity customer = customerService.getCustomerById(customerId);
             CustomerDataResponse response = CustomerDataResponse.fromEntity(customer);
             return ResponseEntity.ok(response);
         } catch (CustomerNotFoundException ex) {

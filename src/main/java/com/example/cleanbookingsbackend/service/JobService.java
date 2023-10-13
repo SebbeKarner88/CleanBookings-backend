@@ -5,7 +5,7 @@ import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.JobType;
 import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.*;
-import com.example.cleanbookingsbackend.model.CustomerEntity;
+import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.repository.CustomerRepository;
@@ -45,7 +45,7 @@ public class JobService {
             throws IllegalArgumentException, CustomerNotFoundException, ParseException {
         JobEntity requestedJob = new JobEntity();
         if (isValidCreateJobRequest(request)) {
-            CustomerEntity customer = input.validateCustomerId(request.customerId());
+            PrivateCustomerEntity customer = input.validateCustomerId(request.customerId());
             JobType type = validateJobType(request.type());
             Date date = DATE_FORMAT.parse(request.date());
             if (jobRepository.findByBookedDateAndType(date, type).isPresent())
@@ -249,7 +249,7 @@ public class JobService {
 
     private void authorizedCancellation(JobUserRequest request)
             throws UnauthorizedCallException, NotFoundException, JobNotFoundException {
-        Optional<CustomerEntity> customerOptional = customerRepository.findById(request.userId());
+        Optional<PrivateCustomerEntity> customerOptional = customerRepository.findById(request.userId());
         Optional<EmployeeEntity> employeeOptional = employeeRepository.findById(request.userId());
 
         if (customerOptional.isEmpty() && employeeOptional.isEmpty()) {
@@ -259,7 +259,7 @@ public class JobService {
         JobEntity job = input.validateJobId(request.jobId());
 
         if (customerOptional.isPresent()) {
-            CustomerEntity customer = customerOptional.get();
+            PrivateCustomerEntity customer = customerOptional.get();
             checkCustomerAuthorization(customer, job);
         } else if (employeeOptional.get().getRole().equals(Role.CLEANER)) {
             throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE +
@@ -285,7 +285,7 @@ public class JobService {
         validateInputDataField(JOB_ID, STRING, request.jobId());
         validateInputDataField(CUSTOMER_ID, STRING, request.customerId());
         JobEntity job = input.validateJobId(request.jobId());
-        CustomerEntity customer = input.validateCustomerId(request.customerId());
+        PrivateCustomerEntity customer = input.validateCustomerId(request.customerId());
         if (!Objects.equals(customer.getId(), job.getCustomer().getId()))
             throw new UnauthorizedCallException("Only the customer who booked the cleaning can approve or deny.");
         return true;
@@ -354,7 +354,7 @@ public class JobService {
         return true;
     }
 
-    private static void checkCustomerAuthorization(CustomerEntity customer, JobEntity job)
+    private static void checkCustomerAuthorization(PrivateCustomerEntity customer, JobEntity job)
             throws UnauthorizedCallException {
         if (job.getCustomer() != customer) {
             throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE +
@@ -366,7 +366,7 @@ public class JobService {
     }
 
     private CreateJobResponse convertToCreateJobResponseDTO(JobEntity job) {
-        CustomerEntity customer = job.getCustomer();
+        PrivateCustomerEntity customer = job.getCustomer();
         CreateJobResponse.Adress adressDto = new CreateJobResponse.Adress(
                 customer.getStreetAddress(),
                 customer.getPostalCode(),

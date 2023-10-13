@@ -32,7 +32,7 @@ public class JobEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
-    private CustomerEntity customer;
+    private PrivateCustomerEntity customer;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -58,7 +58,7 @@ public class JobEntity {
     @OneToOne(mappedBy = "job")
     private PaymentEntity payment;
 
-    public JobEntity(CustomerEntity customer, JobType type, Date bookedDate, String message) {
+    public JobEntity(PrivateCustomerEntity customer, JobType type, Date bookedDate, String message) {
         this.customer = customer;
         this.type = type;
         this.status = JobStatus.OPEN;

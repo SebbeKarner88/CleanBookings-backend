@@ -5,7 +5,7 @@ import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
 import com.example.cleanbookingsbackend.exception.EmployeeNotFoundException;
 import com.example.cleanbookingsbackend.exception.JobNotFoundException;
 import com.example.cleanbookingsbackend.exception.PaymentNotFoundException;
-import com.example.cleanbookingsbackend.model.CustomerEntity;
+import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.model.PaymentEntity;
@@ -75,7 +75,7 @@ public class InputValidation {
         return type;
     }
 
-    public CustomerEntity validateCustomerId(String id) throws CustomerNotFoundException {
+    public PrivateCustomerEntity validateCustomerId(String id) throws CustomerNotFoundException {
         return customerRepository.findById(id)
                 .orElseThrow(() -> new CustomerNotFoundException("There is no customer with id: " + id));
     }

@@ -1,7 +1,7 @@
 package com.example.cleanbookingsbackend.dto;
 
 import com.example.cleanbookingsbackend.enums.CustomerType;
-import com.example.cleanbookingsbackend.model.CustomerEntity;
+import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,17 +24,17 @@ public class CustomerDataResponse {
 
     // Constructors, getters, and setters
 
-    public static CustomerDataResponse fromEntity(CustomerEntity customerEntity) {
+    public static CustomerDataResponse fromEntity(PrivateCustomerEntity privateCustomerEntity) {
         CustomerDataResponse response = new CustomerDataResponse();
-        response.setId(customerEntity.getId());
-        response.setFirstName(customerEntity.getFirstName());
-        response.setLastName(customerEntity.getLastName());
-        response.setCustomerType(customerEntity.getCustomerType());
-        response.setStreetAddress(customerEntity.getStreetAddress());
-        response.setPostalCode(customerEntity.getPostalCode());
-        response.setCity(customerEntity.getCity());
-        response.setPhoneNumber(customerEntity.getPhoneNumber());
-        response.setEmailAddress(customerEntity.getEmailAddress());
+        response.setId(privateCustomerEntity.getId());
+        response.setFirstName(privateCustomerEntity.getFirstName());
+        response.setLastName(privateCustomerEntity.getLastName());
+        response.setCustomerType(privateCustomerEntity.getCustomerType());
+        response.setStreetAddress(privateCustomerEntity.getStreetAddress());
+        response.setPostalCode(privateCustomerEntity.getPostalCode());
+        response.setCity(privateCustomerEntity.getCity());
+        response.setPhoneNumber(privateCustomerEntity.getPhoneNumber());
+        response.setEmailAddress(privateCustomerEntity.getEmailAddress());
         return response;
     }
 }

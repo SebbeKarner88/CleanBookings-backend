@@ -3,7 +3,7 @@ package com.example.cleanbookingsbackend.service;
 import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.*;
-import com.example.cleanbookingsbackend.model.CustomerEntity;
+import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.repository.CustomerRepository;
 import com.example.cleanbookingsbackend.repository.EmployeeRepository;
@@ -22,7 +22,7 @@ import java.util.Optional;
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder encoder;
     private final InputValidation input;
     private final EmployeeRepository employeeRepository;
 
@@ -40,7 +40,7 @@ public class CustomerService {
         if (customerRepository.existsByEmailAddress(request.emailAddress()))
             throw new UsernameIsTakenException("Username is already taken");
 
-        CustomerEntity customer = customerBuilder(request);
+        PrivateCustomerEntity customer = customerBuilder(request);
 
         try {
             customerRepository.save(customer);
@@ -54,8 +54,8 @@ public class CustomerService {
         if (customerRepository.findByEmailAddress(email).isEmpty())
             throw new CustomerNotFoundException("There is no customer registered with email: " + email);
 
-        CustomerEntity customer = customerRepository.findByEmailAddress(email).get();
-        if (!passwordEncoder.matches(password, customer.getPassword()))
+        PrivateCustomerEntity customer = customerRepository.findByEmailAddress(email).get();
+        if (!encoder.matches(password, customer.getPassword()))
             throw new AuthException("The password is incorrect");
 
         return new AuthenticationResponse(customer.getId(), customer.getFirstName());
@@ -64,13 +64,13 @@ public class CustomerService {
     public boolean updateCustomerInfo(String id, UserUpdateRequest request)
             throws NotFoundException {
 
-        Optional<CustomerEntity> customerOptional = customerRepository.findById(id);
+        Optional<PrivateCustomerEntity> customerOptional = customerRepository.findById(id);
 
         if (customerOptional.isEmpty()) {
             throw new NotFoundException("No customer exists by id: " + id);
         }
 
-        CustomerEntity customer = customerOptional.orElse(null);
+        PrivateCustomerEntity customer = customerOptional.orElse(null);
         // check if response fields are not null before updating
         if (request.firstName() != null) {
             customer.setFirstName(request.firstName());
@@ -134,6 +134,8 @@ public class CustomerService {
             throw new ValidationException("First name is required");
         if (request.lastName().isBlank())
             throw new ValidationException("Last name is required.");
+        if (request.personNumber().isBlank())
+            throw new ValidationException("Social security is required.");
         if (request.customerType() == null)
             throw new ValidationException("Type is required.");
         if (request.streetAddress().isBlank())
@@ -158,7 +160,7 @@ public class CustomerService {
     }
 
     private void authorizedUpdate(AdminUserUpdateRequest request) throws NotFoundException {
-        Optional<CustomerEntity> customerOptional = customerRepository.findById(request.customerId());
+        Optional<PrivateCustomerEntity> customerOptional = customerRepository.findById(request.customerId());
         Optional<EmployeeEntity> employeeOptional = employeeRepository.findById(request.adminId());
 
         if (customerOptional.isEmpty() && employeeOptional.isEmpty()) {
@@ -166,7 +168,7 @@ public class CustomerService {
         }
 
         if (customerOptional.isPresent() && employeeOptional.isPresent()) {
-            CustomerEntity customer = customerOptional.orElse(null);
+            PrivateCustomerEntity customer = customerOptional.orElse(null);
             // check if response fields are not null before updating
             if (request.firstName() != null) {
                 customer.setFirstName(request.firstName());
@@ -197,7 +199,7 @@ public class CustomerService {
     }
 
     private void authorizedDelete(String adminId, String customerId) throws NotFoundException, UnauthorizedCallException {
-        Optional<CustomerEntity> customer = customerRepository.findById(customerId);
+        Optional<PrivateCustomerEntity> customer = customerRepository.findById(customerId);
         Optional<EmployeeEntity> employee = employeeRepository.findById(adminId);
 
         if (customer.isEmpty() && employee.isEmpty()) {
@@ -212,23 +214,24 @@ public class CustomerService {
     }
 
     // ##### Builder #####
-    public CustomerEntity customerBuilder(CustomerRegistrationDTO request) {
-        return new CustomerEntity(
+    public PrivateCustomerEntity customerBuilder(CustomerRegistrationDTO request) {
+        return new PrivateCustomerEntity(
                 null,
                 request.firstName(),
                 request.lastName(),
+                encoder.encode(request.personNumber()),
                 request.customerType(),
                 request.streetAddress(),
                 request.postalCode(),
                 request.city(),
                 request.phoneNumber(),
                 request.emailAddress(),
-                passwordEncoder.encode(request.password()),
+                encoder.encode(request.password()),
                 null
         );
     }
 
-    private CustomerResponseDTO toDTO(CustomerEntity customer) {
+    private CustomerResponseDTO toDTO(PrivateCustomerEntity customer) {
         return new CustomerResponseDTO(
                 customer.getId(),
                 customer.getFirstName(),
@@ -242,7 +245,7 @@ public class CustomerService {
         );
     }
 
-    public CustomerEntity getCustomerById(String customerId) {
+    public PrivateCustomerEntity getCustomerById(String customerId) {
         return customerRepository.findById(customerId)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found with ID: " + customerId));
     }
