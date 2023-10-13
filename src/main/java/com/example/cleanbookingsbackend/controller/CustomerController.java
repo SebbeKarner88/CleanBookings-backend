@@ -48,10 +48,11 @@ public class CustomerController {
         }
     }
 
-    @PutMapping("/updateInfo")
-    public ResponseEntity<?> updateCustomerInfo(@RequestBody UserUpdateRequest request) {
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateCustomerInfo(@PathVariable("id") String id,
+                                                @RequestBody UserUpdateRequest request) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(customerService.updateCustomerInfo(request));
+            return ResponseEntity.status(HttpStatus.OK).body(customerService.updateCustomerInfo(id, request));
         } catch (CustomerNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         }

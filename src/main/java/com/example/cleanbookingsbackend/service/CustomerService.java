@@ -61,16 +61,11 @@ public class CustomerService {
         return new AuthenticationResponse(customer.getId(), customer.getFirstName());
     }
 
-    public boolean updateCustomerInfo(UserUpdateRequest request)
+    public boolean updateCustomerInfo(String id, UserUpdateRequest request)
             throws CustomerNotFoundException {
 
-        Optional<PrivateCustomerEntity> customerOptional = customerRepository.findById(request.customerId());
+        PrivateCustomerEntity customer = input.validateCustomerId(id);
 
-        if (customerOptional.isEmpty()) {
-            throw new CustomerNotFoundException("No customer exists by id: " + request.customerId());
-        }
-
-        PrivateCustomerEntity customer = customerOptional.orElse(null);
         // check if response fields are not null before updating
         if (request.firstName() != null) {
             customer.setFirstName(request.firstName());
