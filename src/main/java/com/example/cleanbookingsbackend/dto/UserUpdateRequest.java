@@ -1,6 +1,7 @@
 package com.example.cleanbookingsbackend.dto;
 
 public record UserUpdateRequest(
+        String customerId,
         String firstName,
         String lastName,
         String streetAddress,

@@ -61,13 +61,13 @@ public class CustomerService {
         return new AuthenticationResponse(customer.getId(), customer.getFirstName());
     }
 
-    public boolean updateCustomerInfo(String id, UserUpdateRequest request)
-            throws NotFoundException {
+    public boolean updateCustomerInfo(UserUpdateRequest request)
+            throws CustomerNotFoundException {
 
-        Optional<PrivateCustomerEntity> customerOptional = customerRepository.findById(id);
+        Optional<PrivateCustomerEntity> customerOptional = customerRepository.findById(request.customerId());
 
         if (customerOptional.isEmpty()) {
-            throw new NotFoundException("No customer exists by id: " + id);
+            throw new CustomerNotFoundException("No customer exists by id: " + request.customerId());
         }
 
         PrivateCustomerEntity customer = customerOptional.orElse(null);
