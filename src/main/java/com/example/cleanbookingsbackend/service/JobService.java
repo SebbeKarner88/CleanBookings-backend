@@ -128,6 +128,17 @@ public class JobService {
         return jobs;
     }
 
+    public List<JobResponseDTO> getAllJobsCustomer(String id) throws EmployeeNotFoundException, UnauthorizedCallException {
+        List<JobResponseDTO> jobs = new ArrayList<>();
+        if (isValidGetAllJobsCustomerRequest(id))
+            jobs = jobRepository
+                    .findAllByCustomerId(id)
+                    .stream()
+                    .map(this::convertToJobResponseDTO)
+                    .toList();
+        return jobs;
+    }
+
     private boolean isValidGetAllJobsCleanerRequest(String id) throws UnauthorizedCallException {
         validateInputDataField(EMPLOYEE_ID, STRING, id);
         EmployeeEntity employee = input.validateEmployeeId(id);
@@ -135,6 +146,22 @@ public class JobService {
             throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE);
         return true;
     }
+
+    private boolean isValidGetAllJobsCustomerRequest(String id) throws UnauthorizedCallException {
+        validateInputDataField(CUSTOMER_ID, STRING, id);
+        PrivateCustomerEntity customer = input.validateCustomerId(id);
+//        if (!employee.getRole().equals(Role.CLEANER))
+//            throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE);
+        return true;
+    }
+
+//    private boolean isValidGetAllJobsCustomerRequest(String id) throws UnauthorizedCallException {
+//        validateInputDataField(CUSTOMER_ID, STRING, id);
+//        PrivateCustomerEntity customer = input.validateCustomerId(id);
+////        if (!employee.getRole().equals(Role.CLEANER))
+////            throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE);
+//        return true;
+//    }
 
     public List<JobEntity> getBookedCleaningsForCustomer(String customerId) {
         return jobRepository.findByCustomer_Id(customerId);

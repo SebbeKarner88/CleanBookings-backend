@@ -228,4 +228,16 @@ public class JobController {
 
         return jobDto;
     }
+
+    @GetMapping("/jobs")
+    public ResponseEntity<?> getAllJobsCustomer(@RequestParam String customerId) {
+        try {
+            List<JobResponseDTO> jobs = jobService.getAllJobsCustomer(customerId);
+            return ResponseEntity.ok().body(jobs);
+        } catch (EmployeeNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        } catch (UnauthorizedCallException exception) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+        }
+    }
 }
