@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
-@Table(name = "private_customer", uniqueConstraints = @UniqueConstraint(name = "username_private_customer_unique", columnNames = "email_address"))
+@Table(name = "private_customer", uniqueConstraints =@UniqueConstraint(name = "username_private_customer_unique", columnNames = "email_address"))
 public class PrivateCustomerEntity {
 
     @Id

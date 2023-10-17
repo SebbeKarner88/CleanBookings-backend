@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +27,11 @@ public class CustomerService {
     private final InputValidation input;
     private final EmployeeRepository employeeRepository;
 
-
     public AuthenticationResponse create(CustomerRegistrationDTO request)
             throws ValidationException,
             UsernameIsTakenException,
-            RuntimeException {
+            RuntimeException,
+            SocSecNumberIsTakenException {
 
         validateCustomerInputData(request);
 
@@ -39,6 +40,9 @@ public class CustomerService {
 
         if (customerRepository.existsByEmailAddress(request.emailAddress()))
             throw new UsernameIsTakenException("Username is already taken");
+
+        if (checkIfSocSecNumberExists(request.personNumber()))
+            throw new SocSecNumberIsTakenException("Social security number already exists");
 
         PrivateCustomerEntity customer = customerBuilder(request);
 
@@ -218,6 +222,17 @@ public class CustomerService {
         return customer;
     }
 
+    private boolean checkIfSocSecNumberExists(String number) {
+
+        List<PrivateCustomerEntity> customerList = customerRepository.findAll();
+        AtomicBoolean exists = new AtomicBoolean(false);
+        customerList
+                .forEach(customer -> {
+                    if (encoder.matches(number, customer.getPersonNumber()))
+                        exists.set(true);
+                });
+        return exists.get();
+    }
 
     // ##### Builder #####
     public PrivateCustomerEntity customerBuilder(CustomerRegistrationDTO request) {
