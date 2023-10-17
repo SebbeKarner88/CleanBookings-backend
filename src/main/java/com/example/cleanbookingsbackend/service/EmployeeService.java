@@ -109,7 +109,7 @@ public class EmployeeService {
         List<EmployeeDTO> availableEmployees = new ArrayList<>();
         JobEntity requestedJob = input.validateJobId(jobId);
 
-        if (isValidGetAllAvailableEmployeesRequest(employeeId)) {
+        if (isAdmin(employeeId)) {
             checkIfAvailable(availableEmployees, requestedJob);
         }
         return availableEmployees;
@@ -137,7 +137,20 @@ public class EmployeeService {
         });
     }
 
-    private boolean isValidGetAllAvailableEmployeesRequest(String id)
+    public List<AdminResponseDTO> getAllAdmins(String employeeId)
+            throws UnauthorizedCallException, EmployeeNotFoundException {
+        List<AdminResponseDTO> admins = new ArrayList<>();
+        if(isAdmin(employeeId))
+            admins = employeeRepository
+                    .findAllByRole(Role.ADMIN)
+                    .stream().map(this::convertToAdminResponseDTO)
+                    .toList();
+        return admins;
+
+    }
+
+
+    private boolean isAdmin(String id)
             throws UnauthorizedCallException, EmployeeNotFoundException {
         validateInputDataField(EMPLOYEE_ID, STRING, id);
         EmployeeEntity employee = input.validateEmployeeId(id);
@@ -148,5 +161,9 @@ public class EmployeeService {
 
     private EmployeeDTO convertToEmployeeDTO(EmployeeEntity employee) {
         return new EmployeeDTO(employee.getId(), (employee.getFirstName()) + " " + employee.getLastName());
+    }
+
+    private AdminResponseDTO convertToAdminResponseDTO(EmployeeEntity employee) {
+        return new AdminResponseDTO(employee.getId(), employee.getFirstName(), employee.getLastName(), employee.getEmailAddress(), employee.getPhoneNumber());
     }
 }

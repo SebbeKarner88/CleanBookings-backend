@@ -1,5 +1,6 @@
 package com.example.cleanbookingsbackend.controller;
 
+import com.example.cleanbookingsbackend.dto.AdminResponseDTO;
 import com.example.cleanbookingsbackend.dto.AdminUserUpdateRequest;
 import com.example.cleanbookingsbackend.dto.CustomerResponseDTO;
 import com.example.cleanbookingsbackend.dto.JobResponseDTO;
@@ -8,6 +9,7 @@ import com.example.cleanbookingsbackend.exception.EmployeeNotFoundException;
 import com.example.cleanbookingsbackend.exception.NotFoundException;
 import com.example.cleanbookingsbackend.exception.UnauthorizedCallException;
 import com.example.cleanbookingsbackend.service.CustomerService;
+import com.example.cleanbookingsbackend.service.EmployeeService;
 import com.example.cleanbookingsbackend.service.JobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,7 @@ import java.util.List;
 public class AdminController {
     private final JobService jobService;
     private final CustomerService customerService;
+    private final EmployeeService employeeService;
 
     @GetMapping("/jobs")
     public ResponseEntity<?> getAllJobs(@RequestParam String employeeId) {
@@ -40,6 +43,18 @@ public class AdminController {
         try {
             List<CustomerResponseDTO> customerDTOList = customerService.listAllCustomers(employeeId);
             return ResponseEntity.ok().body(customerDTOList);
+        } catch (EmployeeNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        } catch (UnauthorizedCallException exception) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+        }
+    }
+
+    @GetMapping("/admins")
+    public ResponseEntity<?> getAllAdmins(@RequestParam String employeeId) {
+        try {
+            List<AdminResponseDTO> admins = employeeService.getAllAdmins(employeeId);
+            return ResponseEntity.ok().body(admins);
         } catch (EmployeeNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (UnauthorizedCallException exception) {
