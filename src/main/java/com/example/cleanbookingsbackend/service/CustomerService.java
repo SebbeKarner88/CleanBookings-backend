@@ -81,6 +81,12 @@ public class CustomerService {
         return true;
     }
 
+    public boolean updateCustomerPassword(String customerId, PasswordUpdateRequest request) {
+
+        // WIP
+        return true;
+    }
+
     public boolean updateCustomerAdmin(AdminUserUpdateRequest request)
             throws EmployeeNotFoundException, CustomerNotFoundException, UnauthorizedCallException, NotFoundException {
 

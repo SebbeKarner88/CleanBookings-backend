@@ -46,18 +46,33 @@ public class CustomerController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (AuthException exception) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
         }
+
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("updateCustomer/{id}")
     public ResponseEntity<?> updateCustomerInfo(@PathVariable("id") String id,
                                                 @RequestBody UserUpdateRequest request) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(customerService.updateCustomerInfo(id, request));
         } catch (CustomerNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
         }
     }
 
-
+    @PutMapping("updatePassword/{id}")
+    public ResponseEntity<?> updateCustomerPassword(@PathVariable("id") String customerId,
+                                                @RequestBody PasswordUpdateRequest request) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(customerService.updateCustomerPassword(customerId, request));
+        } catch (CustomerNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
+        }
+    }
 }
