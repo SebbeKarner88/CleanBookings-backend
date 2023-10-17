@@ -81,9 +81,13 @@ public class CustomerService {
         return true;
     }
 
-    public boolean updateCustomerPassword(String customerId, PasswordUpdateRequest request) {
-
-        // WIP
+    public boolean updateCustomerPassword(String customerId, PasswordUpdateRequest request)
+            throws UnauthorizedCallException {
+        PrivateCustomerEntity customer = input.validateCustomerId(customerId);
+        if (!encoder.matches(request.oldPassword(), customer.getPassword()))
+            throw new UnauthorizedCallException("Invalid password");
+        customer.setPassword(encoder.encode(request.newPassword()));
+        customerRepository.save(customer);
         return true;
     }
 

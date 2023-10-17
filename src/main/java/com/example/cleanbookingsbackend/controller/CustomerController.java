@@ -69,8 +69,8 @@ public class CustomerController {
                                                 @RequestBody PasswordUpdateRequest request) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(customerService.updateCustomerPassword(customerId, request));
-        } catch (CustomerNotFoundException exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        } catch (UnauthorizedCallException exception) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
         }
