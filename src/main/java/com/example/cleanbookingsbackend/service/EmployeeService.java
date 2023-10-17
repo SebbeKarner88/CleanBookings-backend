@@ -137,18 +137,51 @@ public class EmployeeService {
         });
     }
 
-    public List<AdminResponseDTO> getAllAdmins(String employeeId)
+    public List<EmployeeResponseDTO> getAllAdmins(String employeeId)
             throws UnauthorizedCallException, EmployeeNotFoundException {
-        List<AdminResponseDTO> admins = new ArrayList<>();
+        List<EmployeeResponseDTO> admins = new ArrayList<>();
         if(isAdmin(employeeId))
             admins = employeeRepository
                     .findAllByRole(Role.ADMIN)
-                    .stream().map(this::convertToAdminResponseDTO)
+                    .stream().map(this::convertToEmployeeResponseDTO)
                     .toList();
         return admins;
-
     }
 
+    public List<EmployeeResponseDTO> getAllCleaners(String employeeId)
+            throws UnauthorizedCallException, EmployeeNotFoundException {
+        List<EmployeeResponseDTO> cleaners = new ArrayList<>();
+        if(isAdmin(employeeId))
+            cleaners = employeeRepository
+                    .findAllByRole(Role.CLEANER)
+                    .stream().map(this::convertToEmployeeResponseDTO)
+                    .toList();
+        return cleaners;
+    }
+
+
+    public void deleteCleaner(String employeeId, String cleanerId)
+            throws UnauthorizedCallException, EmployeeNotFoundException {
+        if(isAdmin(employeeId)) {
+            input.validateEmployeeId(cleanerId);
+            employeeRepository.deleteById(cleanerId);
+        }
+    }
+
+    public void updateEmployee(AdminEmployeeUpdateRequest request) throws UnauthorizedCallException {
+        if (isAdmin((request.adminId()))) {
+            EmployeeEntity employee = input.validateEmployeeId(request.employeeId());
+            if (request.firstName() != null)
+                employee.setFirstName(request.firstName());
+            if (request.lastName() != null)
+                employee.setLastName(request.lastName());
+            if (request.emailAddress() != null)
+                employee.setEmailAddress(request.emailAddress());
+            if (request.phoneNumber() != null)
+                employee.setPhoneNumber(request.phoneNumber());
+            employeeRepository.save(employee);
+        }
+    }
 
     private boolean isAdmin(String id)
             throws UnauthorizedCallException, EmployeeNotFoundException {
@@ -163,7 +196,7 @@ public class EmployeeService {
         return new EmployeeDTO(employee.getId(), (employee.getFirstName()) + " " + employee.getLastName());
     }
 
-    private AdminResponseDTO convertToAdminResponseDTO(EmployeeEntity employee) {
-        return new AdminResponseDTO(employee.getId(), employee.getFirstName(), employee.getLastName(), employee.getEmailAddress(), employee.getPhoneNumber());
+    private EmployeeResponseDTO convertToEmployeeResponseDTO(EmployeeEntity employee) {
+        return new EmployeeResponseDTO(employee.getId(), employee.getFirstName(), employee.getLastName(), employee.getEmailAddress(), employee.getPhoneNumber());
     }
 }
