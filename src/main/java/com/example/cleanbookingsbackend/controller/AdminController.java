@@ -50,7 +50,7 @@ public class AdminController {
     @PutMapping("/updateCustomer")
     public ResponseEntity<?> updateCustomer(@RequestBody AdminUserUpdateRequest request) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(customerService.updateCustomer(request));
+            return ResponseEntity.status(HttpStatus.OK).body(customerService.updateCustomerAdmin(request));
         } catch (EmployeeNotFoundException | CustomerNotFoundException | NotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (UnauthorizedCallException exception) {
