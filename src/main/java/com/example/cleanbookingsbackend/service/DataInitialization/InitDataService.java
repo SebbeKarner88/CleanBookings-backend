@@ -93,21 +93,63 @@ public class InitDataService {
 
         EmployeeEntity cleaner1 = new EmployeeEntity(
                 null,
-                "Cleaner1",
+                "Klas",
                 "Cleanerson",
                 "073-9 453 843",
                 Role.CLEANER,
-                "Cleaner1@CleanBookings.com",
+                "Klas@CleanBookings.com",
                 encoder.encode("password"),
                 null
         );
         EmployeeEntity cleaner2 = new EmployeeEntity(
                 null,
-                "Cleaner2",
-                "Cleanerson",
+                "Anita",
+                "Städgren",
                 "073-9 351 733",
                 Role.CLEANER,
-                "Cleaner2@CleanBookings.com",
+                "Anita@CleanBookings.com",
+                encoder.encode("password"),
+                null
+
+        );
+        EmployeeEntity cleaner3 = new EmployeeEntity(
+                null,
+                "Stig",
+                "Städarson",
+                "073-9 467 843",
+                Role.CLEANER,
+                "Stig@CleanBookings.com",
+                encoder.encode("password"),
+                null
+        );
+        EmployeeEntity cleaner4 = new EmployeeEntity(
+                null,
+                "Ebba",
+                "Sopasson",
+                "073-9 031 733",
+                Role.CLEANER,
+                "Ebba@CleanBookings.com",
+                encoder.encode("password"),
+                null
+
+        );
+        EmployeeEntity cleaner5 = new EmployeeEntity(
+                null,
+                "Svetlana",
+                "Putszki",
+                "072-9 453 843",
+                Role.CLEANER,
+                "Sveta@CleanBookings.com",
+                encoder.encode("password"),
+                null
+        );
+        EmployeeEntity cleaner6 = new EmployeeEntity(
+                null,
+                "Våt-Torkas",
+                "Kvastdottir",
+                "073-9 351 453",
+                Role.CLEANER,
+                "Torkas@CleanBookings.com",
                 encoder.encode("password"),
                 null
 
@@ -123,7 +165,7 @@ public class InitDataService {
                 null
         );
 
-        employeeRepository.saveAll(List.of(cleaner1, cleaner2, admin1));
+        employeeRepository.saveAll(List.of(cleaner1, cleaner2, cleaner3, cleaner4, cleaner5, cleaner6, admin1));
 
         // ##### Jobs #####
 
