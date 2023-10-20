@@ -223,10 +223,8 @@ public class CustomerService {
     }
 
     private boolean checkIfSocSecNumberExists(String number) {
-
-        List<PrivateCustomerEntity> customerList = customerRepository.findAll();
         AtomicBoolean exists = new AtomicBoolean(false);
-        customerList
+        customerRepository.findAll()
                 .forEach(customer -> {
                     if (encoder.matches(number, customer.getPersonNumber()))
                         exists.set(true);

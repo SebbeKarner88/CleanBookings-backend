@@ -50,6 +50,17 @@ public class EmployeeController {
         }
     }
 
+    // THIS CALL IS PURELY FOR FETCHING THE CLEANERS FOR OUR ABOUT US PAGE.
+    @GetMapping("/getAllCleaners")
+    public ResponseEntity<?> getAllCleanersInfo() {
+        try {
+            List<EmployeeResponseDTO> cleaners = employeeService.getAllCleanersInfo();
+            return ResponseEntity.ok().body(cleaners);
+        } catch (EmployeeNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        }
+    }
+
     @GetMapping
     public ResponseEntity<?> getAllAvailableEmployees(
             @RequestParam String employeeId,

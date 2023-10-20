@@ -140,7 +140,7 @@ public class EmployeeService {
     public List<EmployeeResponseDTO> getAllAdmins(String employeeId)
             throws UnauthorizedCallException, EmployeeNotFoundException {
         List<EmployeeResponseDTO> admins = new ArrayList<>();
-        if(isAdmin(employeeId))
+        if (isAdmin(employeeId))
             admins = employeeRepository
                     .findAllByRole(Role.ADMIN)
                     .stream().map(this::convertToEmployeeResponseDTO)
@@ -151,7 +151,7 @@ public class EmployeeService {
     public List<EmployeeResponseDTO> getAllCleaners(String employeeId)
             throws UnauthorizedCallException, EmployeeNotFoundException {
         List<EmployeeResponseDTO> cleaners = new ArrayList<>();
-        if(isAdmin(employeeId))
+        if (isAdmin(employeeId))
             cleaners = employeeRepository
                     .findAllByRole(Role.CLEANER)
                     .stream().map(this::convertToEmployeeResponseDTO)
@@ -159,10 +159,16 @@ public class EmployeeService {
         return cleaners;
     }
 
+    public List<EmployeeResponseDTO> getAllCleanersInfo() {
+        return employeeRepository
+                .findAllByRole(Role.CLEANER)
+                .stream().map(this::convertToEmployeeResponseDTO)
+                .toList();
+    }
 
     public void deleteCleaner(String employeeId, String cleanerId)
             throws UnauthorizedCallException, EmployeeNotFoundException {
-        if(isAdmin(employeeId)) {
+        if (isAdmin(employeeId)) {
             input.validateEmployeeId(cleanerId);
             employeeRepository.deleteById(cleanerId);
         }
