@@ -121,4 +121,19 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
         }
     }
+
+    @DeleteMapping("/admin/{adminId}")
+    public ResponseEntity<?> deleteAdmin(
+            @PathVariable String adminId,
+            @RequestParam String employeeId
+    ) {
+        try {
+            employeeService.deleteCleaner(employeeId, adminId);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (EmployeeNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        } catch (UnauthorizedCallException exception) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+        }
+    }
 }
