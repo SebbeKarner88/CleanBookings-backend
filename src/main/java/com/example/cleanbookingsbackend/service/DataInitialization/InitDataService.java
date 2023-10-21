@@ -51,11 +51,11 @@ public class InitDataService {
                 "Doe",
                 encoder.encode("730623-0145"),
                 CustomerType.PRIVATE,
-                "Jhonny Street 1",
+                "Johnny Street 1",
                 12345,
-                "Jhonny City",
+                "Johnny City",
                 "076-250 45 23",
-                "jhonny.doe@aol.com",
+                "johnny.doe@aol.com",
                 encoder.encode("password"),
                 null);
 
