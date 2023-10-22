@@ -174,28 +174,43 @@ public class EmployeeService {
         }
     }
 
+
     public void updateEmployee(AdminEmployeeUpdateRequest request) throws UnauthorizedCallException {
-        if (isAdmin((request.adminId()))) {
-            EmployeeEntity employee = input.validateEmployeeId(request.employeeId());
-            if (request.firstName() != null)
-                employee.setFirstName(request.firstName());
-            if (request.lastName() != null)
-                employee.setLastName(request.lastName());
-            if (request.emailAddress() != null)
-                employee.setEmailAddress(request.emailAddress());
-            if (request.phoneNumber() != null)
-                employee.setPhoneNumber(request.phoneNumber());
-            employeeRepository.save(employee);
+        // Check if the user is authorized to make updates
+        checkAuthorizedToUpdate(request.adminId(), request.employeeId());
+
+        EmployeeEntity employee = input.validateEmployeeId(request.employeeId());
+        if (request.firstName() != null)
+            employee.setFirstName(request.firstName());
+        if (request.lastName() != null)
+            employee.setLastName(request.lastName());
+        if (request.emailAddress() != null)
+            employee.setEmailAddress(request.emailAddress());
+        if (request.phoneNumber() != null)
+            employee.setPhoneNumber(request.phoneNumber());
+        employeeRepository.save(employee);
+    }
+
+    private void checkAuthorizedToUpdate(String loggedInUserId, String employeeIdToUpdate)
+            throws UnauthorizedCallException, EmployeeNotFoundException {
+        // If the logged-in user ID is null, throw an exception
+        if (loggedInUserId == null) {
+            throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE);
         }
+
+        // Check if the logged-in user is an admin or the same as the employee being updated
+        if (isAdmin(loggedInUserId) || loggedInUserId.equals(employeeIdToUpdate)) {
+            return;
+        }
+
+        throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE);
     }
 
     private boolean isAdmin(String id)
-            throws UnauthorizedCallException, EmployeeNotFoundException {
+            throws EmployeeNotFoundException {
         validateInputDataField(EMPLOYEE_ID, STRING, id);
         EmployeeEntity employee = input.validateEmployeeId(id);
-        if (!employee.getRole().equals(Role.ADMIN))
-            throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE);
-        return true;
+        return employee.getRole().equals(Role.ADMIN);
     }
 
     private EmployeeDTO convertToEmployeeDTO(EmployeeEntity employee) {
