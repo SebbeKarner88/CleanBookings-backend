@@ -5,6 +5,7 @@ import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
+import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import com.example.cleanbookingsbackend.repository.EmployeeRepository;
 import com.example.cleanbookingsbackend.repository.JobRepository;
 import com.example.cleanbookingsbackend.service.utils.InputValidation;
@@ -28,6 +29,7 @@ public class EmployeeService {
     private final JobRepository jobRepository;
     private final PasswordEncoder passwordEncoder;
     private final InputValidation input;
+    private final PasswordEncoder encoder;
 
     private static final String UNAUTHORIZED_CALL_MESSAGE = "You are not authorized to perform this action.";
 
@@ -219,5 +221,15 @@ public class EmployeeService {
 
     private EmployeeResponseDTO convertToEmployeeResponseDTO(EmployeeEntity employee) {
         return new EmployeeResponseDTO(employee.getId(), employee.getFirstName(), employee.getLastName(), employee.getEmailAddress(), employee.getPhoneNumber());
+    }
+
+    public boolean updateEmployeePassword(String employeeId, PasswordUpdateRequest request)
+            throws UnauthorizedCallException {
+        EmployeeEntity employee = input.validateEmployeeId(employeeId);
+        if (!encoder.matches(request.oldPassword(), employee.getPassword()))
+            throw new UnauthorizedCallException("Invalid password");
+        employee.setPassword(encoder.encode(request.newPassword()));
+        employeeRepository.save(employee);
+        return true;
     }
 }
