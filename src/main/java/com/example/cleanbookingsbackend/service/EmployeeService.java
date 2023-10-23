@@ -208,7 +208,7 @@ public class EmployeeService {
         throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE);
     }
 
-    private boolean isAdmin(String id)
+    public boolean isAdmin(String id)
             throws EmployeeNotFoundException {
         validateInputDataField(EMPLOYEE_ID, STRING, id);
         EmployeeEntity employee = input.validateEmployeeId(id);

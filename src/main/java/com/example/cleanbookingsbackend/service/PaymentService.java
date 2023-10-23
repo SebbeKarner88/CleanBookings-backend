@@ -1,5 +1,7 @@
 package com.example.cleanbookingsbackend.service;
 
+import com.example.cleanbookingsbackend.dto.JobResponseDTO;
+import com.example.cleanbookingsbackend.dto.PaymentDTO;
 import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.PaymentStatus;
 import com.example.cleanbookingsbackend.enums.Role;
@@ -19,6 +21,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +32,7 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final JobRepository jobRepository;
+    private final EmployeeService employeeService;
     private final InputValidation input;
     private final MailSenderService mailSender;
 
@@ -36,9 +40,20 @@ public class PaymentService {
         PaymentEntity invoice = createInvoice(job);
         JobEntity updatedJob = input.validateJobId(job.getId());
         updatedJob.setPayment(invoice);
-            paymentRepository.save(invoice);
-            jobRepository.save(updatedJob);
-            mailSender.sendInvoice(job);
+        paymentRepository.save(invoice);
+        jobRepository.save(updatedJob);
+        mailSender.sendInvoice(job);
+    }
+
+    public List<PaymentDTO> getAllInvoices(String adminId)
+            throws UnauthorizedCallException, EmployeeNotFoundException {
+        if (!employeeService.isAdmin(adminId))
+            throw new UnauthorizedCallException("Only a admin is authorized to make this call.");
+        return paymentRepository
+                .findAll()
+                .stream()
+                .map(this::toDTO)
+                .toList();
     }
 
     public void markInvoiceAsPaid(String adminId, String invoiceId)
@@ -47,7 +62,7 @@ public class PaymentService {
         PaymentEntity invoice = input.validatePaymentId(invoiceId);
         JobEntity job = input.validateJobId(invoice.getJob().getId());
 
-        if(!admin.getRole().equals(Role.ADMIN))
+        if (!admin.getRole().equals(Role.ADMIN))
             throw new UnauthorizedCallException("Only a Admin can mark invoices as paid");
 
         invoice.setStatus(PaymentStatus.PAID);
@@ -86,5 +101,17 @@ public class PaymentService {
             paymentRepository.save(payment);
         }
     }
+
+    private PaymentDTO toDTO(PaymentEntity payment) {
+        return new PaymentDTO(
+                payment.getId(),
+                payment.getIssueDate(),
+                payment.getDueDate(),
+                payment.getJob().getId(),
+                payment.getStatus(),
+                payment.getPrice()
+        );
+    }
+
 }
 
