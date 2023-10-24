@@ -1,9 +1,9 @@
-package com.example.cleanbookingsbackend.keycloak.models.adminTokenEntity;
+package com.example.cleanbookingsbackend.keycloak.models.tokenEntity;
 
 import lombok.Data;
 
 @Data
-public class KeycloakAdminTokenEntity {
+public class KeycloakTokenEntity {
 
     String access_token;
     Long expires_in;

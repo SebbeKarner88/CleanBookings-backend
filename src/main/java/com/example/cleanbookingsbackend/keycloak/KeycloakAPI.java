@@ -4,7 +4,7 @@ import com.example.cleanbookingsbackend.enums.CustomerType;
 import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.keycloak.models.roleEntity.KeycloakRoleAssignmentEntity;
 import com.example.cleanbookingsbackend.keycloak.models.roleEntity.KeycloakRoleEntity;
-import com.example.cleanbookingsbackend.keycloak.models.adminTokenEntity.KeycloakAdminTokenEntity;
+import com.example.cleanbookingsbackend.keycloak.models.tokenEntity.KeycloakTokenEntity;
 import com.example.cleanbookingsbackend.keycloak.models.newUserEntity.Credentials;
 import com.example.cleanbookingsbackend.keycloak.models.newUserEntity.NewUserEntity;
 import com.example.cleanbookingsbackend.keycloak.models.userEntity.KeycloakUserEntity;
@@ -34,6 +34,7 @@ public class KeycloakAPI {
 
     private final String REALM = "Karner";
     private final String CLIENT_ID = "0fc8c1c1-7ca8-40b9-8655-bc3a48e95540";
+    private final String CLIENT_SECRET = "v03vGy8VnToWtLw6fnGbhv9QZndODALx";
     private final String ADMIN_USERNAME = "admin";
     private final String ADMIN_PASSWORD = "admin";
     private final String ROLE_CUSTOMER_ID = "bd446b9d-3e5e-4436-a804-a6582a44bda1";
@@ -59,11 +60,14 @@ public class KeycloakAPI {
     @PostConstruct
     public void getKeycloakData() {
 
-        //TODO: CHANGE KEYCLOAG UI TO AUTH WITH SECRET
 
         try {
-            KeycloakAdminTokenEntity admin = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD);
-            System.out.println(admin.toString());
+            KeycloakTokenEntity adminTokenEntity = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD);
+            ADMIN_TOKEN = adminTokenEntity.getAccess_token();
+            System.out.println("ADMIN TOKEN: " + adminTokenEntity.toString());
+
+            KeycloakTokenEntity userTokenEntity = loginKeycloak("sebbe","sebbe");
+            System.out.println("USER TOKEN: " + userTokenEntity.toString());
 
             List<KeycloakUserEntity> users = getKeycloakUserEntities(ADMIN_TOKEN);
             System.out.println(users.toString());
@@ -71,7 +75,7 @@ public class KeycloakAPI {
             List<KeycloakRoleEntity> roles = getKeycloakRoleEntities(ADMIN_TOKEN);
             System.out.println(roles.toString());
 
-            int createNewCustomerStatus = createNewCustomer(ADMIN_TOKEN, customer).value();
+            int createNewCustomerStatus = createNewUser(ADMIN_TOKEN, customer).value();
             System.out.println(createNewCustomerStatus);
 
             int assignRoleToUser = assignRoleToCustomer(ADMIN_TOKEN, CUSTOMER, TEST_USER_ID).value();
@@ -84,7 +88,7 @@ public class KeycloakAPI {
 
 
     // GET A ADMINENTITY CONTAINING A TOKEN TO BE ABLE TO REGISTER A NEW USER IN KEYCLOAK
-    public KeycloakAdminTokenEntity getAdminTokenEntity(String username, String password) {
+    public KeycloakTokenEntity getAdminTokenEntity(String username, String password) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -94,7 +98,7 @@ public class KeycloakAPI {
             map.add("grant_type", "password");
             map.add("client_id", "admin-cli");
             HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
-            ResponseEntity<KeycloakAdminTokenEntity> response = restTemplate.exchange(
+            ResponseEntity<KeycloakTokenEntity> response = restTemplate.exchange(
                     "http://localhost:8080/realms/master/protocol/openid-connect/token",
                     HttpMethod.POST,
                     entity,
@@ -152,7 +156,7 @@ public class KeycloakAPI {
 
 
     // CREATE A NEW CUSTOMER IN THE KEYCLOAK DB
-    public HttpStatusCode createNewCustomer(String adminToken, PrivateCustomerEntity customer) {
+    public HttpStatusCode createNewUser(String adminToken, PrivateCustomerEntity customer) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -194,12 +198,40 @@ public class KeycloakAPI {
             HttpEntity<KeycloakRoleAssignmentEntity[]> entity =
                     new HttpEntity<>(arr, headers);
             ResponseEntity<HttpStatusCode> response = restTemplate.exchange(
-                    "http://localhost:8080/admin/realms/" + REALM + "/users/" + userId + "/role-mappings/clients/" + CLIENT_ID,
+                    "http://localhost:8080/admin/realms/" + REALM + "/users/" +
+                            userId + "/role-mappings/clients/" + CLIENT_ID,
                     HttpMethod.POST,
                     entity,
                     new ParameterizedTypeReference<>() {
                     });
             return response.getStatusCode();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    // LOGIN CALL FOR USER KEYCLOAK
+    public KeycloakTokenEntity loginKeycloak(String username, String password) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+            map.add("username", username);
+            map.add("password", password);
+            map.add("grant_type", "password");
+            map.add("client_id", "karner-rest-api");
+            map.add("client_secret", CLIENT_SECRET);
+            HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
+            ResponseEntity<KeycloakTokenEntity> response = restTemplate.exchange(
+                    "http://localhost:8080/realms/" + REALM + "/protocol/openid-connect/token",
+                    HttpMethod.POST,
+                    entity,
+                    new ParameterizedTypeReference<>() {
+                    });
+
+            return response.getBody();
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
