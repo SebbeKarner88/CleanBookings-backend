@@ -12,7 +12,6 @@ import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import jakarta.annotation.PostConstruct;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -60,6 +59,7 @@ public class KeycloakAPI {
     @PostConstruct
     public void getKeycloakData() {
 
+        //TODO: CHANGE KEYCLOAG UI TO AUTH WITH SECRET
 
         try {
             KeycloakAdminTokenEntity admin = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD);
