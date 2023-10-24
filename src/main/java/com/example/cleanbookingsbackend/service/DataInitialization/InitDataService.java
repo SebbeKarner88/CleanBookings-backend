@@ -11,20 +11,28 @@ import com.example.cleanbookingsbackend.repository.JobRepository;
 import com.example.cleanbookingsbackend.repository.PaymentRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class InitDataService {
+
     private final CustomerRepository customerRepository;
     private final EmployeeRepository employeeRepository;
     private final JobRepository jobRepository;
     private final PaymentRepository paymentRepository;
     private final PasswordEncoder encoder;
+
 
     @PostConstruct
     public void initializeData() {
@@ -259,4 +267,5 @@ public class InitDataService {
         );
         paymentRepository.saveAll(List.of(paymentJob3, paymentJob5));
     }
+
 }
