@@ -21,6 +21,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.example.cleanbookingsbackend.enums.Role.*;
+
 
 @Service
 public class KeycloakInitData {
@@ -37,7 +39,7 @@ public class KeycloakInitData {
     private final String ROLE_CLEANER_ID = "c0c42f0d-76f0-46ca-9b8a-93a7e1c82407";
     private final String ROLE_ADMIN_ID = "95873811-19bc-41ef-9ddf-8d7e45701938";
     private final String TEST_USER_ID = "91f08a18-94bb-4f48-9346-1612a903a304";
-    private String aToken = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIwWkloYmFtY0RVTVpJX0lDbXVSSXg3aDNvOGl5THd3RkNYcmI3NWIydFBJIn0.eyJleHAiOjE2OTgxODU4NzQsImlhdCI6MTY5ODE0OTg3NCwianRpIjoiYzU4MzBhYzUtNTA4ZC00YTExLWE3MDItOWUyN2ZlOWRmODQ0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9tYXN0ZXIiLCJzdWIiOiIzNWIzMTgxZi1lOWQzLTRiYzMtYjEwYS05NDIzMmFmYWI5NjIiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1jbGkiLCJzZXNzaW9uX3N0YXRlIjoiY2ZlNjlhOWEtMzI5OC00N2NlLTgyYTUtNjQzMTMwMTA0ZWFlIiwiYWNyIjoiMSIsInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsInNpZCI6ImNmZTY5YTlhLTMyOTgtNDdjZS04MmE1LTY0MzEzMDEwNGVhZSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4ifQ.XJSejUJF8OvlXYq5C3ovzYiYumUM2JWGqU7w5-iXfHpYVLknsf1uWGXB0wPkEuCO667wPcerZ7WfR1sird1RXKKphTBScUOCfB9vMoh4Qcmd6iI1-zt_6ttyNbm0tdieCqu-a6YDEi76acJh7wt2pHWL9lgwsprbYf3WiAiR2ftyB230qusBzV-Bwzr7O1Ko8ZkYE0lfEvkt0WOBEGhbL-oMuTPKyjSK79vj44CIfz1xFh87ZlMgARlniUHGg9rLsM0dnsLCym81otMMebiIVwApPHxxQRYmvjNG8xdoreLAI2ZAN55AHZuuAnbqyQQoOUuT8AlBbymlxgQbCA9eYQ";
+    private String aToken = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIwWkloYmFtY0RVTVpJX0lDbXVSSXg3aDNvOGl5THd3RkNYcmI3NWIydFBJIn0.eyJleHAiOjE2OTgxODkzMDEsImlhdCI6MTY5ODE1MzMwMSwianRpIjoiZmZiMTJmNzItMTQ3Yi00ODY3LWI0ZjctZWE4Y2FhMmZmNzcwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9tYXN0ZXIiLCJzdWIiOiIzNWIzMTgxZi1lOWQzLTRiYzMtYjEwYS05NDIzMmFmYWI5NjIiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1jbGkiLCJzZXNzaW9uX3N0YXRlIjoiZjc3ZDYxMDItNmY0ZS00NjFiLTlhOGMtZmM3YzljMTRhYWZkIiwiYWNyIjoiMSIsInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsInNpZCI6ImY3N2Q2MTAyLTZmNGUtNDYxYi05YThjLWZjN2M5YzE0YWFmZCIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4ifQ.rlgV30XWp9p4B8a5f48vaOhyLnbEb9TsSIl9Pn2TM0Kp1PTf3gYrMLKsKJSnBlFgP9pmTrD7Vx-7s6NaYfnZJieEqES3FLz0X6mGsddyo48S4NNByV3oeEe2WfMX1ZzUjQt4nHfTFTx4r8SKZSEJZ954NPIXU7aEi2YabQtG55BwJJ9Qmv8pHyh-VplW5JpxqoDNorvZ-A71ui9EmSTuM4-iLit2CigcM1CsRPHGrGlPvrk5A73G0lnktc0mq1WvoYcUcCk-glNfKIgCsRC4uEvsHHJzqcjQFKfPBazVVkO-tpgxYrqvjIv-O-Nuit_3GUi-Bhlrs9wp8kim1w1-Jg";
 
     private PrivateCustomerEntity customer = new PrivateCustomerEntity(
             null,
@@ -58,8 +60,8 @@ public class KeycloakInitData {
 
 
         try {
-            // KeycloakAdminTokenEntity admin = getAdminTokenEntity("admin", "admin");
-            // System.out.println(admin.toString());
+            KeycloakAdminTokenEntity admin = getAdminTokenEntity("admin", "admin");
+            System.out.println(admin.toString());
 
             List<KeycloakUserEntity> users = getKeycloakUserEntities(aToken);
             System.out.println(users.toString());
@@ -70,7 +72,7 @@ public class KeycloakInitData {
             int createNewCustomerStatus = createNewCustomer(aToken, customer).value();
             System.out.println(createNewCustomerStatus);
 
-            int assignRoleToUser = assignRoleToCustomer(aToken, Role.CUSTOMER, TEST_USER_ID).value();
+            int assignRoleToUser = assignRoleToCustomer(aToken, CUSTOMER, TEST_USER_ID).value();
             System.out.println(assignRoleToUser);
 
         } catch (Exception e) {
@@ -84,15 +86,12 @@ public class KeycloakInitData {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-
             MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
             map.add("username", username);
             map.add("password", password);
             map.add("grant_type", "password");
             map.add("client_id", "admin-cli");
-
             HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
-
             ResponseEntity<KeycloakAdminTokenEntity> response = restTemplate.exchange(
                     "http://localhost:8080/realms/master/protocol/openid-connect/token",
                     HttpMethod.POST,
@@ -116,16 +115,13 @@ public class KeycloakInitData {
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
             headers.add("Authorization", "Bearer " + adminToken);
             HttpEntity<String> entity = new HttpEntity<String>(headers);
-
             ResponseEntity<List<KeycloakUserEntity>> response = restTemplate.exchange(
                     "http://localhost:8080/admin/realms/" + REALM + "/users",
                     HttpMethod.GET,
                     entity,
                     new ParameterizedTypeReference<>() {
                     });
-
             return response.getBody();
-
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -139,16 +135,13 @@ public class KeycloakInitData {
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
             headers.add("Authorization", "Bearer " + adminToken);
             HttpEntity<String> entity = new HttpEntity<String>(headers);
-
             ResponseEntity<List<KeycloakRoleEntity>> response = restTemplate.exchange(
                     "http://localhost:8080/admin/realms/" + REALM + "/clients/" + CLIENT_ID + "/roles",
                     HttpMethod.GET,
                     entity,
                     new ParameterizedTypeReference<>() {
                     });
-
             return response.getBody();
-
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -162,12 +155,10 @@ public class KeycloakInitData {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.add("Authorization", "Bearer " + adminToken);
-
             Credentials[] credArr = {
                     new Credentials("password",
                             customer.getPassword(),
                             false)};
-
             NewUserEntity newUserBody = new NewUserEntity(
                     true,
                     customer.getEmailAddress(),
@@ -176,48 +167,37 @@ public class KeycloakInitData {
                     customer.getEmailAddress(),
                     credArr
             );
-
             HttpEntity<NewUserEntity> entity =
                     new HttpEntity<>(newUserBody, headers);
-
             ResponseEntity<?> response = restTemplate.exchange(
                     "http://localhost:8080/admin/realms/" + REALM + "/users",
                     HttpMethod.POST,
                     entity,
                     new ParameterizedTypeReference<>() {
                     });
-
             return response.getStatusCode();
-
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return null;
     }
 
-    // ASSIGN ROLE TO CUSTOMER KEYCLOAK
+    // ASSIGN ROLE TO USER KEYCLOAK
     public HttpStatusCode assignRoleToCustomer(String adminToken, Role role, String userId) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.add("Authorization", "Bearer " + adminToken);
-
-            KeycloakRoleAssignmentEntity roleEntity = determineRole(role);
-
-            //TODO: SOMETHING WRONG WITH THIS
-
-            HttpEntity<KeycloakRoleAssignmentEntity> entity =
-                    new HttpEntity<>(roleEntity, headers);
-
-            ResponseEntity<?> response = restTemplate.exchange(
+            KeycloakRoleAssignmentEntity[] arr = {determineRole(role)};
+            HttpEntity<KeycloakRoleAssignmentEntity[]> entity =
+                    new HttpEntity<>(arr, headers);
+            ResponseEntity<HttpStatusCode> response = restTemplate.exchange(
                     "http://localhost:8080/admin/realms/" + REALM + "/users/" + userId + "/role-mappings/clients/" + CLIENT_ID,
                     HttpMethod.POST,
                     entity,
                     new ParameterizedTypeReference<>() {
                     });
-
             return response.getStatusCode();
-
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -226,10 +206,9 @@ public class KeycloakInitData {
 
     private KeycloakRoleAssignmentEntity determineRole(Role role) {
         return switch (role) {
-            case CUSTOMER ->
-                    new KeycloakRoleAssignmentEntity("bd446b9d-3e5e-4436-a804-a6582a44bda1", "client_customer");
-            case ADMIN -> new KeycloakRoleAssignmentEntity("95873811-19bc-41ef-9ddf-8d7e45701938", "client_admin");
-            case CLEANER -> new KeycloakRoleAssignmentEntity("c0c42f0d-76f0-46ca-9b8a-93a7e1c82407", "client_cleaner");
+            case CUSTOMER -> new KeycloakRoleAssignmentEntity(ROLE_CUSTOMER_ID, "client_customer");
+            case ADMIN -> new KeycloakRoleAssignmentEntity(ROLE_ADMIN_ID, "client_admin");
+            case CLEANER -> new KeycloakRoleAssignmentEntity(ROLE_CLEANER_ID, "client_cleaner");
         };
     }
 
