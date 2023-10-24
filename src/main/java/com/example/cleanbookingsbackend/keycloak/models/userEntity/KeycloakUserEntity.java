@@ -1,4 +1,4 @@
-package com.example.cleanbookingsbackend.keycloak.models;
+package com.example.cleanbookingsbackend.keycloak.models.userEntity;
 
 import lombok.Data;
 
@@ -17,6 +17,6 @@ public class KeycloakUserEntity {
     String[] disableableCredentialTypes;
     String[] requiredActions;
     Long notBefore;
-    Access access;
+    KeycloakAccess access;
 
 }

@@ -1,9 +1,9 @@
-package com.example.cleanbookingsbackend.keycloak.models;
+package com.example.cleanbookingsbackend.keycloak.models.userEntity;
 
 import lombok.Data;
 
 @Data
-public class Access {
+public class KeycloakAccess {
     Boolean manageGroupMembership;
     Boolean view;
     Boolean mapRoles;
