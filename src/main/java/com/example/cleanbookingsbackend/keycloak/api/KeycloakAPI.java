@@ -21,8 +21,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.example.cleanbookingsbackend.enums.Role.*;
-
 
 @Service
 public class KeycloakAPI {
@@ -55,7 +53,7 @@ public class KeycloakAPI {
     private String ADMIN_TOKEN;
     private String USER_TOKEN;
 
-    private PrivateCustomerEntity customer = new PrivateCustomerEntity(
+    private PrivateCustomerEntity testCustomer = new PrivateCustomerEntity(
             null,
             "Johnny",
             "Doe",
@@ -88,7 +86,7 @@ public class KeycloakAPI {
             List<KeycloakRoleEntity> roles = getKeycloakRoleEntities(ADMIN_TOKEN);
             System.out.println(roles.toString());
 
-          //  int createNewCustomerStatus = createNewUser(ADMIN_TOKEN, customer).value();
+          //  int createNewCustomerStatus = createNewUser(ADMIN_TOKEN, testCustomer).value();
           //  System.out.println(createNewCustomerStatus);
 
           //  int assignRoleToUser = assignRoleToCustomer(ADMIN_TOKEN, CUSTOMER, TEST_USER_ID).value();
