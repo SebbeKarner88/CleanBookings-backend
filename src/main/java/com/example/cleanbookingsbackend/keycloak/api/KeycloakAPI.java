@@ -197,7 +197,7 @@ public class KeycloakAPI {
                     entity,
                     new ParameterizedTypeReference<>() {
                     });
-            return response.getStatusCode();
+            return response.getStatusCode(); // 201 IS SUCCESS
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -220,7 +220,7 @@ public class KeycloakAPI {
                     entity,
                     new ParameterizedTypeReference<>() {
                     });
-            return response.getStatusCode();
+            return response.getStatusCode(); // 204 IS SUCCESS
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -273,7 +273,7 @@ public class KeycloakAPI {
                     entity,
                     new ParameterizedTypeReference<>() {
                     });
-            return response.getStatusCode();
+            return response.getStatusCode(); // 204 IS SUCCESS
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
