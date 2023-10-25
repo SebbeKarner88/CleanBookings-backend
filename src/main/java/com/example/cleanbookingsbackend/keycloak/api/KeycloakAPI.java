@@ -53,6 +53,7 @@ public class KeycloakAPI {
     private String TEST_USER_ID;
 
     private String ADMIN_TOKEN;
+    private String USER_TOKEN;
 
     private PrivateCustomerEntity customer = new PrivateCustomerEntity(
             null,
@@ -78,6 +79,7 @@ public class KeycloakAPI {
             System.out.println("ADMIN TOKEN: " + adminTokenEntity.toString());
 
             KeycloakTokenEntity userTokenEntity = loginKeycloak("sebbe", "sebbe");
+            USER_TOKEN = userTokenEntity.getAccess_token();
             System.out.println("USER TOKEN: " + userTokenEntity.toString());
 
             List<KeycloakUserEntity> users = getKeycloakUserEntities(ADMIN_TOKEN);
@@ -86,11 +88,14 @@ public class KeycloakAPI {
             List<KeycloakRoleEntity> roles = getKeycloakRoleEntities(ADMIN_TOKEN);
             System.out.println(roles.toString());
 
-            int createNewCustomerStatus = createNewUser(ADMIN_TOKEN, customer).value();
-            System.out.println(createNewCustomerStatus);
+          //  int createNewCustomerStatus = createNewUser(ADMIN_TOKEN, customer).value();
+          //  System.out.println(createNewCustomerStatus);
 
-            int assignRoleToUser = assignRoleToCustomer(ADMIN_TOKEN, CUSTOMER, TEST_USER_ID).value();
-            System.out.println(assignRoleToUser);
+          //  int assignRoleToUser = assignRoleToCustomer(ADMIN_TOKEN, CUSTOMER, TEST_USER_ID).value();
+          //  System.out.println(assignRoleToUser);
+
+          //  int changePasswordUser = changePasswordUser(ADMIN_TOKEN, TEST_USER_ID, "nytt").value();
+          //  System.out.println(changePasswordUser);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -243,6 +248,32 @@ public class KeycloakAPI {
 
             return response.getBody();
 
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    // UPDATING PASSWORD ON USER KEYCLOAK
+    public HttpStatusCode changePasswordUser(String adminToken, String userId, String password) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add("Authorization", "Bearer " + adminToken);
+            Credentials cred = new Credentials(
+                    "password",
+                    password,
+                    false);
+
+            HttpEntity<Credentials> entity =
+                    new HttpEntity<>(cred, headers);
+            ResponseEntity<HttpStatusCode> response = restTemplate.exchange(
+                    "http://localhost:8080/admin/realms/" + REALM + "/users/" + userId + "/reset-password",
+                    HttpMethod.PUT,
+                    entity,
+                    new ParameterizedTypeReference<>() {
+                    });
+            return response.getStatusCode();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
