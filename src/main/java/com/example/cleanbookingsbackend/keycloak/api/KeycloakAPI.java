@@ -21,16 +21,17 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.example.cleanbookingsbackend.enums.Role.CLEANER;
 
 @Service
 public class KeycloakAPI {
-
+/*
     private final RestTemplate restTemplate;
 
     public KeycloakAPI(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
-/*
+
     @Value("${KC_REALM}")
     private String REALM;
     @Value("${KC_CLIENT_ID}")
@@ -47,8 +48,10 @@ public class KeycloakAPI {
     private String ROLE_CLEANER_ID;
     @Value("${KC_ROLE_ADMIN_ID}")
     private String ROLE_ADMIN_ID;
-    @Value("${KC_TEST_USER_ID}")
-    private String TEST_USER_ID;
+    @Value("${KC_TEST_CUSTOMER_ID}")
+    private String TEST_CUSTOMER_ID;
+    @Value("${KC_TEST_EMPLOYEE_ID}")
+    private String TEST_EMPLOYEE_ID;
 
     private String ADMIN_TOKEN;
     private String USER_TOKEN;
@@ -81,19 +84,22 @@ public class KeycloakAPI {
             System.out.println("USER TOKEN: " + userTokenEntity.toString());
 
             List<KeycloakUserEntity> users = getKeycloakUserEntities(ADMIN_TOKEN);
-            System.out.println(users.toString());
+            System.out.println("USERS: " + users.toString());
 
             List<KeycloakRoleEntity> roles = getKeycloakRoleEntities(ADMIN_TOKEN);
-            System.out.println(roles.toString());
+            System.out.println("ROLES: " + roles.toString());
 
-            int createNewCustomerStatus = createNewUser(ADMIN_TOKEN, testCustomer).value();
-            System.out.println(createNewCustomerStatus);
+            int createNewCustomerStatus = createNewCustomer(ADMIN_TOKEN, testCustomer).value();
+            System.out.println("CREATE NEW CUSTOMER: " + createNewCustomerStatus);
 
-            int assignRoleToUser = assignRoleToCustomer(ADMIN_TOKEN, CUSTOMER, TEST_USER_ID).value();
-            System.out.println(assignRoleToUser);
+            int assignRoleToCustomer = assignRoleToCustomer(ADMIN_TOKEN, TEST_CUSTOMER_ID).value();
+            System.out.println("ASSIGN ROLE TO CUSTOMER: " + assignRoleToCustomer);
 
-            int changePasswordUser = changePasswordUser(ADMIN_TOKEN, TEST_USER_ID, "nytt").value();
-            System.out.println(changePasswordUser);
+            int assignRoleToEmployee = assignRoleToEmployee(ADMIN_TOKEN, CLEANER, TEST_EMPLOYEE_ID).value();
+            System.out.println("ASSIGN ROLE TO EMPLOYEE: " + assignRoleToEmployee);
+
+            int changePasswordUser = changePasswordUser(ADMIN_TOKEN, TEST_CUSTOMER_ID, "nytt").value();
+            System.out.println("CHANGE PASSWORD ON USER: " + changePasswordUser);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -148,7 +154,7 @@ public class KeycloakAPI {
         return null;
     }
 
-    // GET ALL AVAILABLE KEYCLOAK ROLES ON CLIENT LEVEL.
+    // GET A LIST OF AVAILABLE KEYCLOAK ROLEENTITY ON CLIENT LEVEL.
     public List<KeycloakRoleEntity> getKeycloakRoleEntities(String adminToken) {
         try {
             HttpHeaders headers = new HttpHeaders();
@@ -170,7 +176,7 @@ public class KeycloakAPI {
 
 
     // CREATE A NEW CUSTOMER IN THE KEYCLOAK DB
-    public HttpStatusCode createNewUser(String adminToken, PrivateCustomerEntity customer) {
+    public HttpStatusCode createNewCustomer(String adminToken, PrivateCustomerEntity customer) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -203,7 +209,31 @@ public class KeycloakAPI {
     }
 
     // ASSIGN ROLE TO USER KEYCLOAK
-    public HttpStatusCode assignRoleToCustomer(String adminToken, Role role, String userId) {
+    public HttpStatusCode assignRoleToCustomer(String adminToken, String userId) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add("Authorization", "Bearer " + adminToken);
+            KeycloakRoleAssignmentEntity[] arr = {new KeycloakRoleAssignmentEntity(ROLE_CUSTOMER_ID, "client_customer")};
+            HttpEntity<KeycloakRoleAssignmentEntity[]> entity =
+                    new HttpEntity<>(arr, headers);
+            ResponseEntity<HttpStatusCode> response = restTemplate.exchange(
+                    "http://localhost:8080/admin/realms/" + REALM + "/users/" +
+                            userId + "/role-mappings/clients/" + CLIENT_ID,
+                    HttpMethod.POST,
+                    entity,
+                    new ParameterizedTypeReference<>() {
+                    });
+            return response.getStatusCode(); // 204 IS SUCCESS
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    // ASSIGN ROLE TO EMPLOYEE
+    public HttpStatusCode assignRoleToEmployee(String adminToken,Role role, String employeeId)
+            throws IllegalArgumentException{
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -213,7 +243,7 @@ public class KeycloakAPI {
                     new HttpEntity<>(arr, headers);
             ResponseEntity<HttpStatusCode> response = restTemplate.exchange(
                     "http://localhost:8080/admin/realms/" + REALM + "/users/" +
-                            userId + "/role-mappings/clients/" + CLIENT_ID,
+                            employeeId + "/role-mappings/clients/" + CLIENT_ID,
                     HttpMethod.POST,
                     entity,
                     new ParameterizedTypeReference<>() {
@@ -244,7 +274,7 @@ public class KeycloakAPI {
                     new ParameterizedTypeReference<>() {
                     });
 
-            return response.getBody();
+            return response.getBody(); // 204 IS SUCCESS
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -278,11 +308,17 @@ public class KeycloakAPI {
         return null;
     }
 
-    private KeycloakRoleAssignmentEntity determineRole(Role role) {
+    //TODO: CALL FOR LOGGING OUT
+    //TODO: CALL FOR UPDATING CUSTOMER
+    //TODO: CALL FOR UPDATING EMPLOYEE
+    //TODO: CALL FOR DELETING CUSTOMER/EMPLOYEE
+
+    private KeycloakRoleAssignmentEntity determineRole(Role role)
+            throws IllegalArgumentException {
         return switch (role) {
-            case CUSTOMER -> new KeycloakRoleAssignmentEntity(ROLE_CUSTOMER_ID, "client_customer");
             case ADMIN -> new KeycloakRoleAssignmentEntity(ROLE_ADMIN_ID, "client_admin");
             case CLEANER -> new KeycloakRoleAssignmentEntity(ROLE_CLEANER_ID, "client_cleaner");
+            case CUSTOMER -> throw new IllegalArgumentException("Invalid role");
         };
     }
 */
