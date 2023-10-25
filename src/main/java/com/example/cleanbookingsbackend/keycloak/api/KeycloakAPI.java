@@ -30,7 +30,7 @@ public class KeycloakAPI {
     public KeycloakAPI(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
-
+/*
     @Value("${KC_REALM}")
     private String REALM;
     @Value("${KC_CLIENT_ID}")
@@ -86,14 +86,14 @@ public class KeycloakAPI {
             List<KeycloakRoleEntity> roles = getKeycloakRoleEntities(ADMIN_TOKEN);
             System.out.println(roles.toString());
 
-          //  int createNewCustomerStatus = createNewUser(ADMIN_TOKEN, testCustomer).value();
-          //  System.out.println(createNewCustomerStatus);
+            int createNewCustomerStatus = createNewUser(ADMIN_TOKEN, testCustomer).value();
+            System.out.println(createNewCustomerStatus);
 
-          //  int assignRoleToUser = assignRoleToCustomer(ADMIN_TOKEN, CUSTOMER, TEST_USER_ID).value();
-          //  System.out.println(assignRoleToUser);
+            int assignRoleToUser = assignRoleToCustomer(ADMIN_TOKEN, CUSTOMER, TEST_USER_ID).value();
+            System.out.println(assignRoleToUser);
 
-          //  int changePasswordUser = changePasswordUser(ADMIN_TOKEN, TEST_USER_ID, "nytt").value();
-          //  System.out.println(changePasswordUser);
+            int changePasswordUser = changePasswordUser(ADMIN_TOKEN, TEST_USER_ID, "nytt").value();
+            System.out.println(changePasswordUser);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -285,5 +285,5 @@ public class KeycloakAPI {
             case CLEANER -> new KeycloakRoleAssignmentEntity(ROLE_CLEANER_ID, "client_cleaner");
         };
     }
-
+*/
 }
