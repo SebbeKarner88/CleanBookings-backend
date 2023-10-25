@@ -55,6 +55,7 @@ public class KeycloakAPI {
 
     private String ADMIN_TOKEN;
     private String USER_TOKEN;
+    private String USER_REFRESH_TOKEN;
 
     private PrivateCustomerEntity testCustomer = new PrivateCustomerEntity(
             null,
@@ -81,6 +82,7 @@ public class KeycloakAPI {
 
             KeycloakTokenEntity userTokenEntity = loginKeycloak("sebbe", "sebbe");
             USER_TOKEN = userTokenEntity.getAccess_token();
+            USER_REFRESH_TOKEN = userTokenEntity.getRefresh_token();
             System.out.println("USER TOKEN: " + userTokenEntity.toString());
 
             List<KeycloakUserEntity> users = getKeycloakUserEntities(ADMIN_TOKEN);
@@ -100,6 +102,12 @@ public class KeycloakAPI {
 
             int changePasswordUser = changePasswordUser(ADMIN_TOKEN, TEST_CUSTOMER_ID, "nytt").value();
             System.out.println("CHANGE PASSWORD ON USER: " + changePasswordUser);
+
+            int deleteUser = deleteUser(ADMIN_TOKEN, "febbcd2c-f32e-4481-8af7-a4ca7d156c36").value();
+            System.out.println("DELETED USER: " + deleteUser);
+
+            int logoutUser = logoutKeycloak(USER_REFRESH_TOKEN).value();
+            System.out.println("LOGOUT: " + logoutUser);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -282,6 +290,31 @@ public class KeycloakAPI {
         return null;
     }
 
+    // LOGOUT USER
+    public HttpStatusCode logoutKeycloak(String userRefreshToken) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+            map.add("client_id", "karner-rest-api");
+            map.add("client_secret", CLIENT_SECRET);
+            map.add("refresh_token", userRefreshToken);
+
+            HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    "http://localhost:8080/realms/" + REALM + "/protocol/openid-connect/logout",
+                    HttpMethod.POST,
+                    entity,
+                    new ParameterizedTypeReference<>() {
+                    });
+            return response.getStatusCode(); // 204 IS SUCCESS
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
     // UPDATING PASSWORD ON USER KEYCLOAK
     public HttpStatusCode changePasswordUser(String adminToken, String userId, String password) {
         try {
@@ -308,10 +341,29 @@ public class KeycloakAPI {
         return null;
     }
 
-    //TODO: CALL FOR LOGGING OUT
+    // DELETE EMPLOYEE/CUSTOMER BY ID
+    public HttpStatusCode deleteUser(String adminToken, String userId) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add("Authorization", "Bearer " + adminToken);
+
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<HttpStatusCode> response = restTemplate.exchange(
+                    "http://localhost:8080/admin/realms/" + REALM + "/users/" + userId,
+                    HttpMethod.DELETE,
+                    entity,
+                    new ParameterizedTypeReference<>() {
+                    });
+            return response.getStatusCode(); // 204 IS SUCCESS
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
     //TODO: CALL FOR UPDATING CUSTOMER
     //TODO: CALL FOR UPDATING EMPLOYEE
-    //TODO: CALL FOR DELETING CUSTOMER/EMPLOYEE
 
     private KeycloakRoleAssignmentEntity determineRole(Role role)
             throws IllegalArgumentException {
