@@ -1,4 +1,4 @@
-package com.example.cleanbookingsbackend.keycloak;
+package com.example.cleanbookingsbackend.keycloak.api;
 
 import com.example.cleanbookingsbackend.enums.CustomerType;
 import com.example.cleanbookingsbackend.enums.Role;
@@ -10,6 +10,7 @@ import com.example.cleanbookingsbackend.keycloak.models.newUserEntity.NewUserEnt
 import com.example.cleanbookingsbackend.keycloak.models.userEntity.KeycloakUserEntity;
 import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -32,16 +33,26 @@ public class KeycloakAPI {
         this.restTemplate = restTemplate;
     }
 
-    private final String REALM = "Karner";
-    private final String CLIENT_ID = "0fc8c1c1-7ca8-40b9-8655-bc3a48e95540";
-    private final String CLIENT_SECRET = "v03vGy8VnToWtLw6fnGbhv9QZndODALx";
-    private final String ADMIN_USERNAME = "admin";
-    private final String ADMIN_PASSWORD = "admin";
-    private final String ROLE_CUSTOMER_ID = "bd446b9d-3e5e-4436-a804-a6582a44bda1";
-    private final String ROLE_CLEANER_ID = "c0c42f0d-76f0-46ca-9b8a-93a7e1c82407";
-    private final String ROLE_ADMIN_ID = "95873811-19bc-41ef-9ddf-8d7e45701938";
-    private final String TEST_USER_ID = "91f08a18-94bb-4f48-9346-1612a903a304";
-    private String ADMIN_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIwWkloYmFtY0RVTVpJX0lDbXVSSXg3aDNvOGl5THd3RkNYcmI3NWIydFBJIn0.eyJleHAiOjE2OTgxODkzMDEsImlhdCI6MTY5ODE1MzMwMSwianRpIjoiZmZiMTJmNzItMTQ3Yi00ODY3LWI0ZjctZWE4Y2FhMmZmNzcwIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9tYXN0ZXIiLCJzdWIiOiIzNWIzMTgxZi1lOWQzLTRiYzMtYjEwYS05NDIzMmFmYWI5NjIiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1jbGkiLCJzZXNzaW9uX3N0YXRlIjoiZjc3ZDYxMDItNmY0ZS00NjFiLTlhOGMtZmM3YzljMTRhYWZkIiwiYWNyIjoiMSIsInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsInNpZCI6ImY3N2Q2MTAyLTZmNGUtNDYxYi05YThjLWZjN2M5YzE0YWFmZCIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicHJlZmVycmVkX3VzZXJuYW1lIjoiYWRtaW4ifQ.rlgV30XWp9p4B8a5f48vaOhyLnbEb9TsSIl9Pn2TM0Kp1PTf3gYrMLKsKJSnBlFgP9pmTrD7Vx-7s6NaYfnZJieEqES3FLz0X6mGsddyo48S4NNByV3oeEe2WfMX1ZzUjQt4nHfTFTx4r8SKZSEJZ954NPIXU7aEi2YabQtG55BwJJ9Qmv8pHyh-VplW5JpxqoDNorvZ-A71ui9EmSTuM4-iLit2CigcM1CsRPHGrGlPvrk5A73G0lnktc0mq1WvoYcUcCk-glNfKIgCsRC4uEvsHHJzqcjQFKfPBazVVkO-tpgxYrqvjIv-O-Nuit_3GUi-Bhlrs9wp8kim1w1-Jg";
+    @Value("${KC_REALM}")
+    private String REALM;
+    @Value("${KC_CLIENT_ID}")
+    private String CLIENT_ID;
+    @Value("${KC_CLIENT_SECRET}")
+    private String CLIENT_SECRET;
+    @Value("${KC_ADMIN_USERNAME}")
+    private String ADMIN_USERNAME;
+    @Value("${KC_ADMIN_PASSWORD}")
+    private String ADMIN_PASSWORD;
+    @Value("${KC_ROLE_CUSTOMER_ID}")
+    private String ROLE_CUSTOMER_ID;
+    @Value("${KC_ROLE_CLEANER_ID}")
+    private String ROLE_CLEANER_ID;
+    @Value("${KC_ROLE_ADMIN_ID}")
+    private String ROLE_ADMIN_ID;
+    @Value("${KC_TEST_USER_ID}")
+    private String TEST_USER_ID;
+
+    private String ADMIN_TOKEN;
 
     private PrivateCustomerEntity customer = new PrivateCustomerEntity(
             null,
@@ -66,7 +77,7 @@ public class KeycloakAPI {
             ADMIN_TOKEN = adminTokenEntity.getAccess_token();
             System.out.println("ADMIN TOKEN: " + adminTokenEntity.toString());
 
-            KeycloakTokenEntity userTokenEntity = loginKeycloak("sebbe","sebbe");
+            KeycloakTokenEntity userTokenEntity = loginKeycloak("sebbe", "sebbe");
             System.out.println("USER TOKEN: " + userTokenEntity.toString());
 
             List<KeycloakUserEntity> users = getKeycloakUserEntities(ADMIN_TOKEN);
