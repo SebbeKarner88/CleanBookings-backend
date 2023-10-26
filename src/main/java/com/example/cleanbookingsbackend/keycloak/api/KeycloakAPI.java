@@ -25,7 +25,7 @@ import static com.example.cleanbookingsbackend.enums.Role.CLEANER;
 
 @Service
 public class KeycloakAPI {
-/*
+
     private final RestTemplate restTemplate;
 
     public KeycloakAPI(RestTemplate restTemplate) {
@@ -373,5 +373,5 @@ public class KeycloakAPI {
             case CUSTOMER -> throw new IllegalArgumentException("Invalid role");
         };
     }
-*/
+
 }

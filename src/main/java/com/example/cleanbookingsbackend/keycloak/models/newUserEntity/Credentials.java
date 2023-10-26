@@ -10,5 +10,4 @@ public class Credentials {
     String type;
     String value;
     Boolean temporary;
-
 }
