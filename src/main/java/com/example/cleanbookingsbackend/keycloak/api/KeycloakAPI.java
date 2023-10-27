@@ -97,7 +97,7 @@ public class KeycloakAPI {
 
             List<KeycloakRoleEntity> roles = getKeycloakRoleEntities(ADMIN_TOKEN);
             System.out.println("ROLES: " + roles.toString());
-
+/*
             int createNewCustomerStatus = createNewCustomer(ADMIN_TOKEN, testCustomer).value();
             System.out.println("CREATE NEW CUSTOMER: " + createNewCustomerStatus);
 
@@ -107,15 +107,15 @@ public class KeycloakAPI {
             int assignRoleToEmployee = assignRoleToEmployee(ADMIN_TOKEN, CLEANER, TEST_EMPLOYEE_ID).value();
             System.out.println("ASSIGN ROLE TO EMPLOYEE: " + assignRoleToEmployee);
 
-            //int changePasswordUser = changePasswordUser(ADMIN_TOKEN, TEST_CUSTOMER_ID, "nytt").value();
-            //System.out.println("CHANGE PASSWORD ON USER: " + changePasswordUser);
+            int changePasswordUser = changePasswordUser(ADMIN_TOKEN, TEST_CUSTOMER_ID, "nytt").value();
+            System.out.println("CHANGE PASSWORD ON USER: " + changePasswordUser);
 
-            //int deleteUser = deleteUser(ADMIN_TOKEN, "febbcd2c-f32e-4481-8af7-a4ca7d156c36").value();
-            //System.out.println("DELETED USER: " + deleteUser);
+            int deleteUser = deleteUser(ADMIN_TOKEN, "febbcd2c-f32e-4481-8af7-a4ca7d156c36").value();
+            System.out.println("DELETED USER: " + deleteUser);
 
-            //int logoutUser = logoutKeycloak(USER_REFRESH_TOKEN).value();
-            //System.out.println("LOGOUT: " + logoutUser);
-
+            int logoutUser = logoutKeycloak(USER_REFRESH_TOKEN).value();
+            System.out.println("LOGOUT: " + logoutUser);
+*/
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
