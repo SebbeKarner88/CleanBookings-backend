@@ -83,37 +83,47 @@ public class KeycloakAPI {
 
 
         try {
+            // GET ADMIN TOKENENTITY
             KeycloakTokenEntity adminTokenEntity = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD);
             ADMIN_TOKEN = adminTokenEntity.getAccess_token();
             System.out.println("ADMIN TOKEN: " + adminTokenEntity);
 
+            // LOGIN USER / GET USER TOKENENTITY
             KeycloakTokenEntity userTokenEntity = loginKeycloak(TEST_CUSTOMER_USERNAME, TEST_CUSTOMER_PASSWORD);
             USER_TOKEN = userTokenEntity.getAccess_token();
             USER_REFRESH_TOKEN = userTokenEntity.getRefresh_token();
             System.out.println("USER TOKEN: " + userTokenEntity);
 
+            // GET A LIST OF USERS
             List<KeycloakUserEntity> users = getKeycloakUserEntities(ADMIN_TOKEN);
             System.out.println("USERS: " + users.toString());
 
+            //GET A LIST OF ROLES
             List<KeycloakRoleEntity> roles = getKeycloakRoleEntities(ADMIN_TOKEN);
             System.out.println("ROLES: " + roles.toString());
 /*
+            // CREATE A NEW CUSTOMER
             int createNewCustomerStatus = createNewCustomer(ADMIN_TOKEN, testCustomer).value();
             System.out.println("CREATE NEW CUSTOMER: " + createNewCustomerStatus);
 
+            // ASSIGN A ROLE TO CUSTOMER
             int assignRoleToCustomer = assignRoleToCustomer(ADMIN_TOKEN, TEST_CUSTOMER_ID).value();
             System.out.println("ASSIGN ROLE TO CUSTOMER: " + assignRoleToCustomer);
 
+            // ASSIGN ROLE TO EMPLOYEE
             int assignRoleToEmployee = assignRoleToEmployee(ADMIN_TOKEN, CLEANER, TEST_EMPLOYEE_ID).value();
             System.out.println("ASSIGN ROLE TO EMPLOYEE: " + assignRoleToEmployee);
 
+            // CHANGE PASSWORD ON USER
             int changePasswordUser = changePasswordUser(ADMIN_TOKEN, TEST_CUSTOMER_ID, "nytt").value();
             System.out.println("CHANGE PASSWORD ON USER: " + changePasswordUser);
 
+            // DELETE USER
             // WARNING!! NEED TO CREATE USER IN ADMIN UI AND PASTE ID HERE TO TEST.
             int deleteUser = deleteUser(ADMIN_TOKEN, "febbcd2c-f32e-4481-8af7-a4ca7d156c36").value();
             System.out.println("DELETED USER: " + deleteUser);
 
+            // LOGOUT USER
             int logoutUser = logoutKeycloak(USER_REFRESH_TOKEN).value();
             System.out.println("LOGOUT: " + logoutUser);
 */
