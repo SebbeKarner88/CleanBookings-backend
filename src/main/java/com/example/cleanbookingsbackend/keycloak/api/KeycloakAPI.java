@@ -50,14 +50,19 @@ public class KeycloakAPI {
     private String ROLE_ADMIN_ID;
     @Value("${KC_TEST_CUSTOMER_ID}")
     private String TEST_CUSTOMER_ID;
+    @Value("${KC_TEST_CUSTOMER_USERNAME}")
+    private String TEST_CUSTOMER_USERNAME;
+    @Value("${KC_TEST_CUSTOMER_PASSWORD}")
+    private String TEST_CUSTOMER_PASSWORD;
     @Value("${KC_TEST_EMPLOYEE_ID}")
     private String TEST_EMPLOYEE_ID;
+
 
     private String ADMIN_TOKEN;
     private String USER_TOKEN;
     private String USER_REFRESH_TOKEN;
 
-    private PrivateCustomerEntity testCustomer = new PrivateCustomerEntity(
+    private final PrivateCustomerEntity testCustomer = new PrivateCustomerEntity(
             null,
             "Johnny",
             "Doe",
@@ -78,12 +83,12 @@ public class KeycloakAPI {
         try {
             KeycloakTokenEntity adminTokenEntity = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD);
             ADMIN_TOKEN = adminTokenEntity.getAccess_token();
-            System.out.println("ADMIN TOKEN: " + adminTokenEntity.toString());
+            System.out.println("ADMIN TOKEN: " + adminTokenEntity);
 
-            KeycloakTokenEntity userTokenEntity = loginKeycloak("sebbe", "sebbe");
+            KeycloakTokenEntity userTokenEntity = loginKeycloak(TEST_CUSTOMER_USERNAME, TEST_CUSTOMER_PASSWORD);
             USER_TOKEN = userTokenEntity.getAccess_token();
             USER_REFRESH_TOKEN = userTokenEntity.getRefresh_token();
-            System.out.println("USER TOKEN: " + userTokenEntity.toString());
+            System.out.println("USER TOKEN: " + userTokenEntity);
 
             List<KeycloakUserEntity> users = getKeycloakUserEntities(ADMIN_TOKEN);
             System.out.println("USERS: " + users.toString());
@@ -100,14 +105,14 @@ public class KeycloakAPI {
             int assignRoleToEmployee = assignRoleToEmployee(ADMIN_TOKEN, CLEANER, TEST_EMPLOYEE_ID).value();
             System.out.println("ASSIGN ROLE TO EMPLOYEE: " + assignRoleToEmployee);
 
-            int changePasswordUser = changePasswordUser(ADMIN_TOKEN, TEST_CUSTOMER_ID, "nytt").value();
-            System.out.println("CHANGE PASSWORD ON USER: " + changePasswordUser);
+            //int changePasswordUser = changePasswordUser(ADMIN_TOKEN, TEST_CUSTOMER_ID, "nytt").value();
+            //System.out.println("CHANGE PASSWORD ON USER: " + changePasswordUser);
 
-            int deleteUser = deleteUser(ADMIN_TOKEN, "febbcd2c-f32e-4481-8af7-a4ca7d156c36").value();
-            System.out.println("DELETED USER: " + deleteUser);
+            //int deleteUser = deleteUser(ADMIN_TOKEN, "febbcd2c-f32e-4481-8af7-a4ca7d156c36").value();
+            //System.out.println("DELETED USER: " + deleteUser);
 
-            int logoutUser = logoutKeycloak(USER_REFRESH_TOKEN).value();
-            System.out.println("LOGOUT: " + logoutUser);
+            //int logoutUser = logoutKeycloak(USER_REFRESH_TOKEN).value();
+            //System.out.println("LOGOUT: " + logoutUser);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
