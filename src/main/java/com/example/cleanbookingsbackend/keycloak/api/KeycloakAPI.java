@@ -110,6 +110,7 @@ public class KeycloakAPI {
             int changePasswordUser = changePasswordUser(ADMIN_TOKEN, TEST_CUSTOMER_ID, "nytt").value();
             System.out.println("CHANGE PASSWORD ON USER: " + changePasswordUser);
 
+            // WARNING!! NEED TO CREATE USER IN ADMIN UI AND PASTE ID HERE TO TEST.
             int deleteUser = deleteUser(ADMIN_TOKEN, "febbcd2c-f32e-4481-8af7-a4ca7d156c36").value();
             System.out.println("DELETED USER: " + deleteUser);
 
