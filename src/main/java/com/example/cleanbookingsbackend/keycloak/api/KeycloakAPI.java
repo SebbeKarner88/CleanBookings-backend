@@ -36,6 +36,8 @@ public class KeycloakAPI {
     private String REALM;
     @Value("${KC_CLIENT_ID}")
     private String CLIENT_ID;
+    @Value("${KC_CLIENT_NAME}")
+    private String CLIENT_NAME;
     @Value("${KC_CLIENT_SECRET}")
     private String CLIENT_SECRET;
     @Value("${KC_ADMIN_USERNAME}")
@@ -78,7 +80,6 @@ public class KeycloakAPI {
 
     @PostConstruct
     public void getKeycloakData() {
-
 
 
         try {
@@ -278,7 +279,7 @@ public class KeycloakAPI {
             map.add("username", username);
             map.add("password", password);
             map.add("grant_type", "password");
-            map.add("client_id", "karner-rest-api");
+            map.add("client_id", CLIENT_NAME);
             map.add("client_secret", CLIENT_SECRET);
             HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
             ResponseEntity<KeycloakTokenEntity> response = restTemplate.exchange(
@@ -302,7 +303,7 @@ public class KeycloakAPI {
             HttpHeaders headers = new HttpHeaders();
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
             MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-            map.add("client_id", "karner-rest-api");
+            map.add("client_id", CLIENT_NAME);
             map.add("client_secret", CLIENT_SECRET);
             map.add("refresh_token", userRefreshToken);
 
