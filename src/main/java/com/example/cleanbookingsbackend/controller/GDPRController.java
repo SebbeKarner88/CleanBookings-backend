@@ -23,7 +23,6 @@ public class GDPRController {
         this.employeeService = employeeService;
     }
 
-//    TODO: This is commented-out since it won't compile when the methods referenced doesn't exist
     @GetMapping("/customer-data/{customerId}")
     public ResponseEntity<CustomerDataResponse> getCustomerData(@PathVariable String customerId) {
         try {
