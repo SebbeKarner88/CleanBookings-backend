@@ -43,4 +43,19 @@ public class PaymentController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteInvoice(
+            @PathVariable("id") String invoiceId,
+            @RequestParam String adminId
+    ) {
+        try {
+            paymentService.deleteInvoice(adminId, invoiceId);
+            return ResponseEntity.ok().build();
+        } catch (EmployeeNotFoundException | PaymentNotFoundException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
+        } catch (UnauthorizedCallException exception) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+        }
+    }
+
 }

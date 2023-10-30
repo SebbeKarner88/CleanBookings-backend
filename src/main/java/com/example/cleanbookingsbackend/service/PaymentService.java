@@ -1,6 +1,5 @@
 package com.example.cleanbookingsbackend.service;
 
-import com.example.cleanbookingsbackend.dto.JobResponseDTO;
 import com.example.cleanbookingsbackend.dto.PaymentDTO;
 import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.PaymentStatus;
@@ -21,9 +20,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataField.EMPLOYEE_ID;
+import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataField.PAYMENT_ID;
+import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataType.STRING;
+import static com.example.cleanbookingsbackend.service.utils.InputValidation.validateInputDataField;
 
 @Service
 @RequiredArgsConstructor
@@ -113,5 +116,15 @@ public class PaymentService {
         );
     }
 
+    public void deleteInvoice(String adminId, String invoiceId)
+    throws IllegalArgumentException, EmployeeNotFoundException, UnauthorizedCallException, PaymentNotFoundException {
+        validateInputDataField(EMPLOYEE_ID, STRING, adminId);
+        validateInputDataField(PAYMENT_ID, STRING, invoiceId);
+
+        if (input.isAdmin(adminId)) {
+            input.validatePaymentId(invoiceId);
+            paymentRepository.deleteById(invoiceId);
+        }
+    }
 }
 

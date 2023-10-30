@@ -1,10 +1,8 @@
 package com.example.cleanbookingsbackend.service.utils;
 
 import com.example.cleanbookingsbackend.enums.JobType;
-import com.example.cleanbookingsbackend.exception.CustomerNotFoundException;
-import com.example.cleanbookingsbackend.exception.EmployeeNotFoundException;
-import com.example.cleanbookingsbackend.exception.JobNotFoundException;
-import com.example.cleanbookingsbackend.exception.PaymentNotFoundException;
+import com.example.cleanbookingsbackend.enums.Role;
+import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
@@ -16,6 +14,8 @@ import com.example.cleanbookingsbackend.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataField.EMPLOYEE_ID;
+import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataType.STRING;
 import static io.micrometer.common.util.StringUtils.isBlank;
 
 @Service
@@ -25,6 +25,8 @@ public class InputValidation {
     private final EmployeeRepository employeeRepository;
     private final JobRepository jobRepository;
     private final PaymentRepository paymentRepository;
+
+    private static final String UNAUTHORIZED_CALL_MESSAGE = "You are not authorized to perform this action.";
 
     public enum DataField {
         CUSTOMER_ID("Customer id"),
@@ -93,6 +95,15 @@ public class InputValidation {
     public PaymentEntity validatePaymentId(String id) throws PaymentNotFoundException {
         return paymentRepository.findById(id)
                 .orElseThrow(() -> new PaymentNotFoundException("There is no payment with id: " + id));
+    }
+
+    public boolean isAdmin(String id)
+            throws EmployeeNotFoundException, UnauthorizedCallException {
+        validateInputDataField(EMPLOYEE_ID, STRING, id);
+        EmployeeEntity employee = validateEmployeeId(id);
+        if (!employee.getRole().equals(Role.ADMIN))
+            throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE);
+        return true;
     }
 
     public boolean isValidEmailAddress(String email) {

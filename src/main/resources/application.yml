@@ -27,6 +27,6 @@ spring:
           starttls:
             enable: true
 server:
-    error:
+  error:
       include-message: always
-    port: 8081
+  port: 8081
