@@ -8,6 +8,7 @@ import com.example.cleanbookingsbackend.keycloak.models.tokenEntity.KeycloakToke
 import com.example.cleanbookingsbackend.keycloak.models.newUserEntity.Credentials;
 import com.example.cleanbookingsbackend.keycloak.models.newUserEntity.NewUserEntity;
 import com.example.cleanbookingsbackend.keycloak.models.userEntity.KeycloakUserEntity;
+import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,7 +67,7 @@ public class KeycloakAPI {
 
     private final PrivateCustomerEntity testCustomer = new PrivateCustomerEntity(
             null,
-            "Johnny",
+            "Jenny",
             "Doe",
             null,
             CustomerType.PRIVATE,
@@ -74,9 +75,20 @@ public class KeycloakAPI {
             12345,
             "Johnny City",
             "076-250 45 23",
-            "johnny.doe@aol.com",
+            "jenny.doe@aol.com",
             "password",
             null);
+
+    private final EmployeeEntity testEmployee = new EmployeeEntity(
+            null,
+            "Clean",
+            "Cleanerson",
+            null,
+            CLEANER,
+            "CleanCeanerson@Aol.se",
+            "password",
+            null
+           );
 
     @PostConstruct
     public void getKeycloakData() {
@@ -106,6 +118,10 @@ public class KeycloakAPI {
             int createNewCustomerStatus = createNewCustomer(ADMIN_TOKEN, testCustomer).value();
             System.out.println("CREATE NEW CUSTOMER: " + createNewCustomerStatus);
 
+            // CREATE A NEW EMPLOYEE
+            int createNewEmployeeStatus = createNewEmployee(ADMIN_TOKEN, testEmployee).value();
+            System.out.println("CREATE NEW EMPLOYEE: " + createNewEmployeeStatus);
+
             // ASSIGN A ROLE TO CUSTOMER
             int assignRoleToCustomer = assignRoleToCustomer(ADMIN_TOKEN, TEST_CUSTOMER_ID).value();
             System.out.println("ASSIGN ROLE TO CUSTOMER: " + assignRoleToCustomer);
@@ -120,13 +136,22 @@ public class KeycloakAPI {
 
             // DELETE USER
             // WARNING!! NEED TO CREATE USER IN ADMIN UI AND PASTE ID HERE TO TEST.
-            int deleteUser = deleteUser(ADMIN_TOKEN, "febbcd2c-f32e-4481-8af7-a4ca7d156c36").value();
+            int deleteUser = deleteUser(ADMIN_TOKEN, "INSERT USER ID").value();
             System.out.println("DELETED USER: " + deleteUser);
 
             // LOGOUT USER
             int logoutUser = logoutKeycloak(USER_REFRESH_TOKEN).value();
             System.out.println("LOGOUT: " + logoutUser);
+
+            // UPDATE CUSTOMER
+            int updateCustomer = updateCustomer(ADMIN_TOKEN,"INSERT CUSTOMER ID", testCustomer).value();
+            System.out.println("UPDATE CUSTOMER: " + updateCustomer);
+
+            // UPDATE EMPLOYEE
+            int updateEmployee = updateEmployee(ADMIN_TOKEN,"INSERT EMPLOYEE ID", testEmployee).value();
+            System.out.println("UPDATE EMPLOYEE: " + updateEmployee);
 */
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -217,6 +242,39 @@ public class KeycloakAPI {
                     customer.getFirstName(),
                     customer.getLastName(),
                     customer.getEmailAddress(),
+                    credArr
+            );
+            HttpEntity<NewUserEntity> entity =
+                    new HttpEntity<>(newUserBody, headers);
+            ResponseEntity<?> response = restTemplate.exchange(
+                    "http://localhost:8080/admin/realms/" + REALM + "/users",
+                    HttpMethod.POST,
+                    entity,
+                    new ParameterizedTypeReference<>() {
+                    });
+            return response.getStatusCode(); // 201 IS SUCCESS
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    // CREATE A NEW CUSTOMER IN THE KEYCLOAK DB
+    public HttpStatusCode createNewEmployee(String adminToken, EmployeeEntity employee) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add("Authorization", "Bearer " + adminToken);
+            Credentials[] credArr = {
+                    new Credentials("password",
+                            employee.getPassword(),
+                            false)};
+            NewUserEntity newUserBody = new NewUserEntity(
+                    true,
+                    employee.getEmailAddress(),
+                    employee.getFirstName(),
+                    employee.getLastName(),
+                    employee.getEmailAddress(),
                     credArr
             );
             HttpEntity<NewUserEntity> entity =
@@ -380,8 +438,63 @@ public class KeycloakAPI {
         return null;
     }
 
-    //TODO: CALL FOR UPDATING CUSTOMER
-    //TODO: CALL FOR UPDATING EMPLOYEE
+    public HttpStatusCode updateCustomer(String adminToken, String customerId, PrivateCustomerEntity customer) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add("Authorization", "Bearer " + adminToken);
+            Credentials[] credArr = {};
+            NewUserEntity newUserBody = new NewUserEntity(
+                    true,
+                    customer.getEmailAddress(),
+                    customer.getFirstName(),
+                    customer.getLastName(),
+                    customer.getEmailAddress(),
+                    credArr
+            );
+            HttpEntity<NewUserEntity> entity =
+                    new HttpEntity<>(newUserBody, headers);
+            ResponseEntity<?> response = restTemplate.exchange(
+                    "http://localhost:8080/admin/realms/" + REALM + "/users/" + customerId,
+                    HttpMethod.PUT,
+                    entity,
+                    new ParameterizedTypeReference<>() {
+                    });
+            return response.getStatusCode(); // 204 IS SUCCESS
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    public HttpStatusCode updateEmployee(String adminToken, String employeeId, EmployeeEntity employee) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add("Authorization", "Bearer " + adminToken);
+            Credentials[] credArr = {};
+            NewUserEntity newUserBody = new NewUserEntity(
+                    true,
+                    employee.getEmailAddress(),
+                    employee.getFirstName(),
+                    employee.getLastName(),
+                    employee.getEmailAddress(),
+                    credArr
+            );
+            HttpEntity<NewUserEntity> entity =
+                    new HttpEntity<>(newUserBody, headers);
+            ResponseEntity<?> response = restTemplate.exchange(
+                    "http://localhost:8080/admin/realms/" + REALM + "/users/" + employeeId,
+                    HttpMethod.PUT,
+                    entity,
+                    new ParameterizedTypeReference<>() {
+                    });
+            return response.getStatusCode(); // 204 IS SUCCESS
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
 
     private KeycloakRoleAssignmentEntity determineRole(Role role)
             throws IllegalArgumentException {
