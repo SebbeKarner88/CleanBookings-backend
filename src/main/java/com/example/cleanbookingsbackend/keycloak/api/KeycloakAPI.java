@@ -95,6 +95,7 @@ public class KeycloakAPI {
 
 
         try {
+/*
             // GET ADMIN TOKENENTITY
             KeycloakTokenEntity adminTokenEntity = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD);
             ADMIN_TOKEN = adminTokenEntity.getAccess_token();
@@ -113,7 +114,7 @@ public class KeycloakAPI {
             //GET A LIST OF ROLES
             List<KeycloakRoleEntity> roles = getKeycloakRoleEntities(ADMIN_TOKEN);
             System.out.println("ROLES: " + roles.toString());
-/*
+
             // CREATE A NEW CUSTOMER
             int createNewCustomerStatus = createNewCustomer(ADMIN_TOKEN, testCustomer).value();
             System.out.println("CREATE NEW CUSTOMER: " + createNewCustomerStatus);
@@ -159,19 +160,25 @@ public class KeycloakAPI {
 
     //############################## HELPER METHODS #####################################
 
-    public String getKeyCloakCustomerId(String userName) {
-
+    public PrivateCustomerEntity addCustomerKeycloak(PrivateCustomerEntity customer) throws RuntimeException{
         String adminToken = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD).getAccess_token();
-
-        List<KeycloakUserEntity> user =
-                getKeycloakUserEntities(adminToken)
-                        .stream()
-                        .filter(entity -> entity.getUsername().matches(userName))
-                        .toList();
-
-        return user.get(0).getId();
+        try{
+           createNewCustomer(adminToken, customer).is2xxSuccessful();
+           List<KeycloakUserEntity> addedUser = getKeycloakUserEntities(adminToken)
+                   .stream()
+                   .filter(entity -> entity.getUsername().equalsIgnoreCase(customer.getEmailAddress()))
+                   .toList();
+           if(addedUser.isEmpty()) {
+              throw new RuntimeException("User could not be added to Keycloak");
+           }
+           String id = addedUser.get(0).getId();
+           customer.setId(id);
+           assignRoleToCustomer(adminToken, id);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return customer;
     }
-
 
     //############################# API CALLS ###########################################
     // GET A ADMINENTITY CONTAINING A TOKEN TO BE ABLE TO REGISTER A NEW USER IN KEYCLOAK

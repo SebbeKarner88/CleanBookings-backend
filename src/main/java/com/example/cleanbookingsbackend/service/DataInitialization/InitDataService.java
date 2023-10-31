@@ -1,6 +1,8 @@
 package com.example.cleanbookingsbackend.service.DataInitialization;
 
 import com.example.cleanbookingsbackend.enums.*;
+import com.example.cleanbookingsbackend.keycloak.api.KeycloakAPI;
+import com.example.cleanbookingsbackend.keycloak.models.userEntity.KeycloakUserEntity;
 import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
@@ -22,6 +24,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +37,7 @@ public class InitDataService {
     private final PaymentRepository paymentRepository;
     private final PasswordEncoder encoder;
 
+    private final KeycloakAPI keycloakAPI;
 
     @PostConstruct
     public void initializeData() {
@@ -43,7 +48,7 @@ public class InitDataService {
                 null,
                 "Jane",
                 "Doe",
-                encoder.encode("880325-2456"),
+                "730623-0145",
                 CustomerType.PRIVATE,
                 "Jane Street 1",
                 12345,
@@ -57,7 +62,7 @@ public class InitDataService {
                 null,
                 "Johnny",
                 "Doe",
-                encoder.encode("730623-0145"),
+                "730623-0145",
                 CustomerType.PRIVATE,
                 "Johnny Street 1",
                 12345,
@@ -71,7 +76,7 @@ public class InitDataService {
                 null,
                 "Anders",
                 "Svensson",
-                encoder.encode("450919-0945"),
+                "450919-0945",
                 CustomerType.PRIVATE,
                 "Gatgatan 1",
                 12321,
@@ -85,7 +90,7 @@ public class InitDataService {
                 null,
                 "Maj-Britt",
                 "Hemmafrusson",
-                encoder.encode("901224-0165"),
+                "901224-0165",
                 CustomerType.PRIVATE,
                 "Adress 2",
                 11111,
@@ -97,12 +102,13 @@ public class InitDataService {
 
 
         // KEYCLOAK AND DB INIT
+        List<PrivateCustomerEntity> customers = List.of(customer1, customer2, customer3, customer4);
+        List<PrivateCustomerEntity> updatedCustomers = customers
+                .stream()
+                .map(keycloakAPI::addCustomerKeycloak)
+                .toList();
+        customerRepository.saveAll(updatedCustomers);
 /*
-        String adminToken = keycloakAPI.getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD).getAccess_token();
-        Boolean success = keycloakAPI.createNewCustomer(adminToken, customer1).is2xxSuccessful();
-*/
-        customerRepository.saveAll(List.of(customer1, customer2, customer3, customer4));
-
         // ##### Cleaner/admin #####
 
         EmployeeEntity cleaner1 = new EmployeeEntity(
@@ -272,6 +278,8 @@ public class InitDataService {
                 1995.0
         );
         paymentRepository.saveAll(List.of(paymentJob3, paymentJob5));
+
+*/
     }
 
 }
