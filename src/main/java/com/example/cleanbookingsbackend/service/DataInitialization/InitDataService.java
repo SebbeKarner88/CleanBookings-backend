@@ -102,13 +102,11 @@ public class InitDataService {
 
 
         // KEYCLOAK AND DB INIT
-        List<PrivateCustomerEntity> customers = List.of(customer1, customer2, customer3, customer4);
-        List<PrivateCustomerEntity> updatedCustomers = customers
-                .stream()
+        List<PrivateCustomerEntity> updatedCustomers = Stream.of(customer1, customer2, customer3, customer4)
                 .map(keycloakAPI::addCustomerKeycloak)
                 .toList();
         customerRepository.saveAll(updatedCustomers);
-/*
+
         // ##### Cleaner/admin #####
 
         EmployeeEntity cleaner1 = new EmployeeEntity(
@@ -184,8 +182,12 @@ public class InitDataService {
                 encoder.encode("password"),
                 null
         );
-
-        employeeRepository.saveAll(List.of(cleaner1, cleaner2, cleaner3, cleaner4, cleaner5, cleaner6, admin1));
+        // KEYCLOAK AND DB INIT
+        List<EmployeeEntity> updatedEmployees =
+                Stream.of(cleaner1, cleaner2, cleaner3, cleaner4, cleaner5, cleaner6, admin1)
+                .map(keycloakAPI::addEmployeeKeycloak)
+                .toList();
+        employeeRepository.saveAll(updatedEmployees);
 
         // ##### Jobs #####
 
@@ -278,8 +280,5 @@ public class InitDataService {
                 1995.0
         );
         paymentRepository.saveAll(List.of(paymentJob3, paymentJob5));
-
-*/
     }
-
 }

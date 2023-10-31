@@ -159,7 +159,6 @@ public class KeycloakAPI {
     }
 
     //############################## HELPER METHODS #####################################
-
     public PrivateCustomerEntity addCustomerKeycloak(PrivateCustomerEntity customer) throws RuntimeException{
         String adminToken = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD).getAccess_token();
         try{
@@ -178,6 +177,26 @@ public class KeycloakAPI {
             System.out.println(e.getMessage());
         }
         return customer;
+    }
+
+    public EmployeeEntity addEmployeeKeycloak(EmployeeEntity employee) throws RuntimeException{
+        String adminToken = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD).getAccess_token();
+        try{
+            createNewEmployee(adminToken, employee).is2xxSuccessful();
+            List<KeycloakUserEntity> addedUser = getKeycloakUserEntities(adminToken)
+                    .stream()
+                    .filter(entity -> entity.getUsername().equalsIgnoreCase(employee.getEmailAddress()))
+                    .toList();
+            if(addedUser.isEmpty()) {
+                throw new RuntimeException("User could not be added to Keycloak");
+            }
+            String id = addedUser.get(0).getId();
+            employee.setId(id);
+            assignRoleToEmployee(adminToken, employee.getRole(), id);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return employee;
     }
 
     //############################# API CALLS ###########################################
