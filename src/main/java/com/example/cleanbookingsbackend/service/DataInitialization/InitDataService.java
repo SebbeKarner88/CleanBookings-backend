@@ -116,7 +116,7 @@ public class InitDataService {
                 "073-9 453 843",
                 Role.CLEANER,
                 "Klas@CleanBookings.com",
-                encoder.encode("password"),
+                "password",
                 null
         );
         EmployeeEntity cleaner2 = new EmployeeEntity(
@@ -126,7 +126,7 @@ public class InitDataService {
                 "073-9 351 733",
                 Role.CLEANER,
                 "Anita@CleanBookings.com",
-                encoder.encode("password"),
+                "password",
                 null
 
         );
@@ -137,7 +137,7 @@ public class InitDataService {
                 "073-9 467 843",
                 Role.CLEANER,
                 "Stig@CleanBookings.com",
-                encoder.encode("password"),
+                "password",
                 null
         );
         EmployeeEntity cleaner4 = new EmployeeEntity(
@@ -147,7 +147,7 @@ public class InitDataService {
                 "073-9 031 733",
                 Role.CLEANER,
                 "Ebba@CleanBookings.com",
-                encoder.encode("password"),
+                "password",
                 null
 
         );
@@ -158,7 +158,7 @@ public class InitDataService {
                 "072-9 453 843",
                 Role.CLEANER,
                 "Sveta@CleanBookings.com",
-                encoder.encode("password"),
+                "password",
                 null
         );
         EmployeeEntity cleaner6 = new EmployeeEntity(
@@ -168,7 +168,7 @@ public class InitDataService {
                 "073-9 351 453",
                 Role.CLEANER,
                 "Torkas@CleanBookings.com",
-                encoder.encode("password"),
+                "password",
                 null
 
         );
@@ -179,7 +179,7 @@ public class InitDataService {
                 "074-9 433 243",
                 Role.ADMIN,
                 "Admin1@CleanBookings.com",
-                encoder.encode("password"),
+                "password",
                 null
         );
         // KEYCLOAK AND DB INIT

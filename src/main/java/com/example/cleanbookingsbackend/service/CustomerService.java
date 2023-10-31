@@ -3,6 +3,7 @@ package com.example.cleanbookingsbackend.service;
 import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.*;
+import com.example.cleanbookingsbackend.keycloak.api.KeycloakAPI;
 import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.repository.CustomerRepository;
@@ -26,6 +27,7 @@ public class CustomerService {
     private final PasswordEncoder encoder;
     private final InputValidation input;
     private final EmployeeRepository employeeRepository;
+    private final KeycloakAPI keycloakAPI;
 
     public AuthenticationResponse create(CustomerRegistrationDTO request)
             throws ValidationException,
@@ -46,8 +48,8 @@ public class CustomerService {
 
         PrivateCustomerEntity customer = customerBuilder(request);
 
-        try {
-            customerRepository.save(customer);
+        try { //KEYCLOAK IMPLEMENTATION
+            customerRepository.save(keycloakAPI.addCustomerKeycloak(customer));
             return new AuthenticationResponse(customer.getId(), customer.getFirstName());
         } catch (Exception e) {
             throw new RuntimeException("Could not save customer");
@@ -238,14 +240,14 @@ public class CustomerService {
                 null,
                 request.firstName(),
                 request.lastName(),
-                encoder.encode(request.personNumber()),
+                request.personNumber(),
                 request.customerType(),
                 request.streetAddress(),
                 request.postalCode(),
                 request.city(),
                 request.phoneNumber(),
                 request.emailAddress(),
-                encoder.encode(request.password()),
+                request.password(),
                 null
         );
     }

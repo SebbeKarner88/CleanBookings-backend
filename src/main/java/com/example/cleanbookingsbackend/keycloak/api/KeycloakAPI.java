@@ -88,12 +88,12 @@ public class KeycloakAPI {
             "CleanCeanerson@Aol.se",
             "password",
             null
-           );
+    );
 
     @PostConstruct
     public void getKeycloakData() {
 
-
+        // ############################## TESTS ##########################################
         try {
 /*
             // GET ADMIN TOKENENTITY
@@ -152,42 +152,41 @@ public class KeycloakAPI {
             int updateEmployee = updateEmployee(ADMIN_TOKEN,"INSERT EMPLOYEE ID", testEmployee).value();
             System.out.println("UPDATE EMPLOYEE: " + updateEmployee);
 */
-
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     //############################## HELPER METHODS #####################################
-    public PrivateCustomerEntity addCustomerKeycloak(PrivateCustomerEntity customer) throws RuntimeException{
+    public PrivateCustomerEntity addCustomerKeycloak(PrivateCustomerEntity customer) throws RuntimeException {
         String adminToken = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD).getAccess_token();
-        try{
-           createNewCustomer(adminToken, customer).is2xxSuccessful();
-           List<KeycloakUserEntity> addedUser = getKeycloakUserEntities(adminToken)
-                   .stream()
-                   .filter(entity -> entity.getUsername().equalsIgnoreCase(customer.getEmailAddress()))
-                   .toList();
-           if(addedUser.isEmpty()) {
-              throw new RuntimeException("User could not be added to Keycloak");
-           }
-           String id = addedUser.get(0).getId();
-           customer.setId(id);
-           assignRoleToCustomer(adminToken, id);
+        try {
+            createNewCustomer(adminToken, customer).is2xxSuccessful();
+            List<KeycloakUserEntity> addedUser = getKeycloakUserEntities(adminToken)
+                    .stream()
+                    .filter(entity -> entity.getUsername().equalsIgnoreCase(customer.getEmailAddress()))
+                    .toList();
+            if (addedUser.isEmpty()) {
+                throw new RuntimeException("User could not be added to Keycloak");
+            }
+            String id = addedUser.get(0).getId();
+            customer.setId(id);
+            assignRoleToCustomer(adminToken, id);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return customer;
     }
 
-    public EmployeeEntity addEmployeeKeycloak(EmployeeEntity employee) throws RuntimeException{
+    public EmployeeEntity addEmployeeKeycloak(EmployeeEntity employee) throws RuntimeException {
         String adminToken = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD).getAccess_token();
-        try{
+        try {
             createNewEmployee(adminToken, employee).is2xxSuccessful();
             List<KeycloakUserEntity> addedUser = getKeycloakUserEntities(adminToken)
                     .stream()
                     .filter(entity -> entity.getUsername().equalsIgnoreCase(employee.getEmailAddress()))
                     .toList();
-            if(addedUser.isEmpty()) {
+            if (addedUser.isEmpty()) {
                 throw new RuntimeException("User could not be added to Keycloak");
             }
             String id = addedUser.get(0).getId();
@@ -199,7 +198,9 @@ public class KeycloakAPI {
         return employee;
     }
 
+
     //############################# API CALLS ###########################################
+
     // GET A ADMINENTITY CONTAINING A TOKEN TO BE ABLE TO REGISTER A NEW USER IN KEYCLOAK
     public KeycloakTokenEntity getAdminTokenEntity(String username, String password) {
         try {
@@ -225,7 +226,6 @@ public class KeycloakAPI {
         }
         return null;
     }
-
 
     // GET A LIST OF KEYCLOAKUSERENTITY FROM KEYCLOAK REALM AND RETURNING A LIST WITH USERS.
     public List<KeycloakUserEntity> getKeycloakUserEntities(String adminToken) {
@@ -266,7 +266,6 @@ public class KeycloakAPI {
         }
         return null;
     }
-
 
     // CREATE A NEW CUSTOMER IN THE KEYCLOAK DB
     public HttpStatusCode createNewCustomer(String adminToken, PrivateCustomerEntity customer) {
@@ -358,8 +357,8 @@ public class KeycloakAPI {
     }
 
     // ASSIGN ROLE TO EMPLOYEE
-    public HttpStatusCode assignRoleToEmployee(String adminToken,Role role, String employeeId)
-            throws IllegalArgumentException{
+    public HttpStatusCode assignRoleToEmployee(String adminToken, Role role, String employeeId)
+            throws IllegalArgumentException {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -546,5 +545,4 @@ public class KeycloakAPI {
             case CUSTOMER -> throw new IllegalArgumentException("Invalid role");
         };
     }
-
 }

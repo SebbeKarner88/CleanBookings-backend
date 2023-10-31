@@ -3,6 +3,7 @@ package com.example.cleanbookingsbackend.service;
 import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.*;
+import com.example.cleanbookingsbackend.keycloak.api.KeycloakAPI;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
@@ -30,6 +31,7 @@ public class EmployeeService {
     private final PasswordEncoder passwordEncoder;
     private final InputValidation input;
     private final PasswordEncoder encoder;
+    private final KeycloakAPI keycloakAPI;
 
     private static final String UNAUTHORIZED_CALL_MESSAGE = "You are not authorized to perform this action.";
 
@@ -58,7 +60,7 @@ public class EmployeeService {
         EmployeeEntity employee = employeeBuilder(request);
 
         try {
-            employeeRepository.save(employee);
+            employeeRepository.save(keycloakAPI.addEmployeeKeycloak(employee));
             return new CreateEmployeeResponse(
                     employee.getId(),
                     employee.getFirstName(),
@@ -80,7 +82,7 @@ public class EmployeeService {
                 request.phoneNumber(),
                 request.role(),
                 request.emailAddress(),
-                passwordEncoder.encode("password"),
+                "password",
                 null
         );
     }
