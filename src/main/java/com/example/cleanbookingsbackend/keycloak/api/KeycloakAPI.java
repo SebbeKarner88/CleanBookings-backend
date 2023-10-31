@@ -26,13 +26,6 @@ import static com.example.cleanbookingsbackend.enums.Role.CLEANER;
 
 @Service
 public class KeycloakAPI {
-
-    private final RestTemplate restTemplate;
-
-    public KeycloakAPI(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
-
     @Value("${KC_REALM}")
     private String REALM;
     @Value("${KC_CLIENT_ID}")
@@ -60,10 +53,15 @@ public class KeycloakAPI {
     @Value("${KC_TEST_EMPLOYEE_ID}")
     private String TEST_EMPLOYEE_ID;
 
-
+    private final String BASE_URL = "http://localhost:8080/admin/realms/" + REALM;
+    private final RestTemplate restTemplate;
     private String ADMIN_TOKEN;
     private String USER_TOKEN;
     private String USER_REFRESH_TOKEN;
+
+    public KeycloakAPI(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     private final PrivateCustomerEntity testCustomer = new PrivateCustomerEntity(
             null,
@@ -88,7 +86,7 @@ public class KeycloakAPI {
             "CleanCeanerson@Aol.se",
             "password",
             null
-           );
+    );
 
     @PostConstruct
     public void getKeycloakData() {
@@ -193,7 +191,7 @@ public class KeycloakAPI {
             headers.add("Authorization", "Bearer " + adminToken);
             HttpEntity<String> entity = new HttpEntity<String>(headers);
             ResponseEntity<List<KeycloakUserEntity>> response = restTemplate.exchange(
-                    "http://localhost:8080/admin/realms/" + REALM + "/users",
+                    BASE_URL + "/users",
                     HttpMethod.GET,
                     entity,
                     new ParameterizedTypeReference<>() {
@@ -213,7 +211,7 @@ public class KeycloakAPI {
             headers.add("Authorization", "Bearer " + adminToken);
             HttpEntity<String> entity = new HttpEntity<String>(headers);
             ResponseEntity<List<KeycloakRoleEntity>> response = restTemplate.exchange(
-                    "http://localhost:8080/admin/realms/" + REALM + "/clients/" + CLIENT_ID + "/roles",
+                    BASE_URL + "/clients/" + CLIENT_ID + "/roles",
                     HttpMethod.GET,
                     entity,
                     new ParameterizedTypeReference<>() {
@@ -247,7 +245,7 @@ public class KeycloakAPI {
             HttpEntity<NewUserEntity> entity =
                     new HttpEntity<>(newUserBody, headers);
             ResponseEntity<?> response = restTemplate.exchange(
-                    "http://localhost:8080/admin/realms/" + REALM + "/users",
+                    BASE_URL + "/users",
                     HttpMethod.POST,
                     entity,
                     new ParameterizedTypeReference<>() {
@@ -280,7 +278,7 @@ public class KeycloakAPI {
             HttpEntity<NewUserEntity> entity =
                     new HttpEntity<>(newUserBody, headers);
             ResponseEntity<?> response = restTemplate.exchange(
-                    "http://localhost:8080/admin/realms/" + REALM + "/users",
+                    BASE_URL + "/users",
                     HttpMethod.POST,
                     entity,
                     new ParameterizedTypeReference<>() {
@@ -302,8 +300,7 @@ public class KeycloakAPI {
             HttpEntity<KeycloakRoleAssignmentEntity[]> entity =
                     new HttpEntity<>(arr, headers);
             ResponseEntity<HttpStatusCode> response = restTemplate.exchange(
-                    "http://localhost:8080/admin/realms/" + REALM + "/users/" +
-                            userId + "/role-mappings/clients/" + CLIENT_ID,
+                    BASE_URL + "/users/" + userId + "/role-mappings/clients/" + CLIENT_ID,
                     HttpMethod.POST,
                     entity,
                     new ParameterizedTypeReference<>() {
@@ -316,8 +313,8 @@ public class KeycloakAPI {
     }
 
     // ASSIGN ROLE TO EMPLOYEE
-    public HttpStatusCode assignRoleToEmployee(String adminToken,Role role, String employeeId)
-            throws IllegalArgumentException{
+    public HttpStatusCode assignRoleToEmployee(String adminToken, Role role, String employeeId)
+            throws IllegalArgumentException {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -326,8 +323,7 @@ public class KeycloakAPI {
             HttpEntity<KeycloakRoleAssignmentEntity[]> entity =
                     new HttpEntity<>(arr, headers);
             ResponseEntity<HttpStatusCode> response = restTemplate.exchange(
-                    "http://localhost:8080/admin/realms/" + REALM + "/users/" +
-                            employeeId + "/role-mappings/clients/" + CLIENT_ID,
+                    BASE_URL + "/users/" + employeeId + "/role-mappings/clients/" + CLIENT_ID,
                     HttpMethod.POST,
                     entity,
                     new ParameterizedTypeReference<>() {
@@ -352,7 +348,7 @@ public class KeycloakAPI {
             map.add("client_secret", CLIENT_SECRET);
             HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
             ResponseEntity<KeycloakTokenEntity> response = restTemplate.exchange(
-                    "http://localhost:8080/realms/" + REALM + "/protocol/openid-connect/token",
+                    BASE_URL + "/protocol/openid-connect/token",
                     HttpMethod.POST,
                     entity,
                     new ParameterizedTypeReference<>() {
@@ -379,7 +375,7 @@ public class KeycloakAPI {
             HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
 
             ResponseEntity<String> response = restTemplate.exchange(
-                    "http://localhost:8080/realms/" + REALM + "/protocol/openid-connect/logout",
+                    BASE_URL + "/protocol/openid-connect/logout",
                     HttpMethod.POST,
                     entity,
                     new ParameterizedTypeReference<>() {
@@ -405,7 +401,7 @@ public class KeycloakAPI {
             HttpEntity<Credentials> entity =
                     new HttpEntity<>(cred, headers);
             ResponseEntity<HttpStatusCode> response = restTemplate.exchange(
-                    "http://localhost:8080/admin/realms/" + REALM + "/users/" + userId + "/reset-password",
+                    BASE_URL + "/users/" + userId + "/reset-password",
                     HttpMethod.PUT,
                     entity,
                     new ParameterizedTypeReference<>() {
@@ -426,7 +422,7 @@ public class KeycloakAPI {
 
             HttpEntity<String> entity = new HttpEntity<>(headers);
             ResponseEntity<HttpStatusCode> response = restTemplate.exchange(
-                    "http://localhost:8080/admin/realms/" + REALM + "/users/" + userId,
+                    BASE_URL + "/users/" + userId,
                     HttpMethod.DELETE,
                     entity,
                     new ParameterizedTypeReference<>() {
@@ -455,7 +451,7 @@ public class KeycloakAPI {
             HttpEntity<NewUserEntity> entity =
                     new HttpEntity<>(newUserBody, headers);
             ResponseEntity<?> response = restTemplate.exchange(
-                    "http://localhost:8080/admin/realms/" + REALM + "/users/" + customerId,
+                    BASE_URL + "/users/" + customerId,
                     HttpMethod.PUT,
                     entity,
                     new ParameterizedTypeReference<>() {
@@ -484,7 +480,7 @@ public class KeycloakAPI {
             HttpEntity<NewUserEntity> entity =
                     new HttpEntity<>(newUserBody, headers);
             ResponseEntity<?> response = restTemplate.exchange(
-                    "http://localhost:8080/admin/realms/" + REALM + "/users/" + employeeId,
+                    BASE_URL + "/users/" + employeeId,
                     HttpMethod.PUT,
                     entity,
                     new ParameterizedTypeReference<>() {
