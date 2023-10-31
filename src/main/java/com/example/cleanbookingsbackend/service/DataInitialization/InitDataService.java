@@ -50,7 +50,7 @@ public class InitDataService {
                 "Jane City",
                 "076-250 90 80",
                 "jane.doe@janecity.com",
-                encoder.encode("password"),
+                "password",
                 null);
 
         PrivateCustomerEntity customer2 = new PrivateCustomerEntity(
@@ -64,7 +64,7 @@ public class InitDataService {
                 "Johnny City",
                 "076-250 45 23",
                 "johnny.doe@aol.com",
-                encoder.encode("password"),
+                "password",
                 null);
 
         PrivateCustomerEntity customer3 = new PrivateCustomerEntity(
@@ -78,7 +78,7 @@ public class InitDataService {
                 "Stadstaden",
                 "076-253 45 43",
                 "anders.Svensson@google.com",
-                encoder.encode("password"),
+                "password",
                 null);
 
         PrivateCustomerEntity customer4 = new PrivateCustomerEntity(
@@ -92,9 +92,15 @@ public class InitDataService {
                 "Staden",
                 "070777777",
                 "majsan@hotmail.se",
-                encoder.encode("password"),
+                "password",
                 null);
 
+
+        // KEYCLOAK AND DB INIT
+/*
+        String adminToken = keycloakAPI.getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD).getAccess_token();
+        Boolean success = keycloakAPI.createNewCustomer(adminToken, customer1).is2xxSuccessful();
+*/
         customerRepository.saveAll(List.of(customer1, customer2, customer3, customer4));
 
         // ##### Cleaner/admin #####

@@ -157,7 +157,23 @@ public class KeycloakAPI {
         }
     }
 
+    //############################## HELPER METHODS #####################################
 
+    public String getKeyCloakCustomerId(String userName) {
+
+        String adminToken = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD).getAccess_token();
+
+        List<KeycloakUserEntity> user =
+                getKeycloakUserEntities(adminToken)
+                        .stream()
+                        .filter(entity -> entity.getUsername().matches(userName))
+                        .toList();
+
+        return user.get(0).getId();
+    }
+
+
+    //############################# API CALLS ###########################################
     // GET A ADMINENTITY CONTAINING A TOKEN TO BE ABLE TO REGISTER A NEW USER IN KEYCLOAK
     public KeycloakTokenEntity getAdminTokenEntity(String username, String password) {
         try {
