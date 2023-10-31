@@ -24,9 +24,9 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
     private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter =
             new JwtGrantedAuthoritiesConverter();
 
-    @Value("${jwt.auth.converter.PRINCIPAL_ATTRIBUTE}")
+    @Value("${KC_PRINCIPAL_ATTRIBUTE}")
     private String PRINCIPLE_ATTRIBUTE;
-    @Value("${jwt.auth.converter.RESOURCE_ID}")
+    @Value("${KC_CLIENT_NAME}")
     private String RESOURCE_ID;
 
     @Override
