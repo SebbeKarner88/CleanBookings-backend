@@ -16,9 +16,6 @@ import java.util.List;
 public class EmployeeEntity {
 
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.UUID
-    )
     @Column(name = "id", columnDefinition = "text")
     private String id;
 
