@@ -9,6 +9,7 @@ import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.repository.CustomerRepository;
 import com.example.cleanbookingsbackend.repository.EmployeeRepository;
 import com.example.cleanbookingsbackend.service.utils.InputValidation;
+import com.example.cleanbookingsbackend.service.utils.MailSenderService;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
@@ -28,6 +30,7 @@ public class CustomerService {
     private final InputValidation input;
     private final EmployeeRepository employeeRepository;
     private final KeycloakAPI keycloakAPI;
+    private final MailSenderService mailSender;
 
     public AuthenticationResponse create(CustomerRegistrationDTO request)
             throws ValidationException,
@@ -111,6 +114,16 @@ public class CustomerService {
         if (isAdmin(adminId)) {
             authorizedDelete(adminId, customerId);
         }
+    }
+
+    public boolean contactUsForm(ContactRequest request) {
+        try {
+            mailSender.sendEmailConfirmationMessageReceived(request);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not send message.");
+        }
+
+        return true;
     }
 
     // ##### Validation #####

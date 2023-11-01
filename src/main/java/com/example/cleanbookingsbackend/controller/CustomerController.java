@@ -75,4 +75,9 @@ public class CustomerController {
             return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
         }
     }
+
+    @PostMapping("receive-msg")
+    public ResponseEntity<?> contactUsForm(@RequestBody ContactRequest request) {
+        return ResponseEntity.ok(customerService.contactUsForm(request));
+    }
 }
