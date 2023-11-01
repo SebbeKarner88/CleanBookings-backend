@@ -67,30 +67,29 @@ public class KeycloakAPI {
     private String USER_TOKEN;
     private String USER_REFRESH_TOKEN;
 
-    private final PrivateCustomerEntity testCustomer = new PrivateCustomerEntity(
-            null,
-            "Jenny",
-            "Doe",
-            null,
-            CustomerType.PRIVATE,
-            "Johnny Street 1",
-            12345,
-            "Johnny City",
-            "076-250 45 23",
-            "jenny.doe@aol.com",
-            "password",
-            null);
-
-    private final EmployeeEntity testEmployee = new EmployeeEntity(
-            null,
-            "Clean",
-            "Cleanerson",
-            null,
-            CLEANER,
-            "CleanCeanerson@Aol.se",
-            "password",
-            null
-    );
+//    private final PrivateCustomerEntity testCustomer = new PrivateCustomerEntity(
+//            null,
+//            "Jenny",
+//            "Doe",
+//            null,
+//            CustomerType.PRIVATE,
+//            "Johnny Street 1",
+//            12345,
+//            "Johnny City",
+//            "076-250 45 23",
+//            "jenny.doe@aol.com",
+//            null);
+//
+//    private final EmployeeEntity testEmployee = new EmployeeEntity(
+//            null,
+//            "Clean",
+//            "Cleanerson",
+//            null,
+//            CLEANER,
+//            "CleanCeanerson@Aol.se",
+//            "password",
+//            null
+//    );
 
     @PostConstruct
     public void getKeycloakData() {
@@ -160,10 +159,10 @@ public class KeycloakAPI {
     }
 
     //############################## HELPER METHODS #####################################
-    public PrivateCustomerEntity addCustomerKeycloak(PrivateCustomerEntity customer) throws RuntimeException {
+    public PrivateCustomerEntity addCustomerKeycloak(PrivateCustomerEntity customer, String password) throws RuntimeException {
         String adminToken = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD).getAccess_token();
         try {
-            createNewCustomer(adminToken, customer).is2xxSuccessful();
+            createNewCustomer(adminToken, customer, password).is2xxSuccessful();
             List<KeycloakUserEntity> addedUser = getKeycloakUserEntities(adminToken)
                     .stream()
                     .filter(entity -> entity.getUsername().equalsIgnoreCase(customer.getEmailAddress()))
@@ -286,25 +285,12 @@ public class KeycloakAPI {
     }
 
     // CREATE A NEW CUSTOMER IN THE KEYCLOAK DB
-    public HttpStatusCode createNewCustomer(String adminToken, PrivateCustomerEntity customer) {
+    public HttpStatusCode createNewCustomer(String adminToken, PrivateCustomerEntity customer, String password) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.add("Authorization", "Bearer " + adminToken);
-            Credentials[] credArr = {
-                    new Credentials("password",
-                            customer.getPassword(),
-                            false)};
-            NewUserEntity newUserBody = new NewUserEntity(
-                    true,
-                    customer.getEmailAddress(),
-                    customer.getFirstName(),
-                    customer.getLastName(),
-                    customer.getEmailAddress(),
-                    credArr
-            );
-            HttpEntity<NewUserEntity> entity =
-                    new HttpEntity<>(newUserBody, headers);
+            HttpEntity<NewUserEntity> entity = getNewUserEntityHttpEntity(customer, password, headers);
             ResponseEntity<?> response = restTemplate.exchange(
                     "http://localhost:8080/admin/realms/" + REALM + "/users",
                     HttpMethod.POST,
@@ -318,6 +304,22 @@ public class KeycloakAPI {
         return null;
     }
 
+    private static HttpEntity<NewUserEntity> getNewUserEntityHttpEntity(PrivateCustomerEntity customer, String password, HttpHeaders headers) {
+        Credentials[] credArr = {
+                new Credentials("password",
+                        password,
+                        false)};
+        NewUserEntity newUserBody = new NewUserEntity(
+                true,
+                customer.getEmailAddress(),
+                customer.getFirstName(),
+                customer.getLastName(),
+                customer.getEmailAddress(),
+                credArr
+        );
+        return new HttpEntity<>(newUserBody, headers);
+    }
+
     // CREATE A NEW CUSTOMER IN THE KEYCLOAK DB
     public HttpStatusCode createNewEmployee(String adminToken, EmployeeEntity employee) {
         try {
@@ -326,7 +328,7 @@ public class KeycloakAPI {
             headers.add("Authorization", "Bearer " + adminToken);
             Credentials[] credArr = {
                     new Credentials("password",
-                            employee.getPassword(),
+                            "password",
                             false)};
             NewUserEntity newUserBody = new NewUserEntity(
                     true,

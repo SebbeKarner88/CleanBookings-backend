@@ -35,7 +35,7 @@ public class CustomerService {
     private final JwtDecoder jwtDecoder;
     private final MailSenderService mailSender;
 
-    public AuthenticationResponse create(CustomerRegistrationDTO request)
+    public String create(CustomerRegistrationDTO request)
             throws ValidationException,
             UsernameIsTakenException,
             RuntimeException,
@@ -54,9 +54,9 @@ public class CustomerService {
 
         PrivateCustomerEntity customer = customerBuilder(request);
 
-        try { //KEYCLOAK IMPLEMENTATION
-            customerRepository.save(keycloakAPI.addCustomerKeycloak(customer));
-            return new AuthenticationResponse(customer.getId(), customer.getFirstName(), null, null, null);
+        try {
+            customerRepository.save(keycloakAPI.addCustomerKeycloak(customer, request.password()));
+            return customer.getId();
         } catch (Exception e) {
             throw new RuntimeException("Could not save customer");
         }
@@ -114,15 +114,16 @@ public class CustomerService {
         return true;
     }
 
-    public boolean updateCustomerPassword(String customerId, PasswordUpdateRequest request)
-            throws UnauthorizedCallException {
-        PrivateCustomerEntity customer = input.validateCustomerId(customerId);
-        if (!encoder.matches(request.oldPassword(), customer.getPassword()))
-            throw new UnauthorizedCallException("Invalid password");
-        customer.setPassword(encoder.encode(request.newPassword()));
-        customerRepository.save(customer);
-        return true;
-    }
+//    TODO: Needs to be adapted to get password from Keycloak DB
+//    public boolean updateCustomerPassword(String customerId, PasswordUpdateRequest request)
+//            throws UnauthorizedCallException {
+//        PrivateCustomerEntity customer = input.validateCustomerId(customerId);
+//        if (!encoder.matches(request.oldPassword(), customer.getPassword()))
+//            throw new UnauthorizedCallException("Invalid password");
+//        customer.setPassword(encoder.encode(request.newPassword()));
+//        customerRepository.save(customer);
+//        return true;
+//    }
 
     public boolean updateCustomerAdmin(AdminUserUpdateRequest request)
             throws EmployeeNotFoundException, CustomerNotFoundException, UnauthorizedCallException, NotFoundException {
@@ -284,7 +285,6 @@ public class CustomerService {
                 request.city(),
                 request.phoneNumber(),
                 request.emailAddress(),
-                request.password(),
                 null
         );
     }

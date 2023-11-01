@@ -23,17 +23,17 @@ public class CustomerController {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody CustomerRegistrationDTO request) {
         try {
-            AuthenticationResponse response = customerService.create(request);
+            String id = customerService.create(request);
             URI location = ServletUriComponentsBuilder
                     .fromCurrentRequest()
                     .path("/{id}")
-                    .buildAndExpand(response.customerId())
+                    .buildAndExpand(id)
                     .toUri();
-            return ResponseEntity.created(location).body(response);
+            return ResponseEntity.created(location).build();
         } catch (ValidationException | SocSecNumberIsTakenException | UsernameIsTakenException | RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 
@@ -64,18 +64,19 @@ public class CustomerController {
         }
     }
 
-    @PreAuthorize("hasRole('client_customer')")
-    @PutMapping("updatePassword/{id}")
-    public ResponseEntity<?> updateCustomerPassword(@PathVariable("id") String customerId,
-                                                @RequestBody PasswordUpdateRequest request) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(customerService.updateCustomerPassword(customerId, request));
-        } catch (UnauthorizedCallException exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
-        }
-    }
+//    TODO: Needs to be adapted to using Keycloak DB
+//    @PreAuthorize("hasRole('client_customer')")
+//    @PutMapping("updatePassword/{id}")
+//    public ResponseEntity<?> updateCustomerPassword(@PathVariable("id") String customerId,
+//                                                @RequestBody PasswordUpdateRequest request) {
+//        try {
+//            return ResponseEntity.status(HttpStatus.OK).body(customerService.updateCustomerPassword(customerId, request));
+//        } catch (UnauthorizedCallException exception) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
+//        }
+//    }
 
     @PostMapping("receive-msg")
     public ResponseEntity<?> contactUsForm(@RequestBody ContactRequest request) {

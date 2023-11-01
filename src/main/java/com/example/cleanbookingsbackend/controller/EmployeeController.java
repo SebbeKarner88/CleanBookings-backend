@@ -105,17 +105,18 @@ public class EmployeeController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('client_admin', 'client_cleaner')")
-    @PutMapping("updatePassword/{id}")
-    public ResponseEntity<?> updateEmployeePassword(@PathVariable("id") String employeeId,
-                                                    @RequestBody PasswordUpdateRequest request) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(employeeService.updateEmployeePassword(employeeId, request));
-        } catch (UnauthorizedCallException exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
-        }
-    }
+//    TODO: Needs to be adapted for Keycloak integration
+//    @PreAuthorize("hasAnyRole('client_admin', 'client_cleaner')")
+//    @PutMapping("updatePassword/{id}")
+//    public ResponseEntity<?> updateEmployeePassword(@PathVariable("id") String employeeId,
+//                                                    @RequestBody PasswordUpdateRequest request) {
+//        try {
+//            return ResponseEntity.status(HttpStatus.OK).body(employeeService.updateEmployeePassword(employeeId, request));
+//        } catch (UnauthorizedCallException exception) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
+//        }
+//    }
 
 }
