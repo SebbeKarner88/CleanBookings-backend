@@ -4,15 +4,17 @@ import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.keycloak.api.KeycloakAPI;
+import com.example.cleanbookingsbackend.keycloak.models.tokenEntity.KeycloakTokenEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
-import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import com.example.cleanbookingsbackend.repository.EmployeeRepository;
 import com.example.cleanbookingsbackend.repository.JobRepository;
 import com.example.cleanbookingsbackend.service.utils.InputValidation;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,22 +30,38 @@ import static com.example.cleanbookingsbackend.service.utils.InputValidation.val
 public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final JobRepository jobRepository;
-    private final PasswordEncoder passwordEncoder;
     private final InputValidation input;
     private final PasswordEncoder encoder;
     private final KeycloakAPI keycloakAPI;
+    private final JwtDecoder jwtDecoder;
 
     private static final String UNAUTHORIZED_CALL_MESSAGE = "You are not authorized to perform this action.";
 
     public EmployeeAuthenticationResponse login(String email, String password) throws EmployeeNotFoundException, AuthException {
-        EmployeeEntity employee = employeeRepository.findByEmailAddress(email).orElseThrow(
+        employeeRepository.findByEmailAddress(email).orElseThrow(
                 () -> new EmployeeNotFoundException("There is no employee registered with email: " + email)
         );
 
-        if (!passwordEncoder.matches(password, employee.getPassword()))
-            throw new AuthException("The password is incorrect");
+        KeycloakTokenEntity response = keycloakAPI.loginKeycloak(email, password);
+        String accessToken = response.getAccess_token();
+        String refreshToken = response.getRefresh_token();
 
-        return new EmployeeAuthenticationResponse(employee.getId(), employee.getEmailAddress(), employee.getRole());
+        try {
+            Jwt jwt = jwtDecoder.decode(accessToken);
+            String employeeId = jwt.getSubject();
+            String emailAddress = jwt.getClaimAsString("email");
+            String role = keycloakAPI.getUserRole(jwt);
+
+            return new EmployeeAuthenticationResponse(
+                    employeeId,
+                    emailAddress,
+                    role,
+                    accessToken,
+                    refreshToken
+            );
+        } catch (Error error) {
+            throw new Error(error.getMessage());
+        }
     }
 
     public CreateEmployeeResponse createEmployeeRequest(CreateEmployeeRequest request)

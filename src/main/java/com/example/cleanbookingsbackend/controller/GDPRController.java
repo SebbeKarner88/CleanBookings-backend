@@ -9,6 +9,7 @@ import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.service.CustomerService;
 import com.example.cleanbookingsbackend.service.EmployeeService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,6 +24,7 @@ public class GDPRController {
         this.employeeService = employeeService;
     }
 
+    @PreAuthorize("hasRole('client_customer')")
     @GetMapping("/customer-data/{customerId}")
     public ResponseEntity<CustomerDataResponse> getCustomerData(@PathVariable String customerId) {
         try {
@@ -34,6 +36,7 @@ public class GDPRController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('client_cleaner', 'client_admin')")
     @GetMapping("/employee-data/{employeeId}")
     public ResponseEntity<EmployeeDataResponse> getEmployeeData(@PathVariable String employeeId) {
         try {

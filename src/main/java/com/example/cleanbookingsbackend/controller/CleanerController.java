@@ -10,6 +10,7 @@ import com.example.cleanbookingsbackend.service.JobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class CleanerController {
     private final JobService jobService;
     private final EmployeeService employeeService;
 
+    @PreAuthorize("hasRole('client_cleaner')")
     @GetMapping("/jobs")
     public ResponseEntity<?> getAllJobsCleaner(@RequestParam String employeeId) {
         try {
@@ -33,6 +35,7 @@ public class CleanerController {
         }
     }
 
+    @PreAuthorize("hasRole('client_admin')")
     @PutMapping("/update-employee")
     public ResponseEntity<?> updateEmployee(@RequestBody AdminEmployeeUpdateRequest request) {
         try {

@@ -14,6 +14,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -21,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static com.example.cleanbookingsbackend.enums.Role.CLEANER;
 
@@ -176,6 +178,22 @@ public class KeycloakAPI {
             System.out.println(e.getMessage());
         }
         return customer;
+    }
+
+    public String getUserRole(Jwt jwt) {
+        String role = "";
+        Map<String, Object> resourceAccess = jwt.getClaimAsMap("resource_access");
+
+        if (resourceAccess.containsKey(CLIENT_NAME)) {
+            Map<String, Object> clientAccess = (Map<String, Object>) resourceAccess.get(CLIENT_NAME);
+            List<String> roles = (List<String>) clientAccess.get("roles");
+
+            if (roles.isEmpty())
+                throw new RuntimeException("The user has no roles.");
+
+            role = roles.get(0);
+        }
+        return role;
     }
 
     public EmployeeEntity addEmployeeKeycloak(EmployeeEntity employee) throws RuntimeException {

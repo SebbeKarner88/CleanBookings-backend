@@ -9,6 +9,7 @@ import com.example.cleanbookingsbackend.service.JobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class JobController {
     private final JobService jobService;
 
+    @PreAuthorize("hasRole('client_customer')")
     @PostMapping
     public ResponseEntity<?> createJobRequest(@RequestBody CreateJobRequest request) {
         try {
@@ -42,6 +44,7 @@ public class JobController {
         }
     }
 
+    @PreAuthorize("hasRole('client_admin')")
     @PutMapping("/assign-cleaners")
     public ResponseEntity<?> assignCleanerRequest(@RequestBody AssignCleanerRequest request) {
         try {
@@ -56,6 +59,7 @@ public class JobController {
         }
     }
 
+    @PreAuthorize("hasRole('client_cleaner')")
     @PutMapping("/executed-cleaning")
     public ResponseEntity<?> executedCleaningRequest(@RequestBody JobUserRequest request) {
         try {
@@ -70,6 +74,7 @@ public class JobController {
         }
     }
 
+    @PreAuthorize("hasRole('client_customer')")
     @PutMapping("/approve-fail-cleaning")
     public ResponseEntity<?> approvedCleaningRequest(@RequestBody JobApproveRequest request) {
         try {
@@ -84,6 +89,7 @@ public class JobController {
         }
     }
 
+    @PreAuthorize("hasRole('client_admin')")
     @PutMapping("/reissue-failed-cleaning")
     public ResponseEntity<?> reissueFailedCleaningRequest(@RequestBody JobUserRequest request) {
         try {
@@ -98,6 +104,7 @@ public class JobController {
         }
     }
 
+    @PreAuthorize("hasRole('client_customer')")
     @DeleteMapping
     public ResponseEntity<?> cancelJobRequest(@RequestBody JobUserRequest request) {
         try {
@@ -111,8 +118,7 @@ public class JobController {
         }
     }
 
-
-
+    @PreAuthorize("hasRole('client_customer')")
     @GetMapping("/cleanings/{customerId}")
     public ResponseEntity<List<JobDto>> getCleaningsByStatus(
             @PathVariable String customerId,
@@ -138,6 +144,7 @@ public class JobController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('client_cleaner', 'client_admin')")
     @GetMapping("/cleanings/employee/{employeeId}")
     public ResponseEntity<List<JobDto>> getCleaningsByStatusWithRole(
             @PathVariable String employeeId,
@@ -178,6 +185,7 @@ public class JobController {
         }
     }
 
+    @PreAuthorize("hasRole('client_customer')")
     @GetMapping("/booked-cleanings/{customerId}")
     public ResponseEntity<List<JobDto>> getBookedCleanings(@PathVariable String customerId) {
         System.out.println("Received customerId: " + customerId);
@@ -190,6 +198,7 @@ public class JobController {
         return ResponseEntity.ok(jobDtos);
     }
 
+    @PreAuthorize("hasRole('client_customer')")
     @GetMapping("/booking-history/{customerId}")
     public ResponseEntity<List<JobDto>> getBookingHistory(@PathVariable String customerId) {
         System.out.println("Received customerId: " + customerId);
@@ -203,6 +212,7 @@ public class JobController {
         return ResponseEntity.ok(jobDtos);
     }
 
+    @PreAuthorize("hasRole('client_admin')")
     @DeleteMapping("/{jobId}")
     public ResponseEntity<?> deleteJob(
             @PathVariable String jobId,
@@ -229,6 +239,7 @@ public class JobController {
         return jobDto;
     }
 
+    @PreAuthorize("hasRole('client_customer')")
     @GetMapping("/jobs")
     public ResponseEntity<?> getAllJobsCustomer(@RequestParam String customerId) {
         try {

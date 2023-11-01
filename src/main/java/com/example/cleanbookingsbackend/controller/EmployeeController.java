@@ -9,6 +9,7 @@ import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -33,7 +34,8 @@ public class EmployeeController {
         }
     }
 
-    @PostMapping()
+    @PreAuthorize("hasRole('client_admin')")
+    @PostMapping
     public ResponseEntity<?> create(@RequestBody CreateEmployeeRequest request) {
         try {
             CreateEmployeeResponse response = employeeService.createEmployeeRequest(request);
@@ -61,6 +63,7 @@ public class EmployeeController {
         }
     }
 
+    @PreAuthorize("hasRole('client_admin')")
     @GetMapping
     public ResponseEntity<?> getAllAvailableEmployees(
             @RequestParam String employeeId,
@@ -76,6 +79,7 @@ public class EmployeeController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('client_admin', 'client_cleaner')")
     @GetMapping("/jobs")
     public ResponseEntity<?> getAllJobsByEmployee(@RequestParam String employeeId) {
         try {
@@ -101,6 +105,7 @@ public class EmployeeController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('client_admin', 'client_cleaner')")
     @PutMapping("updatePassword/{id}")
     public ResponseEntity<?> updateEmployeePassword(@PathVariable("id") String employeeId,
                                                     @RequestBody PasswordUpdateRequest request) {
