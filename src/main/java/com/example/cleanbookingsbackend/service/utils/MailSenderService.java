@@ -176,8 +176,8 @@ public class MailSenderService {
         msg.setText("Hej " + request.getName() + "! " +
                 "\n\nVi har mottagit ditt meddelande och återkommer så snart vi kan." +
                 "\n\nStädaFint AB" +
-                "\n\n" + request.getSubject() +
-                "\n\n" + request.getMessage());
+                "\n\nÄmne:\n" + request.getSubject() +
+                "\n\nMeddelande:\n" + request.getMessage());
         try {
             mailSender.send(msg);
         } catch (MailException exception) {
