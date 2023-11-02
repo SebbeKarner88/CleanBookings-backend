@@ -20,7 +20,7 @@ import java.net.URI;
 public class CustomerController {
     private final CustomerService customerService;
 
-    @PostMapping
+     @PostMapping
     public ResponseEntity<?> create(@RequestBody CustomerRegistrationDTO request) {
         try {
             String id = customerService.create(request);

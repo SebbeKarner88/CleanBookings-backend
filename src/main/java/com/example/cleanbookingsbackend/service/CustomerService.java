@@ -107,10 +107,11 @@ public class CustomerService {
     }
 
     public boolean updateCustomerInfo(String id, UserUpdateRequest request)
-            throws CustomerNotFoundException {
+            throws Exception {
 
         PrivateCustomerEntity customer = input.validateCustomerId(id);
-        customerRepository.save(updateCustomer(customer, request));
+        PrivateCustomerEntity updatedCustomer = updateCustomer(customer, request);
+        customerRepository.save(keycloakAPI.updateCustomerKeycloak(updatedCustomer));
         return true;
     }
 
