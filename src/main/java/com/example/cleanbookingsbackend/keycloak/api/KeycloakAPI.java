@@ -158,7 +158,27 @@ public class KeycloakAPI {
         }
     }
 
+
+    //###################################################################################
     //############################## HELPER METHODS #####################################
+    //###################################################################################
+
+    public String getUserRole(Jwt jwt) {
+        String role = "";
+        Map<String, Object> resourceAccess = jwt.getClaimAsMap("resource_access");
+
+        if (resourceAccess.containsKey(CLIENT_NAME)) {
+            Map<String, Object> clientAccess = (Map<String, Object>) resourceAccess.get(CLIENT_NAME);
+            List<String> roles = (List<String>) clientAccess.get("roles");
+
+            if (roles.isEmpty())
+                throw new RuntimeException("The user has no roles.");
+
+            role = roles.get(0);
+        }
+        return role;
+    }
+
     public PrivateCustomerEntity addCustomerKeycloak(PrivateCustomerEntity customer, String password) throws RuntimeException {
         String adminToken = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD).getAccess_token();
         try {
@@ -177,22 +197,6 @@ public class KeycloakAPI {
             System.out.println(e.getMessage());
         }
         return customer;
-    }
-
-    public String getUserRole(Jwt jwt) {
-        String role = "";
-        Map<String, Object> resourceAccess = jwt.getClaimAsMap("resource_access");
-
-        if (resourceAccess.containsKey(CLIENT_NAME)) {
-            Map<String, Object> clientAccess = (Map<String, Object>) resourceAccess.get(CLIENT_NAME);
-            List<String> roles = (List<String>) clientAccess.get("roles");
-
-            if (roles.isEmpty())
-                throw new RuntimeException("The user has no roles.");
-
-            role = roles.get(0);
-        }
-        return role;
     }
 
     public EmployeeEntity addEmployeeKeycloak(EmployeeEntity employee) throws RuntimeException {
@@ -246,7 +250,18 @@ public class KeycloakAPI {
         return status;
     }
 
+    private KeycloakRoleAssignmentEntity determineRole(Role role)
+            throws IllegalArgumentException {
+        return switch (role) {
+            case ADMIN -> new KeycloakRoleAssignmentEntity(ROLE_ADMIN_ID, "client_admin");
+            case CLEANER -> new KeycloakRoleAssignmentEntity(ROLE_CLEANER_ID, "client_cleaner");
+            case CUSTOMER -> throw new IllegalArgumentException("Invalid role");
+        };
+    }
+
+    //###################################################################################
     //############################# API CALLS ###########################################
+    //###################################################################################
 
     // GET A ADMINENTITY CONTAINING A TOKEN TO BE ABLE TO REGISTER A NEW USER IN KEYCLOAK
     public KeycloakTokenEntity getAdminTokenEntity(String username, String password) {
@@ -585,14 +600,5 @@ public class KeycloakAPI {
             System.out.println(e.getMessage());
         }
         return null;
-    }
-
-    private KeycloakRoleAssignmentEntity determineRole(Role role)
-            throws IllegalArgumentException {
-        return switch (role) {
-            case ADMIN -> new KeycloakRoleAssignmentEntity(ROLE_ADMIN_ID, "client_admin");
-            case CLEANER -> new KeycloakRoleAssignmentEntity(ROLE_CLEANER_ID, "client_cleaner");
-            case CUSTOMER -> throw new IllegalArgumentException("Invalid role");
-        };
     }
 }
