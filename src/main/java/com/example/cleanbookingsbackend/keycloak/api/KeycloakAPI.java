@@ -235,6 +235,17 @@ public class KeycloakAPI {
         return employee;
     }
 
+    public HttpStatusCode deleteUserKeycloak(String userId) throws RuntimeException {
+        String adminToken = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD).getAccess_token();
+        HttpStatusCode status;
+        try{
+            status = deleteUser(adminToken, userId);
+        } catch (Exception e){
+            throw new RuntimeException("Failed to update customer. ERRORCODE: " + e);
+        }
+        return status;
+    }
+
     //############################# API CALLS ###########################################
 
     // GET A ADMINENTITY CONTAINING A TOKEN TO BE ABLE TO REGISTER A NEW USER IN KEYCLOAK

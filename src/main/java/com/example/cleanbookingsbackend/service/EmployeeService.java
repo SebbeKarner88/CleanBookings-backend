@@ -188,9 +188,14 @@ public class EmployeeService {
     }
 
     public void deleteCleaner(String employeeId, String cleanerId)
-            throws UnauthorizedCallException, EmployeeNotFoundException {
+            throws UnauthorizedCallException, EmployeeNotFoundException, RuntimeException {
         if (isAdmin(employeeId)) {
             input.validateEmployeeId(cleanerId);
+            try {
+                keycloakAPI.deleteUserKeycloak(cleanerId);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to delete Cleaner. Error: " + e);
+            }
             employeeRepository.deleteById(cleanerId);
         }
     }

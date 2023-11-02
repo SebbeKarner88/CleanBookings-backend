@@ -231,6 +231,11 @@ public class CustomerService {
             throw new NotFoundException("No Customer or Administrator exists by id: " + customerId);
         } else if (customer.isPresent()) {
             if (customer.get().getJobs().isEmpty()) {
+                try{
+                    keycloakAPI.deleteUserKeycloak(customerId);
+                } catch (Exception e) {
+                    throw new RuntimeException("Could not delete customer. Error: " + e);
+                }
                 customerRepository.deleteById(customerId);
             } else {
                 throw new UnauthorizedCallException("This customer has one or more active bookings.");
