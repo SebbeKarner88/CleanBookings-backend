@@ -215,12 +215,12 @@ public class KeycloakAPI {
         return employee;
     }
 
-    public PrivateCustomerEntity updateCustomerKeycloak(PrivateCustomerEntity customer) throws Exception {
+    public PrivateCustomerEntity updateCustomerKeycloak(PrivateCustomerEntity customer) throws RuntimeException {
         String adminToken = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD).getAccess_token();
         try{
             updateCustomer(adminToken, customer);
         } catch (Exception e){
-            throw new Exception("Failed to update customer. ERRORCODE: " + e);
+            throw new RuntimeException("Failed to update customer. ERRORCODE: " + e);
         }
         return customer;
     }

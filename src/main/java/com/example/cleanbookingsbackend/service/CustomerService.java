@@ -184,7 +184,7 @@ public class CustomerService {
         return true;
     }
 
-    private void authorizedUpdate(AdminUserUpdateRequest request) throws NotFoundException {
+    private void authorizedUpdate(AdminUserUpdateRequest request) throws NotFoundException, RuntimeException {
         Optional<PrivateCustomerEntity> customerOptional = customerRepository.findById(request.customerId());
         Optional<EmployeeEntity> employeeOptional = employeeRepository.findById(request.adminId());
 
@@ -219,7 +219,7 @@ public class CustomerService {
             if (request.emailAddress() != null) {
                 customer.setEmailAddress(request.emailAddress());
             }
-            customerRepository.save(customer);
+            customerRepository.save(keycloakAPI.updateCustomerKeycloak(customer));
         }
     }
 
