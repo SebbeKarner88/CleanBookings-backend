@@ -225,6 +225,16 @@ public class KeycloakAPI {
         return customer;
     }
 
+    public EmployeeEntity updateEmployeeKeycloak(EmployeeEntity employee) throws RuntimeException {
+        String adminToken = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD).getAccess_token();
+        try{
+            updateEmployee(adminToken, employee);
+        } catch (Exception e){
+            throw new RuntimeException("Failed to update customer. ERRORCODE: " + e);
+        }
+        return employee;
+    }
+
     //############################# API CALLS ###########################################
 
     // GET A ADMINENTITY CONTAINING A TOKEN TO BE ABLE TO REGISTER A NEW USER IN KEYCLOAK
@@ -537,7 +547,7 @@ public class KeycloakAPI {
         return null;
     }
 
-    public HttpStatusCode updateEmployee(String adminToken, String employeeId, EmployeeEntity employee) {
+    public HttpStatusCode updateEmployee(String adminToken, EmployeeEntity employee) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -554,7 +564,7 @@ public class KeycloakAPI {
             HttpEntity<NewUserEntity> entity =
                     new HttpEntity<>(newUserBody, headers);
             ResponseEntity<?> response = restTemplate.exchange(
-                    "http://localhost:8080/admin/realms/" + REALM + "/users/" + employeeId,
+                    "http://localhost:8080/admin/realms/" + REALM + "/users/" + employee.getId(),
                     HttpMethod.PUT,
                     entity,
                     new ParameterizedTypeReference<>() {

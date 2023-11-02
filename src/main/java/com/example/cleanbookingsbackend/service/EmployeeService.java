@@ -209,7 +209,8 @@ public class EmployeeService {
             employee.setEmailAddress(request.emailAddress());
         if (request.phoneNumber() != null)
             employee.setPhoneNumber(request.phoneNumber());
-        employeeRepository.save(employee);
+
+        employeeRepository.save(keycloakAPI.updateEmployeeKeycloak(employee));
     }
 
     private void checkAuthorizedToUpdate(String loggedInUserId, String employeeIdToUpdate)

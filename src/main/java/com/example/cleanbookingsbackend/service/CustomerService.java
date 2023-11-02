@@ -107,7 +107,7 @@ public class CustomerService {
     }
 
     public boolean updateCustomerInfo(String id, UserUpdateRequest request)
-            throws Exception {
+            throws RuntimeException {
 
         PrivateCustomerEntity customer = input.validateCustomerId(id);
         PrivateCustomerEntity updatedCustomer = updateCustomer(customer, request);
