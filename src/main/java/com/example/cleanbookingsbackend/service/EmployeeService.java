@@ -31,7 +31,6 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final JobRepository jobRepository;
     private final InputValidation input;
-    private final PasswordEncoder encoder;
     private final KeycloakAPI keycloakAPI;
     private final JwtDecoder jwtDecoder;
 
@@ -62,6 +61,28 @@ public class EmployeeService {
         } catch (Error error) {
             throw new Error(error.getMessage());
         }
+    }
+
+    public AuthenticationResponse refresh(String token) {
+        if (token.isBlank())
+            throw new IllegalArgumentException("Refresh token is required.");
+
+        KeycloakTokenEntity response = keycloakAPI.refreshToken(token);
+        String accessToken = response.getAccess_token();
+        String refreshToken = response.getRefresh_token();
+
+        Jwt jwt = jwtDecoder.decode(accessToken);
+        String employeeId = jwt.getSubject();
+        String emailAddress = jwt.getClaimAsString("email");
+        String role = keycloakAPI.getUserRole(jwt);
+
+        return new AuthenticationResponse(
+                employeeId,
+                emailAddress,
+                role,
+                accessToken,
+                refreshToken
+        );
     }
 
     public CreateEmployeeResponse createEmployeeRequest(CreateEmployeeRequest request)

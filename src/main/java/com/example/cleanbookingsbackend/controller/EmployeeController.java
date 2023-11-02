@@ -34,6 +34,15 @@ public class EmployeeController {
         }
     }
 
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refresh(@RequestHeader String refresh_token) {
+        try {
+            return ResponseEntity.ok(employeeService.refresh(refresh_token));
+        } catch (Exception exception) {
+            return ResponseEntity.internalServerError().body(exception.getMessage());
+        }
+    }
+
     @PreAuthorize("hasRole('client_admin')")
     @PostMapping
     public ResponseEntity<?> create(@RequestBody CreateEmployeeRequest request) {

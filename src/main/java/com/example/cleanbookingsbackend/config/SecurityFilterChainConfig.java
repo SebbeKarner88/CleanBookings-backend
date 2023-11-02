@@ -40,7 +40,7 @@ public class SecurityFilterChainConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->
                         req
-                                .requestMatchers(HttpMethod.POST, "/api/v1/customer/login", "/api/v1/customer").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/customer/login", "/api/v1/customer", "api/v1/customer/refresh-token", "/api/v1/employee/refresh-token").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/employee/getAllCleaners").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/employee/login").permitAll()
                                 .requestMatchers("/api/v1/admin/**", "/api/v1/payment/**").hasRole("client_admin")

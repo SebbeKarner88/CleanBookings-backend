@@ -53,15 +53,6 @@ public class KeycloakAPI {
     private String ROLE_CLEANER_ID;
     @Value("${KC_ROLE_ADMIN_ID}")
     private String ROLE_ADMIN_ID;
-    @Value("${KC_TEST_CUSTOMER_ID}")
-    private String TEST_CUSTOMER_ID;
-    @Value("${KC_TEST_CUSTOMER_USERNAME}")
-    private String TEST_CUSTOMER_USERNAME;
-    @Value("${KC_TEST_CUSTOMER_PASSWORD}")
-    private String TEST_CUSTOMER_PASSWORD;
-    @Value("${KC_TEST_EMPLOYEE_ID}")
-    private String TEST_EMPLOYEE_ID;
-
 
     private String ADMIN_TOKEN;
     private String USER_TOKEN;
@@ -465,6 +456,32 @@ public class KeycloakAPI {
                     });
 
             return response.getBody(); // 204 IS SUCCESS
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
+    // CALL FOR USING REFRESH TOKEN TO GET NEW ACCESS TOKEN
+    public KeycloakTokenEntity refreshToken(String refreshToken) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+            map.add("refresh_token", refreshToken);
+            map.add("grant_type", "refresh_token");
+            map.add("client_id", CLIENT_NAME);
+            map.add("client_secret", CLIENT_SECRET);
+            HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
+            ResponseEntity<KeycloakTokenEntity> response = restTemplate.exchange(
+                    "http://localhost:8080/realms/" + REALM + "/protocol/openid-connect/token",
+                    HttpMethod.POST,
+                    entity,
+                    new ParameterizedTypeReference<>() {
+                    });
+
+            return response.getBody(); // 200 IS SUCCESS
 
         } catch (Exception e) {
             System.out.println(e.getMessage());

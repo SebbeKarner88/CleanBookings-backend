@@ -48,7 +48,15 @@ public class CustomerController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
+    }
 
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refresh(@RequestHeader String refresh_token) {
+         try {
+             return ResponseEntity.ok(customerService.refresh(refresh_token));
+         } catch (Exception exception) {
+             return ResponseEntity.internalServerError().body(exception.getMessage());
+         }
     }
 
     @PreAuthorize("hasRole('client_customer')")

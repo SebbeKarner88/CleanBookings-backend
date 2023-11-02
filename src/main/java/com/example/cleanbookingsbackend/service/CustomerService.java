@@ -94,6 +94,28 @@ public class CustomerService {
         }
     }
 
+    public AuthenticationResponse refresh(String token) {
+        if (token.isBlank())
+            throw new IllegalArgumentException("Refresh token is required.");
+
+        KeycloakTokenEntity response = keycloakAPI.refreshToken(token);
+        String accessToken = response.getAccess_token();
+        String refreshToken = response.getRefresh_token();
+
+        Jwt jwt = jwtDecoder.decode(accessToken);
+        String customerId = jwt.getSubject();
+        String name = jwt.getClaimAsString("given_name");
+        String role = keycloakAPI.getUserRole(jwt);
+
+        return new AuthenticationResponse(
+                customerId,
+                name,
+                accessToken,
+                refreshToken,
+                role
+        );
+    }
+
     public List<CustomerResponseDTO> listAllCustomers(String id)
             throws EmployeeNotFoundException, UnauthorizedCallException {
         List<CustomerResponseDTO> customers = new ArrayList<>();
