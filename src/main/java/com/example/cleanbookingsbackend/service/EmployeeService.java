@@ -63,7 +63,7 @@ public class EmployeeService {
         }
     }
 
-    public AuthenticationResponse refresh(String token) {
+    public EmployeeAuthenticationResponse refresh(String token) {
         if (token.isBlank())
             throw new IllegalArgumentException("Missing header. Refresh token is required.");
 
@@ -76,7 +76,7 @@ public class EmployeeService {
         String emailAddress = jwt.getClaimAsString("email");
         String role = keycloakAPI.getUserRole(jwt);
 
-        return new AuthenticationResponse(
+        return new EmployeeAuthenticationResponse(
                 employeeId,
                 emailAddress,
                 role,
