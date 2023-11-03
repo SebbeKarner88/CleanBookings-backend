@@ -35,7 +35,7 @@ public class CleanerController {
         }
     }
 
-    @PreAuthorize("hasRole('client_admin')")
+    @PreAuthorize("hasAnyRole('client_admin', 'client_cleaner')")
     @PutMapping("/update-employee")
     public ResponseEntity<?> updateEmployee(@RequestBody AdminEmployeeUpdateRequest request) {
         try {

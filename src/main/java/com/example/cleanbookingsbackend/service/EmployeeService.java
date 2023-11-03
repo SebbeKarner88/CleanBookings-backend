@@ -11,6 +11,7 @@ import com.example.cleanbookingsbackend.repository.EmployeeRepository;
 import com.example.cleanbookingsbackend.repository.JobRepository;
 import com.example.cleanbookingsbackend.service.utils.InputValidation;
 import jakarta.security.auth.message.AuthException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -276,10 +277,16 @@ public class EmployeeService {
     }
 
 
-    public boolean updateEmployeePassword(String employeeId, String password)
+    public void updateEmployeePassword(String employeeId, PasswordUpdateRequest request, HttpServletRequest servletRequest)
             throws UnauthorizedCallException {
-        EmployeeEntity employee = input.validateEmployeeId(employeeId);
-        keycloakAPI.changePasswordKeycloak(employeeId, password);
-        return true;
+        input.validateEmployeeId(employeeId);
+        String token = servletRequest.getHeader("Authorization").replace("Bearer ", "");
+        Jwt jwt = jwtDecoder.decode(token);
+        String email = jwt.getClaimAsString("email");
+
+        KeycloakTokenEntity response = keycloakAPI.loginKeycloak(email, request.oldPassword());
+        if (response == null)
+            throw new UnauthorizedCallException("Incorrect password.");
+        keycloakAPI.changePasswordKeycloak(employeeId, request.newPassword());
     }
 }

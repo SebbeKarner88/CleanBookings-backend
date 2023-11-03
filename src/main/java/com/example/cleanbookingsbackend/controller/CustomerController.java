@@ -4,6 +4,7 @@ import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.service.CustomerService;
 import jakarta.security.auth.message.AuthException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -88,15 +89,17 @@ public class CustomerController {
 
     @PreAuthorize("hasRole('client_customer')")
     @PutMapping("updatePassword/{id}")
-    public ResponseEntity<?> updateCustomerPassword(@PathVariable("id") String customerId,
-                                                    @RequestBody PasswordUpdateRequest request) {
+    public ResponseEntity<?> updateCustomerPassword(
+            @PathVariable("id") String customerId,
+            @RequestBody PasswordUpdateRequest request,
+            HttpServletRequest servletRequest) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    customerService.updateCustomerPassword(customerId, request.newPassword()));
+            customerService.updateCustomerPassword(customerId, request, servletRequest);
+            return ResponseEntity.noContent().build();
         } catch (UnauthorizedCallException exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 

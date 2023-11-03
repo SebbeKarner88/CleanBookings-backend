@@ -6,6 +6,7 @@ import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.service.EmployeeService;
 import com.example.cleanbookingsbackend.service.JobService;
 import jakarta.security.auth.message.AuthException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class EmployeeController {
     public ResponseEntity<?> refresh(@RequestHeader String refresh_token) {
         try {
             return ResponseEntity.ok(employeeService.refresh(refresh_token));
-        }  catch (IllegalArgumentException exception) {
+        } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().body(exception.getMessage());
         } catch (Exception exception) {
             return ResponseEntity.internalServerError().body(exception.getMessage());
@@ -50,7 +51,7 @@ public class EmployeeController {
         try {
             employeeService.logout(refresh_token);
             return ResponseEntity.noContent().build();
-        }  catch (IllegalArgumentException exception) {
+        } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().body(exception.getMessage());
         } catch (Exception exception) {
             return ResponseEntity.internalServerError().body(exception.getMessage());
@@ -129,14 +130,17 @@ public class EmployeeController {
     }
 
 
-   @PreAuthorize("hasAnyRole('client_admin', 'client_cleaner')")
+    @PreAuthorize("hasAnyRole('client_admin', 'client_cleaner')")
     @PutMapping("updatePassword/{id}")
-    public ResponseEntity<?> updateEmployeePassword(@PathVariable("id") String employeeId,
-                                                    @RequestBody PasswordUpdateRequest request) {
+    public ResponseEntity<?> updateEmployeePassword(
+            @PathVariable("id") String employeeId,
+            @RequestBody PasswordUpdateRequest request,
+            HttpServletRequest servletRequest) {
         try {
-           return ResponseEntity.status(HttpStatus.OK).body(employeeService.updateEmployeePassword(employeeId, request.newPassword()));
+            employeeService.updateEmployeePassword(employeeId, request, servletRequest);
+            return ResponseEntity.noContent().build();
         } catch (UnauthorizedCallException exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
         }

@@ -13,7 +13,9 @@ import com.example.cleanbookingsbackend.service.utils.InputValidation;
 
 import com.example.cleanbookingsbackend.service.utils.MailSenderService;
 import jakarta.security.auth.message.AuthException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -143,11 +146,18 @@ public class CustomerService {
         return true;
     }
 
-    public boolean updateCustomerPassword(String customerId, String password)
-            throws UnauthorizedCallException{
-            PrivateCustomerEntity customer = input.validateCustomerId(customerId);
-            keycloakAPI.changePasswordKeycloak(customerId, password);
-        return true;
+    public void updateCustomerPassword(String customerId, PasswordUpdateRequest request, HttpServletRequest servletRequest)
+            throws UnauthorizedCallException {
+
+        input.validateCustomerId(customerId);
+        String token = servletRequest.getHeader("Authorization").replace("Bearer ", "");
+        Jwt jwt = jwtDecoder.decode(token);
+        String email = jwt.getClaimAsString("email");
+
+        KeycloakTokenEntity response = keycloakAPI.loginKeycloak(email, request.oldPassword());
+        if (response == null)
+            throw new UnauthorizedCallException("Incorrect password.");
+        keycloakAPI.changePasswordKeycloak(customerId, request.newPassword());
     }
 
     public boolean updateCustomerAdmin(AdminUserUpdateRequest request)
