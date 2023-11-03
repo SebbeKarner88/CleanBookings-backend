@@ -96,7 +96,7 @@ public class CustomerService {
 
     public AuthenticationResponse refresh(String token) {
         if (token.isBlank())
-            throw new IllegalArgumentException("Refresh token is required.");
+            throw new IllegalArgumentException("Missing header. Refresh token is required.");
 
         KeycloakTokenEntity response = keycloakAPI.refreshToken(token);
         String accessToken = response.getAccess_token();
@@ -114,6 +114,12 @@ public class CustomerService {
                 refreshToken,
                 role
         );
+    }
+
+    public void logout(String token) {
+        if (token.isBlank())
+            throw new IllegalArgumentException("Missing header. Refresh token is required.");
+        keycloakAPI.logoutKeycloak(token);
     }
 
     public List<CustomerResponseDTO> listAllCustomers(String id)

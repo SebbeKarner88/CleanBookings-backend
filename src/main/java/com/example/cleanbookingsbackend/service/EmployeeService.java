@@ -65,7 +65,7 @@ public class EmployeeService {
 
     public AuthenticationResponse refresh(String token) {
         if (token.isBlank())
-            throw new IllegalArgumentException("Refresh token is required.");
+            throw new IllegalArgumentException("Missing header. Refresh token is required.");
 
         KeycloakTokenEntity response = keycloakAPI.refreshToken(token);
         String accessToken = response.getAccess_token();
@@ -83,6 +83,12 @@ public class EmployeeService {
                 accessToken,
                 refreshToken
         );
+    }
+
+    public void logout(String token) {
+        if (token.isBlank())
+            throw new IllegalArgumentException("Missing header. Refresh token is required.");
+        keycloakAPI.logoutKeycloak(token);
     }
 
     public CreateEmployeeResponse createEmployeeRequest(CreateEmployeeRequest request)

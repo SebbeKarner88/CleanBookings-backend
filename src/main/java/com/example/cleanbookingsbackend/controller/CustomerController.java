@@ -54,9 +54,23 @@ public class CustomerController {
     public ResponseEntity<?> refresh(@RequestHeader String refresh_token) {
          try {
              return ResponseEntity.ok(customerService.refresh(refresh_token));
+         }  catch (IllegalArgumentException exception) {
+             return ResponseEntity.badRequest().body(exception.getMessage());
          } catch (Exception exception) {
              return ResponseEntity.internalServerError().body(exception.getMessage());
          }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader String refresh_token) {
+        try {
+            customerService.logout(refresh_token);
+            return ResponseEntity.noContent().build();
+        }  catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().body(exception.getMessage());
+        } catch (Exception exception) {
+            return ResponseEntity.internalServerError().body(exception.getMessage());
+        }
     }
 
     @PreAuthorize("hasRole('client_customer')")
