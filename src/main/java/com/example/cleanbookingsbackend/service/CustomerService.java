@@ -296,7 +296,7 @@ public class CustomerService {
         AtomicBoolean exists = new AtomicBoolean(false);
         customerRepository.findAll()
                 .forEach(customer -> {
-                    if (encoder.matches(number, customer.getPersonNumber()))
+                    if (customer.getPersonNumber().equals(number))
                         exists.set(true);
                 });
         return exists.get();

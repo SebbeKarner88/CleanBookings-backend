@@ -275,14 +275,11 @@ public class EmployeeService {
         return new EmployeeResponseDTO(employee.getId(), employee.getFirstName(), employee.getLastName(), employee.getEmailAddress(), employee.getPhoneNumber());
     }
 
-//    TODO: Needs to be adapted for Keycloak integration
-//    public boolean updateEmployeePassword(String employeeId, PasswordUpdateRequest request)
-//            throws UnauthorizedCallException {
-//        EmployeeEntity employee = input.validateEmployeeId(employeeId);
-//        if (!encoder.matches(request.oldPassword(), employee.getPassword()))
-//            throw new UnauthorizedCallException("Invalid password");
-//        employee.setPassword(encoder.encode(request.newPassword()));
-//        employeeRepository.save(employee);
-//        return true;
-//    }
+
+    public boolean updateEmployeePassword(String employeeId, String password)
+            throws UnauthorizedCallException {
+        EmployeeEntity employee = input.validateEmployeeId(employeeId);
+        keycloakAPI.changePasswordKeycloak(employeeId, password);
+        return true;
+    }
 }
