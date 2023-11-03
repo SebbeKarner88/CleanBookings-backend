@@ -86,7 +86,6 @@ public class CustomerController {
         }
     }
 
-    // TODO: Needs to be adapted to using Keycloak DB
     @PreAuthorize("hasRole('client_customer')")
     @PutMapping("updatePassword/{id}")
     public ResponseEntity<?> updateCustomerPassword(@PathVariable("id") String customerId,
