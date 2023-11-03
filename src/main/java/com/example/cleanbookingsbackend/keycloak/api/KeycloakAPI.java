@@ -241,6 +241,18 @@ public class KeycloakAPI {
         return status;
     }
 
+    public HttpStatusCode changePasswordKeycloak(String userId, String password)
+            throws RuntimeException {
+        String adminToken = getAdminTokenEntity(ADMIN_USERNAME, ADMIN_PASSWORD).getAccess_token();
+        HttpStatusCode status;
+        try{
+            status = changePasswordUser(adminToken, userId, password);
+        } catch (Exception e){
+            throw new RuntimeException("Failed to update customer. ERRORCODE: " + e);
+        }
+        return status;
+    }
+
     private KeycloakRoleAssignmentEntity determineRole(Role role)
             throws IllegalArgumentException {
         return switch (role) {

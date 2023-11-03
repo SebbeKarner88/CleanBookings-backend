@@ -143,16 +143,12 @@ public class CustomerService {
         return true;
     }
 
-//    TODO: Needs to be adapted to get password from Keycloak DB
-//    public boolean updateCustomerPassword(String customerId, PasswordUpdateRequest request)
-//            throws UnauthorizedCallException {
-//        PrivateCustomerEntity customer = input.validateCustomerId(customerId);
-//        if (!encoder.matches(request.oldPassword(), customer.getPassword()))
-//            throw new UnauthorizedCallException("Invalid password");
-//        customer.setPassword(encoder.encode(request.newPassword()));
-//        customerRepository.save(customer);
-//        return true;
-//    }
+    public boolean updateCustomerPassword(String customerId, String password)
+            throws UnauthorizedCallException{
+            PrivateCustomerEntity customer = input.validateCustomerId(customerId);
+            keycloakAPI.changePasswordKeycloak(customerId, password);
+        return true;
+    }
 
     public boolean updateCustomerAdmin(AdminUserUpdateRequest request)
             throws EmployeeNotFoundException, CustomerNotFoundException, UnauthorizedCallException, NotFoundException {
@@ -259,7 +255,7 @@ public class CustomerService {
             throw new NotFoundException("No Customer or Administrator exists by id: " + customerId);
         } else if (customer.isPresent()) {
             if (customer.get().getJobs().isEmpty()) {
-                try{
+                try {
                     keycloakAPI.deleteUserKeycloak(customerId);
                 } catch (Exception e) {
                     throw new RuntimeException("Could not delete customer. Error: " + e);

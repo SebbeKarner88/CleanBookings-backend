@@ -20,7 +20,7 @@ import java.net.URI;
 public class CustomerController {
     private final CustomerService customerService;
 
-     @PostMapping
+    @PostMapping
     public ResponseEntity<?> create(@RequestBody CustomerRegistrationDTO request) {
         try {
             String id = customerService.create(request);
@@ -52,13 +52,13 @@ public class CustomerController {
 
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refresh(@RequestHeader String refresh_token) {
-         try {
-             return ResponseEntity.ok(customerService.refresh(refresh_token));
-         }  catch (IllegalArgumentException exception) {
-             return ResponseEntity.badRequest().body(exception.getMessage());
-         } catch (Exception exception) {
-             return ResponseEntity.internalServerError().body(exception.getMessage());
-         }
+        try {
+            return ResponseEntity.ok(customerService.refresh(refresh_token));
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().body(exception.getMessage());
+        } catch (Exception exception) {
+            return ResponseEntity.internalServerError().body(exception.getMessage());
+        }
     }
 
     @PostMapping("/logout")
@@ -66,7 +66,7 @@ public class CustomerController {
         try {
             customerService.logout(refresh_token);
             return ResponseEntity.noContent().build();
-        }  catch (IllegalArgumentException exception) {
+        } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().body(exception.getMessage());
         } catch (Exception exception) {
             return ResponseEntity.internalServerError().body(exception.getMessage());
@@ -86,19 +86,20 @@ public class CustomerController {
         }
     }
 
-//    TODO: Needs to be adapted to using Keycloak DB
-//    @PreAuthorize("hasRole('client_customer')")
-//    @PutMapping("updatePassword/{id}")
-//    public ResponseEntity<?> updateCustomerPassword(@PathVariable("id") String customerId,
-//                                                @RequestBody PasswordUpdateRequest request) {
-//        try {
-//            return ResponseEntity.status(HttpStatus.OK).body(customerService.updateCustomerPassword(customerId, request));
-//        } catch (UnauthorizedCallException exception) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
-//        } catch (Exception e) {
-//            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
-//        }
-//    }
+    // TODO: Needs to be adapted to using Keycloak DB
+    @PreAuthorize("hasRole('client_customer')")
+    @PutMapping("updatePassword/{id}")
+    public ResponseEntity<?> updateCustomerPassword(@PathVariable("id") String customerId,
+                                                    @RequestBody PasswordUpdateRequest request) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    customerService.updateCustomerPassword(customerId, request.newPassword()));
+        } catch (UnauthorizedCallException exception) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
+        }
+    }
 
     @PostMapping("receive-msg")
     public ResponseEntity<?> contactUsForm(@RequestBody ContactRequest request) {
