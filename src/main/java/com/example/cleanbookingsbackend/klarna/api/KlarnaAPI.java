@@ -35,17 +35,17 @@ public class KlarnaAPI {
             );
 
 
-    @PostConstruct
-    public void init() {
-        try {
-            System.out.println(createOrder(JobType.BASIC_CLEANING));
+//    @PostConstruct
+//    public void init() {
+//        try {
+//            System.out.println(createOrder(JobType.BASIC_CLEANING));
+//
+//        } catch (Exception e) {
+//            System.out.println(e.getMessage());
+//        }
+//    }
 
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    public ResponseEntity<KlarnaCreateOrderResponse> createOrder(JobType jobType) {
+    public ResponseEntity<KlarnaCreateOrderResponse> createOrder(String jobType) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Authorization", "Basic " + Base64.getEncoder().encodeToString((KLARNA_USERNAME + ":" + KLARNA_PASSWORD).getBytes()));
@@ -59,13 +59,13 @@ public class KlarnaAPI {
         return response;
     }
 
-    private static HttpEntity<KlarnaCreateOrderRequest> getNewOrderRequestHttpEntity(JobType jobType, HttpHeaders headers) {
+    private static HttpEntity<KlarnaCreateOrderRequest> getNewOrderRequestHttpEntity(String jobType, HttpHeaders headers) {
         KlarnaCreateOrderRequest request = null;
         switch (jobType) {
-            case BASIC_CLEANING -> request = createNewBasicCleaning();
-            case TOPP_CLEANING -> request = createNewToppCleaning();
-            case DIAMOND_CLEANING -> request = createNewDiamondCleaning();
-            case WINDOW_CLEANING -> request = createNewWindowCleaning();
+            case "BASIC" -> request = createNewBasicCleaning();
+            case "TOPP" -> request = createNewToppCleaning();
+            case "DIAMOND" -> request = createNewDiamondCleaning();
+            case "WINDOW" -> request = createNewWindowCleaning();
         }
         return new HttpEntity<>(request, headers);
     }
