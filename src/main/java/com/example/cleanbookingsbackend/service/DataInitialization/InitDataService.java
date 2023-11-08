@@ -1,31 +1,7 @@
 package com.example.cleanbookingsbackend.service.DataInitialization;
 
-import com.example.cleanbookingsbackend.enums.*;
-import com.example.cleanbookingsbackend.keycloak.api.KeycloakAPI;
-import com.example.cleanbookingsbackend.keycloak.models.userEntity.KeycloakUserEntity;
-import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
-import com.example.cleanbookingsbackend.model.EmployeeEntity;
-import com.example.cleanbookingsbackend.model.JobEntity;
-import com.example.cleanbookingsbackend.model.PaymentEntity;
-import com.example.cleanbookingsbackend.repository.CustomerRepository;
-import com.example.cleanbookingsbackend.repository.EmployeeRepository;
-import com.example.cleanbookingsbackend.repository.JobRepository;
-import com.example.cleanbookingsbackend.repository.PaymentRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor

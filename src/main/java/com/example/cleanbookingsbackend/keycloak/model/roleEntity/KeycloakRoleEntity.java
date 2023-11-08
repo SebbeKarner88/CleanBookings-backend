@@ -1,4 +1,4 @@
-package com.example.cleanbookingsbackend.keycloak.models.roleEntity;
+package com.example.cleanbookingsbackend.keycloak.model.roleEntity;
 
 import lombok.Data;
 

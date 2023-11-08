@@ -1,4 +1,4 @@
-package com.example.cleanbookingsbackend.keycloak.models.userEntity;
+package com.example.cleanbookingsbackend.keycloak.model.userEntity;
 
 import lombok.Data;
 

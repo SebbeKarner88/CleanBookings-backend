@@ -1,13 +1,12 @@
 package com.example.cleanbookingsbackend.keycloak.api;
 
-import com.example.cleanbookingsbackend.enums.CustomerType;
 import com.example.cleanbookingsbackend.enums.Role;
-import com.example.cleanbookingsbackend.keycloak.models.roleEntity.KeycloakRoleAssignmentEntity;
-import com.example.cleanbookingsbackend.keycloak.models.roleEntity.KeycloakRoleEntity;
-import com.example.cleanbookingsbackend.keycloak.models.tokenEntity.KeycloakTokenEntity;
-import com.example.cleanbookingsbackend.keycloak.models.newUserEntity.Credentials;
-import com.example.cleanbookingsbackend.keycloak.models.newUserEntity.NewUserEntity;
-import com.example.cleanbookingsbackend.keycloak.models.userEntity.KeycloakUserEntity;
+import com.example.cleanbookingsbackend.keycloak.model.roleEntity.KeycloakRoleAssignmentEntity;
+import com.example.cleanbookingsbackend.keycloak.model.roleEntity.KeycloakRoleEntity;
+import com.example.cleanbookingsbackend.keycloak.model.tokenEntity.KeycloakTokenEntity;
+import com.example.cleanbookingsbackend.keycloak.model.newUserEntity.Credentials;
+import com.example.cleanbookingsbackend.keycloak.model.newUserEntity.NewUserEntity;
+import com.example.cleanbookingsbackend.keycloak.model.userEntity.KeycloakUserEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import jakarta.annotation.PostConstruct;
@@ -23,8 +22,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import static com.example.cleanbookingsbackend.enums.Role.CLEANER;
 
 @Service
 public class KeycloakAPI {

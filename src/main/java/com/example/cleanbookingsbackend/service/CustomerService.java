@@ -4,7 +4,7 @@ import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.keycloak.api.KeycloakAPI;
-import com.example.cleanbookingsbackend.keycloak.models.tokenEntity.KeycloakTokenEntity;
+import com.example.cleanbookingsbackend.keycloak.model.tokenEntity.KeycloakTokenEntity;
 import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.repository.CustomerRepository;
@@ -15,7 +15,6 @@ import com.example.cleanbookingsbackend.service.utils.MailSenderService;
 import jakarta.security.auth.message.AuthException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
