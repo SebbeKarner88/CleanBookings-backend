@@ -3,7 +3,6 @@ package com.example.cleanbookingsbackend.klarna.api;
 import com.example.cleanbookingsbackend.enums.JobType;
 import com.example.cleanbookingsbackend.klarna.dto.KlarnaCreateOrderRequest;
 import com.example.cleanbookingsbackend.klarna.dto.KlarnaCreateOrderResponse;
-import com.nimbusds.jose.util.Base64URL;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -11,7 +10,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -28,23 +26,24 @@ public class KlarnaAPI {
     private String KLARNA_USERNAME;
     @Value("${KLARNA_PASSWORD}")
     private String KLARNA_PASSWORD;
+    private static final KlarnaCreateOrderRequest.MerchantUrls merchantUrls =
+            new KlarnaCreateOrderRequest.MerchantUrls(
+                    "http://localhost:5173/terms",
+                    "https://www.example.com/checkout.html",
+                    "https://www.example.com/confirmation.html",
+                    "https://www.example.com/api/push"
+            );
 
-    private static final KlarnaCreateOrderRequest.MerchantUrls merchantUrls = new KlarnaCreateOrderRequest.MerchantUrls(
-            "http://localhost:5173/terms",
-            "https://www.example.com/checkout.html",
-            "https://www.example.com/confirmation.html",
-            "https://www.example.com/api/push"
-    );
 
-   @PostConstruct
-   public void init() {
-       try {
-           System.out.println(createOrder(JobType.BASIC_CLEANING));
+    @PostConstruct
+    public void init() {
+        try {
+            System.out.println(createOrder(JobType.BASIC_CLEANING));
 
-       } catch (Exception e) {
-           System.out.println(e.getMessage());
-       }
-   }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
     public ResponseEntity<KlarnaCreateOrderResponse> createOrder(JobType jobType) {
         HttpHeaders headers = new HttpHeaders();
@@ -58,23 +57,18 @@ public class KlarnaAPI {
                 new ParameterizedTypeReference<>() {
                 });
         return response;
-
     }
 
     private static HttpEntity<KlarnaCreateOrderRequest> getNewOrderRequestHttpEntity(JobType jobType, HttpHeaders headers) {
-
         KlarnaCreateOrderRequest request = null;
-
         switch (jobType) {
             case BASIC_CLEANING -> request = createNewBasicCleaning();
             case TOPP_CLEANING -> request = createNewToppCleaning();
             case DIAMOND_CLEANING -> request = createNewDiamondCleaning();
             case WINDOW_CLEANING -> request = createNewWindowCleaning();
         }
-
         return new HttpEntity<>(request, headers);
     }
-
 
 
     private static KlarnaCreateOrderRequest createNewBasicCleaning() {
