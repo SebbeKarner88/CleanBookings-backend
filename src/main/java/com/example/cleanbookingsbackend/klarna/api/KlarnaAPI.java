@@ -30,7 +30,7 @@ public class KlarnaAPI {
             new KlarnaCreateOrderRequest.MerchantUrls(
                     "http://localhost:5173/terms",
                     "https://www.example.com/checkout.html",
-                    "http://localhost:5173/checkout/confiramtion",
+                    "https://localhost:5173/checkout/confirmation",
                     "https://www.example.com/api/push"
             );
 
