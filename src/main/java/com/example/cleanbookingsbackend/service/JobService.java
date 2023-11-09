@@ -5,6 +5,8 @@ import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.JobType;
 import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.*;
+import com.example.cleanbookingsbackend.klarna.api.KlarnaAPI;
+import com.example.cleanbookingsbackend.klarna.dto.KlarnaCreateOrderResponse;
 import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
@@ -14,8 +16,10 @@ import com.example.cleanbookingsbackend.repository.JobRepository;
 import com.example.cleanbookingsbackend.service.utils.InputValidation;
 import com.example.cleanbookingsbackend.service.utils.MailSenderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.ws.rs.core.Response;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -34,6 +38,7 @@ public class JobService {
     private final PaymentService paymentService;
     private final MailSenderService mailSender;
     private final InputValidation input;
+    private final KlarnaAPI klarnaAPI;
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final String INVALID_ROLE_MESSAGE = "Invalid role. An admin cannot be assigned to a cleaning job.";
@@ -44,6 +49,7 @@ public class JobService {
     public CreateJobResponse createJobRequest(CreateJobRequest request)
             throws IllegalArgumentException, CustomerNotFoundException, ParseException {
         JobEntity requestedJob = new JobEntity();
+        KlarnaCreateOrderResponse response = null;
         if (isValidCreateJobRequest(request)) {
             PrivateCustomerEntity customer = input.validateCustomerId(request.customerId());
             JobType type = validateJobType(request.type());
@@ -53,9 +59,14 @@ public class JobService {
             requestedJob = new JobEntity(customer, type, date, request.message());
             jobRepository.save(requestedJob);
             mailSender.sendEmailConfirmationBookedJob(requestedJob);
+            try {
+                response = klarnaAPI.createOrder(request.type()).getBody();
+            } catch (Exception exception) {
+                System.out.println(exception.getMessage());
+            }
         }
-        return convertToCreateJobResponseDTO(requestedJob);
-
+        assert response != null;
+        return new CreateJobResponse(requestedJob.getId(), response.html_snippet());
     }
 
     public boolean cancelJobRequest(JobUserRequest request)
@@ -391,31 +402,6 @@ public class JobService {
             throw new UnauthorizedCallException(CANCEL_COMPLETED_JOB_MESSAGE);
         }
     }
-
-    private CreateJobResponse convertToCreateJobResponseDTO(JobEntity job) {
-        PrivateCustomerEntity customer = job.getCustomer();
-        CreateJobResponse.Adress adressDto = new CreateJobResponse.Adress(
-                customer.getStreetAddress(),
-                customer.getPostalCode(),
-                customer.getCity()
-        );
-        CreateJobResponse.Customer customerDto = new CreateJobResponse.Customer(
-                customer.getFirstName() + " " + customer.getLastName(),
-                customer.getPhoneNumber(),
-                customer.getEmailAddress(),
-                adressDto
-        );
-
-        return CreateJobResponse
-                .builder()
-                .jobId(job.getId())
-                .jobType(job.getType())
-                .date(new SimpleDateFormat("yyyy-MM-dd hh:mm").format(job.getBookedDate()))
-                .customer(customerDto)
-                .message(job.getMessage())
-                .build();
-    }
-
 
     // Helper method to convert JobEntity to JobDto
     private JobDto convertToJobDto(JobEntity jobEntity) {

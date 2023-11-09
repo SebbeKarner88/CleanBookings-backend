@@ -6,9 +6,11 @@ import com.example.cleanbookingsbackend.model.JobEntity;
 import com.example.cleanbookingsbackend.service.EmployeeService;
 import com.example.cleanbookingsbackend.service.JobService;
 import jakarta.security.auth.message.AuthException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -33,7 +35,31 @@ public class EmployeeController {
         }
     }
 
-    @PostMapping()
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refresh(@RequestHeader String refresh_token) {
+        try {
+            return ResponseEntity.ok(employeeService.refresh(refresh_token));
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().body(exception.getMessage());
+        } catch (Exception exception) {
+            return ResponseEntity.internalServerError().body(exception.getMessage());
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader String refresh_token) {
+        try {
+            employeeService.logout(refresh_token);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().body(exception.getMessage());
+        } catch (Exception exception) {
+            return ResponseEntity.internalServerError().body(exception.getMessage());
+        }
+    }
+
+    @PreAuthorize("hasRole('client_admin')")
+    @PostMapping
     public ResponseEntity<?> create(@RequestBody CreateEmployeeRequest request) {
         try {
             CreateEmployeeResponse response = employeeService.createEmployeeRequest(request);
@@ -61,6 +87,7 @@ public class EmployeeController {
         }
     }
 
+    @PreAuthorize("hasRole('client_admin')")
     @GetMapping
     public ResponseEntity<?> getAllAvailableEmployees(
             @RequestParam String employeeId,
@@ -76,6 +103,7 @@ public class EmployeeController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('client_admin', 'client_cleaner')")
     @GetMapping("/jobs")
     public ResponseEntity<?> getAllJobsByEmployee(@RequestParam String employeeId) {
         try {
@@ -101,16 +129,20 @@ public class EmployeeController {
         );
     }
 
+
+    @PreAuthorize("hasAnyRole('client_admin', 'client_cleaner')")
     @PutMapping("updatePassword/{id}")
-    public ResponseEntity<?> updateEmployeePassword(@PathVariable("id") String employeeId,
-                                                    @RequestBody PasswordUpdateRequest request) {
+    public ResponseEntity<?> updateEmployeePassword(
+            @PathVariable("id") String employeeId,
+            @RequestBody PasswordUpdateRequest request,
+            HttpServletRequest servletRequest) {
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(employeeService.updateEmployeePassword(employeeId, request));
+            employeeService.updateEmployeePassword(employeeId, request, servletRequest);
+            return ResponseEntity.noContent().build();
         } catch (UnauthorizedCallException exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Something went wrong, and I don't know why...");
         }
     }
-
 }

@@ -3,14 +3,21 @@ package com.example.cleanbookingsbackend.service;
 import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.*;
+import com.example.cleanbookingsbackend.keycloak.api.KeycloakAPI;
+import com.example.cleanbookingsbackend.keycloak.model.tokenEntity.KeycloakTokenEntity;
 import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.repository.CustomerRepository;
 import com.example.cleanbookingsbackend.repository.EmployeeRepository;
 import com.example.cleanbookingsbackend.service.utils.InputValidation;
+
+import com.example.cleanbookingsbackend.service.utils.MailSenderService;
 import jakarta.security.auth.message.AuthException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,13 +28,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
-
     private final CustomerRepository customerRepository;
     private final PasswordEncoder encoder;
     private final InputValidation input;
     private final EmployeeRepository employeeRepository;
+    private final KeycloakAPI keycloakAPI;
+    private final JwtDecoder jwtDecoder;
+    private final MailSenderService mailSender;
 
-    public AuthenticationResponse create(CustomerRegistrationDTO request)
+    public String create(CustomerRegistrationDTO request)
             throws ValidationException,
             UsernameIsTakenException,
             RuntimeException,
@@ -47,22 +56,71 @@ public class CustomerService {
         PrivateCustomerEntity customer = customerBuilder(request);
 
         try {
-            customerRepository.save(customer);
-            return new AuthenticationResponse(customer.getId(), customer.getFirstName());
+            customerRepository.save(keycloakAPI.addCustomerKeycloak(customer, request.password()));
+            return customer.getId();
         } catch (Exception e) {
             throw new RuntimeException("Could not save customer");
         }
     }
 
     public AuthenticationResponse login(String email, String password) throws CustomerNotFoundException, AuthException {
-        if (customerRepository.findByEmailAddress(email).isEmpty())
-            throw new CustomerNotFoundException("There is no customer registered with email: " + email);
+        if (email.isBlank())
+            throw new IllegalArgumentException("Email is required.");
+        if (password.isBlank())
+            throw new IllegalArgumentException("Password is required.");
 
-        PrivateCustomerEntity customer = customerRepository.findByEmailAddress(email).get();
-        if (!encoder.matches(password, customer.getPassword()))
-            throw new AuthException("The password is incorrect");
+        customerRepository.findByEmailAddress(email).orElseThrow(
+                () -> new CustomerNotFoundException("There is no customer registered with email: " + email)
+        );
 
-        return new AuthenticationResponse(customer.getId(), customer.getFirstName());
+        KeycloakTokenEntity response = keycloakAPI.loginKeycloak(email, password);
+        String accessToken = response.getAccess_token();
+        String refreshToken = response.getRefresh_token();
+
+        try {
+            Jwt jwt = jwtDecoder.decode(accessToken);
+            String customerId = jwt.getSubject();
+            String name = jwt.getClaimAsString("given_name");
+            String role = keycloakAPI.getUserRole(jwt);
+
+            return new AuthenticationResponse(
+                    customerId,
+                    name,
+                    accessToken,
+                    refreshToken,
+                    role
+            );
+        } catch (Error error) {
+            throw new Error(error.getMessage());
+        }
+    }
+
+    public AuthenticationResponse refresh(String token) {
+        if (token.isBlank())
+            throw new IllegalArgumentException("Missing header. Refresh token is required.");
+
+        KeycloakTokenEntity response = keycloakAPI.refreshToken(token);
+        String accessToken = response.getAccess_token();
+        String refreshToken = response.getRefresh_token();
+
+        Jwt jwt = jwtDecoder.decode(accessToken);
+        String customerId = jwt.getSubject();
+        String name = jwt.getClaimAsString("given_name");
+        String role = keycloakAPI.getUserRole(jwt);
+
+        return new AuthenticationResponse(
+                customerId,
+                name,
+                accessToken,
+                refreshToken,
+                role
+        );
+    }
+
+    public void logout(String token) {
+        if (token.isBlank())
+            throw new IllegalArgumentException("Missing header. Refresh token is required.");
+        keycloakAPI.logoutKeycloak(token);
     }
 
     public List<CustomerResponseDTO> listAllCustomers(String id)
@@ -78,21 +136,26 @@ public class CustomerService {
     }
 
     public boolean updateCustomerInfo(String id, UserUpdateRequest request)
-            throws CustomerNotFoundException {
+            throws RuntimeException {
 
         PrivateCustomerEntity customer = input.validateCustomerId(id);
-        customerRepository.save(updateCustomer(customer, request));
+        PrivateCustomerEntity updatedCustomer = updateCustomer(customer, request);
+        customerRepository.save(keycloakAPI.updateCustomerKeycloak(updatedCustomer));
         return true;
     }
 
-    public boolean updateCustomerPassword(String customerId, PasswordUpdateRequest request)
+    public void updateCustomerPassword(String customerId, PasswordUpdateRequest request, HttpServletRequest servletRequest)
             throws UnauthorizedCallException {
-        PrivateCustomerEntity customer = input.validateCustomerId(customerId);
-        if (!encoder.matches(request.oldPassword(), customer.getPassword()))
-            throw new UnauthorizedCallException("Invalid password");
-        customer.setPassword(encoder.encode(request.newPassword()));
-        customerRepository.save(customer);
-        return true;
+
+        input.validateCustomerId(customerId);
+        String token = servletRequest.getHeader("Authorization").replace("Bearer ", "");
+        Jwt jwt = jwtDecoder.decode(token);
+        String email = jwt.getClaimAsString("email");
+
+        KeycloakTokenEntity response = keycloakAPI.loginKeycloak(email, request.oldPassword());
+        if (response == null)
+            throw new UnauthorizedCallException("Incorrect password.");
+        keycloakAPI.changePasswordKeycloak(customerId, request.newPassword());
     }
 
     public boolean updateCustomerAdmin(AdminUserUpdateRequest request)
@@ -109,6 +172,16 @@ public class CustomerService {
         if (isAdmin(adminId)) {
             authorizedDelete(adminId, customerId);
         }
+    }
+
+    public boolean contactUsForm(ContactRequest request) {
+        try {
+            mailSender.sendEmailConfirmationMessageReceived(request);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not send message.");
+        }
+
+        return true;
     }
 
     // ##### Validation #####
@@ -143,7 +216,7 @@ public class CustomerService {
         return true;
     }
 
-    private void authorizedUpdate(AdminUserUpdateRequest request) throws NotFoundException {
+    private void authorizedUpdate(AdminUserUpdateRequest request) throws NotFoundException, RuntimeException {
         Optional<PrivateCustomerEntity> customerOptional = customerRepository.findById(request.customerId());
         Optional<EmployeeEntity> employeeOptional = employeeRepository.findById(request.adminId());
 
@@ -178,7 +251,7 @@ public class CustomerService {
             if (request.emailAddress() != null) {
                 customer.setEmailAddress(request.emailAddress());
             }
-            customerRepository.save(customer);
+            customerRepository.save(keycloakAPI.updateCustomerKeycloak(customer));
         }
     }
 
@@ -190,6 +263,11 @@ public class CustomerService {
             throw new NotFoundException("No Customer or Administrator exists by id: " + customerId);
         } else if (customer.isPresent()) {
             if (customer.get().getJobs().isEmpty()) {
+                try {
+                    keycloakAPI.deleteUserKeycloak(customerId);
+                } catch (Exception e) {
+                    throw new RuntimeException("Could not delete customer. Error: " + e);
+                }
                 customerRepository.deleteById(customerId);
             } else {
                 throw new UnauthorizedCallException("This customer has one or more active bookings.");
@@ -226,7 +304,7 @@ public class CustomerService {
         AtomicBoolean exists = new AtomicBoolean(false);
         customerRepository.findAll()
                 .forEach(customer -> {
-                    if (encoder.matches(number, customer.getPersonNumber()))
+                    if (customer.getPersonNumber().equals(number))
                         exists.set(true);
                 });
         return exists.get();
@@ -238,14 +316,13 @@ public class CustomerService {
                 null,
                 request.firstName(),
                 request.lastName(),
-                encoder.encode(request.personNumber()),
+                request.personNumber(),
                 request.customerType(),
                 request.streetAddress(),
                 request.postalCode(),
                 request.city(),
                 request.phoneNumber(),
                 request.emailAddress(),
-                encoder.encode(request.password()),
                 null
         );
     }

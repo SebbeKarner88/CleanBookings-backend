@@ -17,7 +17,6 @@ import java.util.List;
 public class PrivateCustomerEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", columnDefinition = "text")
     private String id;
 
@@ -48,9 +47,6 @@ public class PrivateCustomerEntity {
 
     @Column(name = "email_address", columnDefinition = "text")
     private String emailAddress;
-
-    @Column(name = "password", columnDefinition = "text", nullable = false)
-    private String password;
 
     @OneToMany(mappedBy = "customer")
     private List<JobEntity> jobs;

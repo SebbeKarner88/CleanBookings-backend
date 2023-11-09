@@ -1,38 +1,19 @@
 package com.example.cleanbookingsbackend.service.DataInitialization;
 
-import com.example.cleanbookingsbackend.enums.*;
-import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
-import com.example.cleanbookingsbackend.model.EmployeeEntity;
-import com.example.cleanbookingsbackend.model.JobEntity;
-import com.example.cleanbookingsbackend.model.PaymentEntity;
-import com.example.cleanbookingsbackend.repository.CustomerRepository;
-import com.example.cleanbookingsbackend.repository.EmployeeRepository;
-import com.example.cleanbookingsbackend.repository.JobRepository;
-import com.example.cleanbookingsbackend.repository.PaymentRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class InitDataService {
-
+/*
     private final CustomerRepository customerRepository;
     private final EmployeeRepository employeeRepository;
     private final JobRepository jobRepository;
     private final PaymentRepository paymentRepository;
     private final PasswordEncoder encoder;
 
+    private final KeycloakAPI keycloakAPI;
 
     @PostConstruct
     public void initializeData() {
@@ -43,59 +24,60 @@ public class InitDataService {
                 null,
                 "Jane",
                 "Doe",
-                encoder.encode("880325-2456"),
+                "730623-0145",
                 CustomerType.PRIVATE,
                 "Jane Street 1",
                 12345,
                 "Jane City",
                 "076-250 90 80",
                 "jane.doe@janecity.com",
-                encoder.encode("password"),
                 null);
 
         PrivateCustomerEntity customer2 = new PrivateCustomerEntity(
                 null,
                 "Johnny",
                 "Doe",
-                encoder.encode("730623-0145"),
+                "730623-0145",
                 CustomerType.PRIVATE,
                 "Johnny Street 1",
                 12345,
                 "Johnny City",
                 "076-250 45 23",
                 "johnny.doe@aol.com",
-                encoder.encode("password"),
                 null);
 
         PrivateCustomerEntity customer3 = new PrivateCustomerEntity(
                 null,
                 "Anders",
                 "Svensson",
-                encoder.encode("450919-0945"),
+                "450919-0945",
                 CustomerType.PRIVATE,
                 "Gatgatan 1",
                 12321,
                 "Stadstaden",
                 "076-253 45 43",
                 "anders.Svensson@google.com",
-                encoder.encode("password"),
                 null);
 
         PrivateCustomerEntity customer4 = new PrivateCustomerEntity(
                 null,
                 "Maj-Britt",
                 "Hemmafrusson",
-                encoder.encode("901224-0165"),
+                "901224-0165",
                 CustomerType.PRIVATE,
                 "Adress 2",
                 11111,
                 "Staden",
                 "070777777",
                 "majsan@hotmail.se",
-                encoder.encode("password"),
                 null);
 
-        customerRepository.saveAll(List.of(customer1, customer2, customer3, customer4));
+
+        // KEYCLOAK AND DB INIT
+        List<PrivateCustomerEntity> updatedCustomers = Stream.of(customer1, customer2, customer3, customer4)
+                .map(customer -> keycloakAPI.addCustomerKeycloak(customer, "password"))
+                .toList();
+        customerRepository.saveAll(updatedCustomers);
 
         // ##### Cleaner/admin #####
 
@@ -106,7 +88,6 @@ public class InitDataService {
                 "073-9 453 843",
                 Role.CLEANER,
                 "Klas@CleanBookings.com",
-                encoder.encode("password"),
                 null
         );
         EmployeeEntity cleaner2 = new EmployeeEntity(
@@ -116,7 +97,6 @@ public class InitDataService {
                 "073-9 351 733",
                 Role.CLEANER,
                 "Anita@CleanBookings.com",
-                encoder.encode("password"),
                 null
 
         );
@@ -127,7 +107,6 @@ public class InitDataService {
                 "073-9 467 843",
                 Role.CLEANER,
                 "Stig@CleanBookings.com",
-                encoder.encode("password"),
                 null
         );
         EmployeeEntity cleaner4 = new EmployeeEntity(
@@ -137,7 +116,6 @@ public class InitDataService {
                 "073-9 031 733",
                 Role.CLEANER,
                 "Ebba@CleanBookings.com",
-                encoder.encode("password"),
                 null
 
         );
@@ -148,7 +126,6 @@ public class InitDataService {
                 "072-9 453 843",
                 Role.CLEANER,
                 "Sveta@CleanBookings.com",
-                encoder.encode("password"),
                 null
         );
         EmployeeEntity cleaner6 = new EmployeeEntity(
@@ -158,7 +135,6 @@ public class InitDataService {
                 "073-9 351 453",
                 Role.CLEANER,
                 "Torkas@CleanBookings.com",
-                encoder.encode("password"),
                 null
 
         );
@@ -169,11 +145,14 @@ public class InitDataService {
                 "074-9 433 243",
                 Role.ADMIN,
                 "Admin1@CleanBookings.com",
-                encoder.encode("password"),
                 null
         );
-
-        employeeRepository.saveAll(List.of(cleaner1, cleaner2, cleaner3, cleaner4, cleaner5, cleaner6, admin1));
+        // KEYCLOAK AND DB INIT
+        List<EmployeeEntity> updatedEmployees =
+                Stream.of(cleaner1, cleaner2, cleaner3, cleaner4, cleaner5, cleaner6, admin1)
+                .map(keycloakAPI::addEmployeeKeycloak)
+                .toList();
+        employeeRepository.saveAll(updatedEmployees);
 
         // ##### Jobs #####
 
@@ -267,5 +246,5 @@ public class InitDataService {
         );
         paymentRepository.saveAll(List.of(paymentJob3, paymentJob5));
     }
-
+*/
 }

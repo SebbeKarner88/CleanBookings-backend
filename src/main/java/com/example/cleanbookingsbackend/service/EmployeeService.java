@@ -3,15 +3,18 @@ package com.example.cleanbookingsbackend.service;
 import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.enums.Role;
 import com.example.cleanbookingsbackend.exception.*;
+import com.example.cleanbookingsbackend.keycloak.api.KeycloakAPI;
+import com.example.cleanbookingsbackend.keycloak.model.tokenEntity.KeycloakTokenEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
-import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import com.example.cleanbookingsbackend.repository.EmployeeRepository;
 import com.example.cleanbookingsbackend.repository.JobRepository;
 import com.example.cleanbookingsbackend.service.utils.InputValidation;
 import jakarta.security.auth.message.AuthException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,21 +30,65 @@ import static com.example.cleanbookingsbackend.service.utils.InputValidation.val
 public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final JobRepository jobRepository;
-    private final PasswordEncoder passwordEncoder;
     private final InputValidation input;
-    private final PasswordEncoder encoder;
+    private final KeycloakAPI keycloakAPI;
+    private final JwtDecoder jwtDecoder;
 
     private static final String UNAUTHORIZED_CALL_MESSAGE = "You are not authorized to perform this action.";
 
     public EmployeeAuthenticationResponse login(String email, String password) throws EmployeeNotFoundException, AuthException {
-        EmployeeEntity employee = employeeRepository.findByEmailAddress(email).orElseThrow(
+        employeeRepository.findByEmailAddress(email).orElseThrow(
                 () -> new EmployeeNotFoundException("There is no employee registered with email: " + email)
         );
 
-        if (!passwordEncoder.matches(password, employee.getPassword()))
-            throw new AuthException("The password is incorrect");
+        KeycloakTokenEntity response = keycloakAPI.loginKeycloak(email, password);
+        String accessToken = response.getAccess_token();
+        String refreshToken = response.getRefresh_token();
 
-        return new EmployeeAuthenticationResponse(employee.getId(), employee.getEmailAddress(), employee.getRole());
+        try {
+            Jwt jwt = jwtDecoder.decode(accessToken);
+            String employeeId = jwt.getSubject();
+            String emailAddress = jwt.getClaimAsString("email");
+            String role = keycloakAPI.getUserRole(jwt);
+
+            return new EmployeeAuthenticationResponse(
+                    employeeId,
+                    emailAddress,
+                    role,
+                    accessToken,
+                    refreshToken
+            );
+        } catch (Error error) {
+            throw new Error(error.getMessage());
+        }
+    }
+
+    public EmployeeAuthenticationResponse refresh(String token) {
+        if (token.isBlank())
+            throw new IllegalArgumentException("Missing header. Refresh token is required.");
+
+        KeycloakTokenEntity response = keycloakAPI.refreshToken(token);
+        String accessToken = response.getAccess_token();
+        String refreshToken = response.getRefresh_token();
+
+        Jwt jwt = jwtDecoder.decode(accessToken);
+        String employeeId = jwt.getSubject();
+        String emailAddress = jwt.getClaimAsString("email");
+        String role = keycloakAPI.getUserRole(jwt);
+
+        return new EmployeeAuthenticationResponse(
+                employeeId,
+                emailAddress,
+                role,
+                accessToken,
+                refreshToken
+        );
+    }
+
+    public void logout(String token) {
+        if (token.isBlank())
+            throw new IllegalArgumentException("Missing header. Refresh token is required.");
+        keycloakAPI.logoutKeycloak(token);
     }
 
     public CreateEmployeeResponse createEmployeeRequest(CreateEmployeeRequest request)
@@ -58,7 +105,7 @@ public class EmployeeService {
         EmployeeEntity employee = employeeBuilder(request);
 
         try {
-            employeeRepository.save(employee);
+            employeeRepository.save(keycloakAPI.addEmployeeKeycloak(employee));
             return new CreateEmployeeResponse(
                     employee.getId(),
                     employee.getFirstName(),
@@ -80,7 +127,6 @@ public class EmployeeService {
                 request.phoneNumber(),
                 request.role(),
                 request.emailAddress(),
-                passwordEncoder.encode("password"),
                 null
         );
     }
@@ -169,9 +215,14 @@ public class EmployeeService {
     }
 
     public void deleteCleaner(String employeeId, String cleanerId)
-            throws UnauthorizedCallException, EmployeeNotFoundException {
+            throws UnauthorizedCallException, EmployeeNotFoundException, RuntimeException {
         if (isAdmin(employeeId)) {
             input.validateEmployeeId(cleanerId);
+            try {
+                keycloakAPI.deleteUserKeycloak(cleanerId);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to delete Cleaner. Error: " + e);
+            }
             employeeRepository.deleteById(cleanerId);
         }
     }
@@ -190,7 +241,8 @@ public class EmployeeService {
             employee.setEmailAddress(request.emailAddress());
         if (request.phoneNumber() != null)
             employee.setPhoneNumber(request.phoneNumber());
-        employeeRepository.save(employee);
+
+        employeeRepository.save(keycloakAPI.updateEmployeeKeycloak(employee));
     }
 
     private void checkAuthorizedToUpdate(String loggedInUserId, String employeeIdToUpdate)
@@ -223,13 +275,17 @@ public class EmployeeService {
         return new EmployeeResponseDTO(employee.getId(), employee.getFirstName(), employee.getLastName(), employee.getEmailAddress(), employee.getPhoneNumber());
     }
 
-    public boolean updateEmployeePassword(String employeeId, PasswordUpdateRequest request)
+
+    public void updateEmployeePassword(String employeeId, PasswordUpdateRequest request, HttpServletRequest servletRequest)
             throws UnauthorizedCallException {
-        EmployeeEntity employee = input.validateEmployeeId(employeeId);
-        if (!encoder.matches(request.oldPassword(), employee.getPassword()))
-            throw new UnauthorizedCallException("Invalid password");
-        employee.setPassword(encoder.encode(request.newPassword()));
-        employeeRepository.save(employee);
-        return true;
+        input.validateEmployeeId(employeeId);
+        String token = servletRequest.getHeader("Authorization").replace("Bearer ", "");
+        Jwt jwt = jwtDecoder.decode(token);
+        String email = jwt.getClaimAsString("email");
+
+        KeycloakTokenEntity response = keycloakAPI.loginKeycloak(email, request.oldPassword());
+        if (response == null)
+            throw new UnauthorizedCallException("Incorrect password.");
+        keycloakAPI.changePasswordKeycloak(employeeId, request.newPassword());
     }
 }

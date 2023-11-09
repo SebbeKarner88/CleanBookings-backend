@@ -1,7 +1,9 @@
 package com.example.cleanbookingsbackend.service.utils;
 
+import com.example.cleanbookingsbackend.dto.ContactRequest;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
 import com.example.cleanbookingsbackend.model.JobEntity;
+import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -145,7 +147,7 @@ public class MailSenderService {
                 "                                                         Total: " + job.getPayment().getPrice() + "kr ink. moms.\n\n\n\n" +
                 "Vid betalning vänligen uppge fakturanummer som meddelande.\n\n" +
                 "Tack så mycket för att ni anlitade oss, vi hoppas att vi snart ses igen!\n\n" +
-                "//Städafint AB" );
+                "Städafint AB" );
         try {
             mailSender.send(msg);
         } catch (MailException exception) {
@@ -160,6 +162,22 @@ public class MailSenderService {
         msg.setText("Hej " + getCustomerName(job) + "! \n\nHär kommer en bekräftelse på att vi mottagit betalning på jobb: ." + job.getType() +
                 "\n\nVi tackar så mycket för ert förtroende och vi hoppas att ni är nöjda med vårat arbete. På återseende!\n\n" +
                 "StädaFint AB");
+        try {
+            mailSender.send(msg);
+        } catch (MailException exception) {
+            System.out.println(EMAIL_NOT_SENT + exception.getMessage());
+        }
+    }
+
+    public void sendEmailConfirmationMessageReceived(ContactRequest request) {
+        msg.setFrom(CLEAN_BOOKINGS);
+        msg.setTo(request.getEmail());
+        msg.setSubject("Tack för ditt meddelande");
+        msg.setText("Hej " + request.getName() + "! " +
+                "\n\nVi har mottagit ditt meddelande och återkommer så snart vi kan." +
+                "\n\nStädaFint AB" +
+                "\n\nÄmne:\n" + request.getSubject() +
+                "\n\nMeddelande:\n" + request.getMessage());
         try {
             mailSender.send(msg);
         } catch (MailException exception) {
