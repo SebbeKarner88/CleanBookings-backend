@@ -33,17 +33,13 @@ public class KlarnaAPI {
                     "https://localhost:5173/checkout/confirmation",
                     "https://www.example.com/api/push"
             );
+    private static final KlarnaCreateOrderRequest.Options options =
+            new KlarnaCreateOrderRequest.Options(
+                    "#594545",
+                    "#594545",
+                    "#594545"
+            );
 
-
-//    @PostConstruct
-//    public void init() {
-//        try {
-//            System.out.println(createOrder(JobType.BASIC_CLEANING));
-//
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage());
-//        }
-//    }
 
     public ResponseEntity<KlarnaCreateOrderResponse> createOrder(String jobType) {
         HttpHeaders headers = new HttpHeaders();
@@ -96,6 +92,7 @@ public class KlarnaAPI {
                 .order_tax_amount(15900)
                 .order_lines(List.of(product))
                 .merchant_urls(merchantUrls)
+                .options(options)
                 .build();
     }
 
@@ -124,6 +121,7 @@ public class KlarnaAPI {
                 .order_tax_amount(29900)
                 .order_lines(List.of(product))
                 .merchant_urls(merchantUrls)
+                .options(options)
                 .build();
     }
 
@@ -152,6 +150,7 @@ public class KlarnaAPI {
                 .order_tax_amount(49900)
                 .order_lines(List.of(product))
                 .merchant_urls(merchantUrls)
+                .options(options)
                 .build();
     }
 
@@ -180,6 +179,7 @@ public class KlarnaAPI {
                 .order_tax_amount(15900)
                 .order_lines(List.of(product))
                 .merchant_urls(merchantUrls)
+                .options(options)
                 .build();
     }
 }
