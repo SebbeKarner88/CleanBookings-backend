@@ -2,6 +2,7 @@ package com.example.cleanbookingsbackend.service.utils;
 
 import com.example.cleanbookingsbackend.enums.JobType;
 import com.example.cleanbookingsbackend.enums.Role;
+import com.example.cleanbookingsbackend.enums.Timeslot;
 import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
 import com.example.cleanbookingsbackend.model.EmployeeEntity;
@@ -75,6 +76,17 @@ public class InputValidation {
             default -> throw new IllegalArgumentException("Invalid job type");
         }
         return type;
+    }
+
+    public static Timeslot convertTimeslot(String requestedTimeslot) {
+        Timeslot timeslot;
+        switch (requestedTimeslot.toUpperCase()) {
+            case "MORNING" -> timeslot = Timeslot.MORNING;
+            case "AFTERNOON" -> timeslot = Timeslot.AFTERNOON;
+            case "EVENING" -> timeslot = Timeslot.EVENING;
+            default -> throw new IllegalArgumentException("Invalid Timeslot");
+        }
+        return timeslot;
     }
 
     public PrivateCustomerEntity validateCustomerId(String id) throws CustomerNotFoundException {

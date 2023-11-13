@@ -3,6 +3,7 @@ package com.example.cleanbookingsbackend.model;
 
 import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.JobType;
+import com.example.cleanbookingsbackend.enums.Timeslot;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +30,10 @@ public class JobEntity {
 
     @Column(name = "booked_date", columnDefinition = "varchar")
     private Date bookedDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "timeslot")
+    private Timeslot timeslot;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
@@ -58,9 +63,10 @@ public class JobEntity {
     @OneToOne(mappedBy = "job")
     private PaymentEntity payment;
 
-    public JobEntity(PrivateCustomerEntity customer, JobType type, Date bookedDate, String message) {
+    public JobEntity(PrivateCustomerEntity customer, Timeslot timeslot, JobType type, Date bookedDate, String message) {
         this.customer = customer;
         this.type = type;
+        this.timeslot = timeslot;
         this.status = JobStatus.OPEN;
         this.bookedDate = bookedDate;
         this.message = message;

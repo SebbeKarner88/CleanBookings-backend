@@ -153,17 +153,18 @@ public class EmployeeService {
         }
     }
 
-    public List<EmployeeDTO> getAllAvailableEmployees(String employeeId, String jobId) throws EmployeeNotFoundException, UnauthorizedCallException, JobNotFoundException {
+    public List<EmployeeDTO> getAllAvailableEmployees(String employeeId, String jobId, String timeslot)
+            throws EmployeeNotFoundException, UnauthorizedCallException, JobNotFoundException {
         List<EmployeeDTO> availableEmployees = new ArrayList<>();
         JobEntity requestedJob = input.validateJobId(jobId);
 
-        if (isAdmin(employeeId)) {
-            checkIfAvailable(availableEmployees, requestedJob);
-        }
+       // if (isAdmin(employeeId)) {
+            checkIfAvailable(availableEmployees, requestedJob, timeslot);
+      //  }
         return availableEmployees;
     }
 
-    private void checkIfAvailable(List<EmployeeDTO> availableEmployees, JobEntity requestedJob) {
+    private void checkIfAvailable(List<EmployeeDTO> availableEmployees, JobEntity requestedJob, String timeslot) {
         List<EmployeeEntity> allCleaners = employeeRepository
                 .findAll()
                 .stream()
@@ -174,7 +175,7 @@ public class EmployeeService {
             List<JobEntity> jobs = jobRepository.findAllByEmployeeId(employee.getId());
             boolean isAvailable = jobs
                     .stream()
-                    .noneMatch(job -> job.getBookedDate().equals(requestedJob.getBookedDate()));
+                    .noneMatch(job -> job.getBookedDate().equals(requestedJob.getBookedDate()) && job.getTimeslot().equals(requestedJob.getTimeslot()));
 /*
             If the employee isn't assigned to any job on that specific date,
             or if the employee already was assigned to this job (in the case of a NOT_APPROVED job)

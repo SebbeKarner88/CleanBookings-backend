@@ -4,6 +4,7 @@ import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.JobType;
 import com.example.cleanbookingsbackend.enums.Role;
+import com.example.cleanbookingsbackend.enums.Timeslot;
 import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.klarna.api.KlarnaAPI;
 import com.example.cleanbookingsbackend.klarna.dto.KlarnaCreateOrderResponse;
@@ -27,10 +28,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.example.cleanbookingsbackend.service.utils.InputValidation.*;
 import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataField.*;
 import static com.example.cleanbookingsbackend.service.utils.InputValidation.DataType.STRING;
-import static com.example.cleanbookingsbackend.service.utils.InputValidation.validateInputDataField;
-import static com.example.cleanbookingsbackend.service.utils.InputValidation.validateJobType;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +60,7 @@ public class JobService {
             Date date = DATE_FORMAT.parse(request.date());
             if (jobRepository.findByBookedDateAndType(date, type).isPresent())
                 throw new IllegalArgumentException("There is already a job of type " + type + " requested on " + date);
-            requestedJob = new JobEntity(customer, type, date, request.message());
+            requestedJob = new JobEntity(customer, convertTimeslot(request.timeslot()), type, date, request.message());
             jobRepository.save(requestedJob);
             mailSender.sendEmailConfirmationBookedJob(requestedJob);
             try {
@@ -342,10 +342,11 @@ public class JobService {
 
     private boolean isValidAssignCleanerRequest(AssignCleanerRequest request)
             throws EmployeeNotFoundException, JobNotFoundException, IllegalArgumentException {
-        validateInputDataField(EMPLOYEE_ID, STRING, request.adminId());
-        EmployeeEntity admin = input.validateEmployeeId(request.adminId());
-        if (!admin.getRole().equals(Role.ADMIN))
-            throw new IllegalArgumentException("Only an admin can assign a cleaner to a job.");
+
+        //validateInputDataField(EMPLOYEE_ID, STRING, request.adminId());
+        //EmployeeEntity admin = input.validateEmployeeId(request.adminId());
+        //if (!admin.getRole().equals(Role.ADMIN))
+        //    throw new IllegalArgumentException("Only an admin can assign a cleaner to a job.");
 
         validateInputDataField(JOB_ID, STRING, request.jobId());
         JobEntity job = input.validateJobId(request.jobId());
@@ -408,6 +409,7 @@ public class JobService {
         return new JobResponseDTO(
                 job.getId(),
                 job.getType().toString(),
+                job.getTimeslot().toString(),
                 job.getStatus().toString(),
                 job.getMessage(),
                 job.getCustomer().getId(),

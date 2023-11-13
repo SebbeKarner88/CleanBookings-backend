@@ -24,9 +24,9 @@ public class MailSenderService {
     public void sendEmailConfirmationBookedJob(JobEntity requestedJob) {
         msg.setFrom(CLEAN_BOOKINGS);
         msg.setTo(getCustomerEmailAdress(requestedJob));
-        msg.setSubject("Din bokningsförfrågan.");
+        msg.setSubject("Din bokningsförfrågan."); // TODO : SNYGGA TILL TIMESLOT.
         msg.setText("Hej " + getCustomerName(requestedJob) + "! Er bokning av " + requestedJob.getType() + " den "
-                + getFormattedDateAndTime(requestedJob.getBookedDate()) + " har tagits emot av oss.\n\nNi kommer att få en bekräftelse på " +
+                + getFormattedDateAndTime(requestedJob.getBookedDate()) + requestedJob.getTimeslot() + " har tagits emot av oss.\n\nNi kommer att få en bekräftelse på " +
                 "bokningen när vi bokat in en städare på ert jobb.\n\n" + "StädaFint AB");
         try {
             mailSender.send(msg);

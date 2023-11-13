@@ -91,10 +91,11 @@ public class EmployeeController {
     @GetMapping
     public ResponseEntity<?> getAllAvailableEmployees(
             @RequestParam String employeeId,
-            @RequestParam String jobId
+            @RequestParam String jobId,
+            @RequestParam String timeslot
     ) {
         try {
-            List<EmployeeDTO> employees = employeeService.getAllAvailableEmployees(employeeId, jobId);
+            List<EmployeeDTO> employees = employeeService.getAllAvailableEmployees(employeeId, jobId, timeslot);
             return ResponseEntity.ok().body(employees);
         } catch (EmployeeNotFoundException | JobNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
@@ -122,6 +123,7 @@ public class EmployeeController {
         return new JobResponseDTO(
                 job.getId(),
                 job.getType().toString(),
+                job.getTimeslot().toString(),
                 job.getStatus().toString(),
                 job.getMessage(),
                 job.getCustomer().getId(),
