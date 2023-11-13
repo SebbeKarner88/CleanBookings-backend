@@ -15,8 +15,11 @@ import com.example.cleanbookingsbackend.repository.EmployeeRepository;
 import com.example.cleanbookingsbackend.repository.JobRepository;
 import com.example.cleanbookingsbackend.service.utils.InputValidation;
 import com.example.cleanbookingsbackend.service.utils.MailSenderService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
@@ -39,6 +42,7 @@ public class JobService {
     private final MailSenderService mailSender;
     private final InputValidation input;
     private final KlarnaAPI klarnaAPI;
+    private final JwtDecoder jwtDecoder;
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final String INVALID_ROLE_MESSAGE = "Invalid role. An admin cannot be assigned to a cleaning job.";
@@ -69,13 +73,13 @@ public class JobService {
         return new CreateJobResponse(requestedJob.getId(), response.html_snippet());
     }
 
-    public boolean cancelJobRequest(JobUserRequest request)
+    public void cancelJobRequest(String jobId, HttpServletRequest request)
             throws IllegalArgumentException, JobNotFoundException, NotFoundException, UnauthorizedCallException {
-        if (isValidCancelJobRequest(request)) {
-            authorizedCancellation(request);
-            mailSender.sendEmailConfirmationCanceledJob(jobRepository.findById(request.jobId()).get());
+        if (isValidCancelJobRequest(jobId, request)) {
+            JobEntity job = input.validateJobId(jobId);
+            mailSender.sendEmailConfirmationCanceledJob(job);
+            jobRepository.deleteById(jobId);
         }
-        return true;
     }
 
     public void assignCleanerRequest(AssignCleanerRequest request)
@@ -285,25 +289,21 @@ public class JobService {
         mailSender.sendEmailConfirmationExecutedJob(job, cleaner);
     }
 
-    private void authorizedCancellation(JobUserRequest request)
-            throws UnauthorizedCallException, NotFoundException, JobNotFoundException {
-        Optional<PrivateCustomerEntity> customerOptional = customerRepository.findById(request.userId());
-        Optional<EmployeeEntity> employeeOptional = employeeRepository.findById(request.userId());
+    private boolean isValidCancelJobRequest(String jobId, HttpServletRequest request) throws JobNotFoundException, UnauthorizedCallException {
+        if (jobId.isBlank())
+            throw new IllegalArgumentException("Job id is required.");
+        JobEntity job = input.validateJobId(jobId);
 
-        if (customerOptional.isEmpty() && employeeOptional.isEmpty()) {
-            throw new NotFoundException("No Customer or Administrator exists by id: " + request.userId());
-        }
+        String accessToken = request.getHeader("Authorization").replace("Bearer ", "");
+        Jwt jwt = jwtDecoder.decode(accessToken);
+        String customerId = jwt.getSubject();
+        PrivateCustomerEntity customer = input.validateCustomerId(customerId);
 
-        JobEntity job = input.validateJobId(request.jobId());
-
-        if (customerOptional.isPresent()) {
-            PrivateCustomerEntity customer = customerOptional.get();
-            checkCustomerAuthorization(customer, job);
-        } else if (employeeOptional.get().getRole().equals(Role.CLEANER)) {
+        if (job.getCustomer() != customer) {
             throw new UnauthorizedCallException(UNAUTHORIZED_CALL_MESSAGE +
-                    "\nOnly " + Role.ADMIN + " are allowed to cancel a booked cleaning.");
+                    "\nThe customer who booked the job is the only one allowed to cancel this booked cleaning.");
         }
-        jobRepository.deleteById(request.jobId());
+        return true;
     }
 
     private void isValidReissueFailedCleaningRequest(JobUserRequest request)
@@ -364,13 +364,6 @@ public class JobService {
                 throw new IllegalArgumentException(INVALID_ROLE_MESSAGE);
             }
         }
-        return true;
-    }
-
-    private boolean isValidCancelJobRequest(JobUserRequest request) {
-        if (request.userId().isBlank())
-            throw new IllegalArgumentException(USER_ID_REQUIRED_MESSAGE);
-        validateInputDataField(JOB_ID, STRING, request.jobId());
         return true;
     }
 
