@@ -240,11 +240,36 @@ KC_ROLE_ADMIN_ID=
 KC_ROLE_CUSTOMER_ID=
 
 #### Nu har vi konfigurerat vår Keycloak klient på båda sidor av tjänsten, nu kan vi gå vidare till Klarna konfig.
+<br/><br/>
 
 ## Klarna Konfigurering
 
-# WIP WIP WIP WIP WIP WIP WIP
+#### Nu ska vi sätta upp vår konfigurering för klarna checkout.
+#### Skapa ett konto på https://playground.eu.portal.klarna.com/
+#### Logga in och säkerställ att du har tillgång till Web-gränssnittet.
+#### Klicka på Payment Settings nere till vänster i menyn.
+#### På sidan som presenteras, tryck på generate Klarna API credentials.
+#### Det du får tillbaka bör se ut ungefär såhär:
 
+username: PK1XXXX7_ed17XXXXXXXX
+password: 4osSiXXXXXXXXXUBi
+
+#### De värden du fått klistrar du in i env. filen under:
+
+KLARNA_USERNAME= [klarna api key username]
+KLARNA_PASSWORD= [klarna api key password]
+
+### Nu är Klarna konfigureringen klar.
+<br/><br/>
+
+# Data Initializer
+#### Det sista vi behöver titta på är 
+"src/main/java/com/example/cleanbookingsbackend/service/DataInitialization/InitDataService.java"
+
+#### Denna klass initierar vår databas och Keycloak klient med test data.
+#### Såhär ser vi till att datan kommer in i systemet på ett korrekt sätt.
+
+# WIP WIP WIP WIP WIP WIP WIP WIP
 
 # ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 
