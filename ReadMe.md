@@ -1,26 +1,35 @@
-# ¤¤¤ Direktiv för att sätta upp programmets utvecklingsmiljö ¤¤¤
+# ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+
+# Direktiv för att sätta upp programmets utvecklingsmiljö
+
+# ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 
 ## Databas
+
 För en enkel och korrekt databasuppkoppling så hämtas PostgreSQL i lämplig version och installeras på datorn.
-### PostgreSQL finns att hämta här: https://www.postgresql.org/ 
 
+### PostgreSQL finns att hämta här: https://www.postgresql.org/
 
-#### * Konfigurera databasen enligt den standard som hänvisas i installationen. <br/>
-#### * Välj ett lämpligt användarnamn och lösenord och spara dessa värden för framtida användning.
+####  * Konfigurera databasen enligt den standard som hänvisas i installationen. <br/>
+
+####  * Välj ett lämpligt användarnamn och lösenord och spara dessa värden för framtida användning.
+
 <br/>
 
-#### * I programmets filstruktur, navigera till src/main/resources<br/>
-#### * Skapa en fil i resources-mappen som heter env.properties och öppna denna fil.
+####  * I programmets filstruktur, navigera till src/main/resources<br/>
+
+####  * Skapa en fil i resources-mappen som heter env.properties och öppna denna fil.
+
 #### Kopiera in dessa miljövariabler i env.properties filen:
 
 DB_URL=jdbc:postgresql://localhost:5432/postgres
-DB_USER=[Ditt Användarnamn] <- Ditt Databas användarnamn
-DB_PASSWORD=[Ditt lösenord] <- Ditt databas lösenord
+DB_USER=[Ditt Användarnamn]
+DB_PASSWORD=[Ditt lösenord]
 SMTP_USER=order.cleanbookings@gmail.com
 SMTP_PASSWORD=vmno lpps vetz rtjh
 
 KC_REALM= CB_REALM
-KC_CLIENT_ID= 
+KC_CLIENT_ID=
 KC_CLIENT_NAME= CB_CLIENT
 KC_CLIENT_SECRET=
 KC_ADMIN_USERNAME=admin
@@ -34,68 +43,104 @@ KLARNA_USERNAME=
 KLARNA_PASSWORD=
 
 ### Uppkoppling till databas är nu konfigurerad.
+
 <br/>
 
 ## Keycloak Authentiseringstjänst
+
 ### Nu ska vi konfigurera vår autentiseringstjänst.
+
 <br/>
 
 ### Docker
 
 #### Vi börjar med att installera Docker/Docker Desktop.
+
 #### Hämta och installera Docker/Docker Desktop från denna url: https://www.docker.com/products/docker-desktop/
+
 #### Om installationen inte lyckas, vänligen referera till denna url för felsökning (PC, Windows): https://docs.docker.com/desktop/vm-vdi/
+
 <br/>
 
 ### Postman
 
 #### Nu ska vi installera ett program som kommer hjälpa oss att hämta data från vår keycloak klient.
+
 #### Hämta postman från följande URL: https://www.postman.com/
+
 #### Installera programmet och säkerställ att det startar korrekt.
+
 <br/>
 
 ### Starta Keycloak container från docker-image
-#### I programmets terminal, kör detta kommando: 
-docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:22.0.5 start-dev
+
+#### I programmets terminal, kör detta kommando:
+
+docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:22.0.5
+start-dev
 
 #### Detta kommando skapar en container innehållandes en keycloak klient på din dator.
+
 #### Säkerställ att containern är igång, antingen i docker desktop gränssnittet eller i terminalen.
+
 <br/>
 
 ### Konfigurera Keycloak klienten på klientsidan
 
 #### Öppna ett nytt webbläsarfönster och kopiera in följande URL: http://localhost:8080/
+
 #### Klicka på Administration Console och mata in "admin" som både username och password.
+
 #### Nästan högst upp i vänstra hörnet på sidan kommer ni finna en "drop-down lista" där det just nu står master.
+
 #### Klicka på pilen och gå ner till "Create Realm" och klicka på den.
+
 #### Under Realm name så matar vi in "CB_REALM", detta blir namnet på vår Realm.
+
 #### Se till så "Enabled" är ikryssad innan vi trycker på "Create".
+
 <br/>
 
 #### När vi tryckt på Create så kommer vi till startsidan för vår nyskapade Realm.
+
 #### Nu navigerar vi till sidomenyn till vänster och trycker på Clients.
+
 #### När vi kommit till Client-sidan så hittar vi en blå knapp i mitten av sidan som heter Create client, Klicka på denna.
+
 #### Säkerställ att Client type är OpenID Connect.
+
 #### Under Client ID så döper vi vår client till "CB_CLIENT", Name och Description är inte nödvändiga.
+
 #### Säkerställ att "Always display in UI" är ikryssad.
+
 #### Tryck på Next.
+
 <br/>
 
-#### Innan vi fortsätter så navigerar vi till "assets/images/" från programmets root-mapp. 
+#### Innan vi fortsätter så navigerar vi till "assets/images/" från programmets root-mapp.
+
 #### I denna mapp finner vi ett antal bildfiler som vi nu ska ha som mall för konfigurering.
+
 <br/>
 
 #### På följande sida, säkerställ att konfigureringen ser ut enligt bildfilen "assets/images/capabilityConfig.png"
+
 #### Tryck på Next.
+
 <br/>
 
 #### På följande sida, säkerställ att konfigureringen ser ut enligt bildfilen "assets/images/accessSettings.png"
+
 #### Tryck på Save.
+
 <br/>
 
 #### Nu kan vi gå vidare till att skapa de roller vi använder oss av.
+
 #### På Client sidan så finns det en flik som heter Roles, klicka på denna.
+
 #### Klicka på Create role.
+
 #### Här ska vi nu skapa 3 olika roller, de roller som behöver upprättas är:
 
 "client_admin"  <br/>
@@ -103,34 +148,109 @@ docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin
 "client_customer"  <br/>
 
 #### Skapa dessa 3 roller med varsina passande descriptions.
+
 #### Nu är vi klara med rollskapandet, navigera nu till:
+
 #### Credentials i Client vyn.
+
 <br/>
 
 #### I Credentials fliken så ska vi hämta en Miljövariabel till vår env.properties fil.
+
 #### Säkerställ att Client Authenticator är satt till Client Id and Secret.
+
 #### Under Client secret, tryck på knappen som liknar två pappersark för att kopiera secret.
+
 #### gå nu till env.properties som vi upprättade tidigare, fyll i enligt nedan:
 
 KC_CLIENT_SECRET=[din kopierade secret]
 
 #### Nu är vi klara med konfigureringen av keycloak på klientens sida.
+
 #### Nu ska vi fortsätta med att starta Postman och hämta lite data för konfigurering på applikations-sidan.
 
 ### Konfigurera Keycloak Klienten på applikationssidan
 
-#### Starta Postman som vi installerade tidigare.
+#### Starta Postman som installerades tidigare.
+
+#### Nu ska vi skicka en rad anrop för att hämta data som vi sedan ska lägga till i vår env. fil.
+
+#### Skapa ett nytt anrop och fyll i parametrar enligt "assets/images/adminTokenCall.png"
+
+#### Tryck på Send.
+
+#### I returen så kommer det nu finnas en position som heter "access_token", värdet av denna position ska vi kopiera för att kunna skicka följande anrop.
+#### VIKTIGT! Denna access_token är bara giltig i 60 sekunder per default, så ha detta i åtanke när vi skickar de andra anropen.
+<br/>
+
+#### Nu ska vi skicka ett anrop för att hämta ID på vår client.
+#### Skriv anropet enligt "assets/images/getClientKeycloak.png"
+#### Under fliken Auth så väljer vi Bearer token, och därefter klistrar vi in vår access_token från tidigare anrop.
+#### !!Observera att detta måste göras inom 60 sekunder från förra anropet!!
+<br/>
+
+#### I svaret på detta anrop så kommer vi få en lång rad objekt där varje objekt representerar en client i vår keycloak realm.
+#### Svaret ser ut något åt dethär hållet:
+
+"id": "0fc8c1c1-7ca8-40b9-8655-bc3a48e95540",
+"clientId": "CB_CLIENT",
+"name": "name",
+"description": "description",
+"rootUrl": "http://localhost:8081",
+"adminUrl": "http://localhost:8081",
+"baseUrl": "http://localhost:8081",
+"surrogateAuthRequired": false,
+"enabled": true,
+"alwaysDisplayInConsole": true,
+"clientAuthenticatorType": "client-secret",
+
+#### Här letar vi nu upp det objekt i listan vars "name" parameter har CB_CLIENT som värde.
+#### När vi hittat den så kopierar vi värdet på parametern "id" i samma objekt, i exemplet ovan skulle det då bli:
+0fc8c1c1-7ca8-40b9-8655-bc3a48e95540
+
+#### Detta värde ska vi nu klistra in i vår env. fil på:
+KC_CLIENT_ID=[Id från anrop]
+
+#### Vi har nu hämtat vårat Client id, nu saknas bara idn för våra roller. 
+<br/>
+
+#### För att hämta våra roll-id så ska vi göra ett liknande anrop via postman.
+#### Säkerställ att vi har skickat ett access_token anrop och att den fortfarande är giltig.
+#### Skriv anropet enligt "assets/images/getRolesKeycloak.png"
+#### Fyll i auth likt tidigare anrop.
+#### Observera att du måste kopiera in det ID vi hämtade i föregående anrop i URL på detta anrop, byt ut placeholder till klientens id.
+#### Det vi får tillbaka på detta anrop bör se ut något likt detta:
+
+"id": "c0c42f0d-76f0-46ca-9b8a-93a7e1c82407",
+"name": "client_cleaner",
+"description": "Cleaner",
+"composite": false,
+"clientRole": true,
+"containerId": "0fc8c1c1-7ca8-40b9-8655-bc3a48e95540"
+
+#### Här hämtar vi nu id från våra tre olika roller och sätter dessa värden i vår env. fil.
+#### Här ovanför har vi till exempel client cleaner, då vill vi ta id:
+c0c42f0d-76f0-46ca-9b8a-93a7e1c82407
+
+#### Och sätta detta id i env. filen till:
+KC_ROLE_CLEANER_ID=c0c42f0d-76f0-46ca-9b8a-93a7e1c82407
+
+#### Upprepa samma procedur för att hämta
+KC_ROLE_ADMIN_ID=
+KC_ROLE_CUSTOMER_ID=
+
+#### Nu har vi konfigurerat vår Keycloak klient på båda sidor av tjänsten, nu kan vi gå vidare till Klarna konfig.
+
+## Klarna Konfigurering
+
+# WIP WIP WIP WIP WIP WIP WIP
 
 
+# ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 
-# WIP!!! !!!!FORTSÄTTNING FÖLJER!!!!
+# Dokumentation av programmets funktioner
 
-
-
-
-
-
-# ¤¤¤ Dokumentation av programmets funktioner ¤¤¤
+# ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 
 # Controller
 
