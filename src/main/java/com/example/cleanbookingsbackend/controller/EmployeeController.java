@@ -131,7 +131,6 @@ public class EmployeeController {
         );
     }
 
-
     @PreAuthorize("hasAnyRole('client_admin', 'client_cleaner')")
     @PutMapping("updatePassword/{id}")
     public ResponseEntity<?> updateEmployeePassword(

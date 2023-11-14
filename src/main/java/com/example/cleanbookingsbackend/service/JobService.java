@@ -343,11 +343,6 @@ public class JobService {
     private boolean isValidAssignCleanerRequest(AssignCleanerRequest request)
             throws EmployeeNotFoundException, JobNotFoundException, IllegalArgumentException {
 
-        //validateInputDataField(EMPLOYEE_ID, STRING, request.adminId());
-        //EmployeeEntity admin = input.validateEmployeeId(request.adminId());
-        //if (!admin.getRole().equals(Role.ADMIN))
-        //    throw new IllegalArgumentException("Only an admin can assign a cleaner to a job.");
-
         validateInputDataField(JOB_ID, STRING, request.jobId());
         JobEntity job = input.validateJobId(request.jobId());
         if (job.getStatus().equals(JobStatus.CLOSED)) {

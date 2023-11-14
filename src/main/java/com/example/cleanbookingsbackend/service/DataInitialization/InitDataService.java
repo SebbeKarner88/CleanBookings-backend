@@ -1,7 +1,23 @@
 package com.example.cleanbookingsbackend.service.DataInitialization;
 
+import com.example.cleanbookingsbackend.enums.*;
+import com.example.cleanbookingsbackend.keycloak.api.KeycloakAPI;
+import com.example.cleanbookingsbackend.model.EmployeeEntity;
+import com.example.cleanbookingsbackend.model.JobEntity;
+import com.example.cleanbookingsbackend.model.PaymentEntity;
+import com.example.cleanbookingsbackend.model.PrivateCustomerEntity;
+import com.example.cleanbookingsbackend.repository.CustomerRepository;
+import com.example.cleanbookingsbackend.repository.EmployeeRepository;
+import com.example.cleanbookingsbackend.repository.JobRepository;
+import com.example.cleanbookingsbackend.repository.PaymentRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -159,6 +175,7 @@ public class InitDataService {
         JobEntity job1Customer1Cleaner1 = new JobEntity(
                 null,
                 new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 5),
+                Timeslot.AFTERNOON,
                 customer1,
                 null,
                 JobType.BASIC_CLEANING,
@@ -169,6 +186,7 @@ public class InitDataService {
         JobEntity job2Customer2Cleaner1And2 = new JobEntity(
                 null,
                 new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7),
+                Timeslot.MORNING,
                 customer2,
                 List.of(cleaner1, cleaner2),
                 JobType.WINDOW_CLEANING,
@@ -179,6 +197,7 @@ public class InitDataService {
         JobEntity job3Customer2Cleaner2 = new JobEntity(
                 null,
                 new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7),
+                Timeslot.EVENING,
                 customer2,
                 List.of(cleaner2),
                 JobType.TOPP_CLEANING,
@@ -189,6 +208,7 @@ public class InitDataService {
         JobEntity job4Customer1Cleaner1And2 = new JobEntity(
                 null,
                 new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3),
+                Timeslot.EVENING,
                 customer1,
                 List.of(cleaner1, cleaner2),
                 JobType.DIAMOND_CLEANING,
@@ -199,6 +219,7 @@ public class InitDataService {
         JobEntity job5Customer2Cleaner1 = new JobEntity(
                 null,
                 new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 2),
+                Timeslot.MORNING,
                 customer2,
                 List.of(cleaner1),
                 JobType.BASIC_CLEANING,
@@ -209,6 +230,7 @@ public class InitDataService {
         JobEntity job6Customer2Cleaner2 = new JobEntity(
                 null,
                 new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 7),
+                Timeslot.EVENING,
                 customer2,
                 List.of(cleaner2),
                 JobType.TOPP_CLEANING,
