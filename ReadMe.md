@@ -267,9 +267,16 @@ KLARNA_PASSWORD= [klarna api key password]
 "src/main/java/com/example/cleanbookingsbackend/service/DataInitialization/InitDataService.java"
 
 #### Denna klass initierar vår databas och Keycloak klient med test data.
-#### Såhär ser vi till att datan kommer in i systemet på ett korrekt sätt.
+### Såhär ser vi till att datan kommer in i systemet på ett korrekt sätt.
 
-# WIP WIP WIP WIP WIP WIP WIP WIP
+#### Per default så är klassen utkommenterad, första gången vi startar vår applikation vill vi ha med denna kalss.
+#### Ta bort utkommenterings-kommandona (/* */) i klassen.
+#### Starta programmet.
+#### OBS! Glöm inte att ha dockercontainern igång med vår keycloak klient. Denna måste vara igång varje gång vi startar vårt program.
+#### Kompilerar programmet som det ska så kan vi vid detta skede kommentera ut klassen igen, då har den fyllt sin funktion.
+
+## Vi har nu konfigurerat allt vi behöver för att köra vårat program.
+
 
 # ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 
