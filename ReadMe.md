@@ -62,15 +62,73 @@ docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin
 #### Säkerställ att containern är igång, antingen i docker desktop gränssnittet eller i terminalen.
 <br/>
 
-### Konfigurera Keycloak klienten
+### Konfigurera Keycloak klienten på klientsidan
 
 #### Öppna ett nytt webbläsarfönster och kopiera in följande URL: http://localhost:8080/
 #### Klicka på Administration Console och mata in "admin" som både username och password.
 #### Nästan högst upp i vänstra hörnet på sidan kommer ni finna en "drop-down lista" där det just nu står master.
 #### Klicka på pilen och gå ner till "Create Realm" och klicka på den.
-#### 
+#### Under Realm name så matar vi in "CB_REALM", detta blir namnet på vår Realm.
+#### Se till så "Enabled" är ikryssad innan vi trycker på "Create".
+<br/>
 
-<br/><br/>
+#### När vi tryckt på Create så kommer vi till startsidan för vår nyskapade Realm.
+#### Nu navigerar vi till sidomenyn till vänster och trycker på Clients.
+#### När vi kommit till Client-sidan så hittar vi en blå knapp i mitten av sidan som heter Create client, Klicka på denna.
+#### Säkerställ att Client type är OpenID Connect.
+#### Under Client ID så döper vi vår client till "CB_CLIENT", Name och Description är inte nödvändiga.
+#### Säkerställ att "Always display in UI" är ikryssad.
+#### Tryck på Next.
+<br/>
+
+#### Innan vi fortsätter så navigerar vi till "assets/images/" från programmets root-mapp. 
+#### I denna mapp finner vi ett antal bildfiler som vi nu ska ha som mall för konfigurering.
+<br/>
+
+#### På följande sida, säkerställ att konfigureringen ser ut enligt bildfilen "assets/images/capabilityConfig.png"
+#### Tryck på Next.
+<br/>
+
+#### På följande sida, säkerställ att konfigureringen ser ut enligt bildfilen "assets/images/accessSettings.png"
+#### Tryck på Save.
+<br/>
+
+#### Nu kan vi gå vidare till att skapa de roller vi använder oss av.
+#### På Client sidan så finns det en flik som heter Roles, klicka på denna.
+#### Klicka på Create role.
+#### Här ska vi nu skapa 3 olika roller, de roller som behöver upprättas är:
+
+"client_admin"  <br/>
+"client_cleaner"  <br/>
+"client_customer"  <br/>
+
+#### Skapa dessa 3 roller med varsina passande descriptions.
+#### Nu är vi klara med rollskapandet, navigera nu till:
+#### Credentials i Client vyn.
+<br/>
+
+#### I Credentials fliken så ska vi hämta en Miljövariabel till vår env.properties fil.
+#### Säkerställ att Client Authenticator är satt till Client Id and Secret.
+#### Under Client secret, tryck på knappen som liknar två pappersark för att kopiera secret.
+#### gå nu till env.properties som vi upprättade tidigare, fyll i enligt nedan:
+
+KC_CLIENT_SECRET=[din kopierade secret]
+
+#### Nu är vi klara med konfigureringen av keycloak på klientens sida.
+#### Nu ska vi fortsätta med att starta Postman och hämta lite data för konfigurering på applikations-sidan.
+
+### Konfigurera Keycloak Klienten på applikationssidan
+
+#### Starta Postman som vi installerade tidigare.
+
+
+
+# WIP!!! !!!!FORTSÄTTNING FÖLJER!!!!
+
+
+
+
+
 
 # ¤¤¤ Dokumentation av programmets funktioner ¤¤¤
 
