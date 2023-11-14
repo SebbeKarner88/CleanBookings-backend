@@ -1,5 +1,75 @@
 # ¤¤¤ Direktiv för att sätta upp programmets utvecklingsmiljö ¤¤¤
 
+## Databas
+För en enkel och korrekt databasuppkoppling så hämtas PostgreSQL i lämplig version och installeras på datorn.
+### PostgreSQL finns att hämta här: https://www.postgresql.org/ 
+
+
+#### * Konfigurera databasen enligt den standard som hänvisas i installationen. <br/>
+#### * Välj ett lämpligt användarnamn och lösenord och spara dessa värden för framtida användning.
+<br/>
+
+#### * I programmets filstruktur, navigera till src/main/resources<br/>
+#### * Skapa en fil i resources-mappen som heter env.properties och öppna denna fil.
+#### Kopiera in dessa miljövariabler i env.properties filen:
+
+DB_URL=jdbc:postgresql://localhost:5432/postgres
+DB_USER=[Ditt Användarnamn] <- Ditt Databas användarnamn
+DB_PASSWORD=[Ditt lösenord] <- Ditt databas lösenord
+SMTP_USER=order.cleanbookings@gmail.com
+SMTP_PASSWORD=vmno lpps vetz rtjh
+
+KC_REALM= CB_REALM
+KC_CLIENT_ID= 
+KC_CLIENT_NAME= CB_CLIENT
+KC_CLIENT_SECRET=
+KC_ADMIN_USERNAME=admin
+KC_ADMIN_PASSWORD=admin
+KC_ROLE_CUSTOMER_ID=
+KC_ROLE_CLEANER_ID=
+KC_ROLE_ADMIN_ID=
+KC_PRINCIPAL_ATTRIBUTE=preferred_username
+
+KLARNA_USERNAME=
+KLARNA_PASSWORD=
+
+### Uppkoppling till databas är nu konfigurerad.
+<br/>
+
+## Keycloak Authentiseringstjänst
+### Nu ska vi konfigurera vår autentiseringstjänst.
+<br/>
+
+### Docker
+
+#### Vi börjar med att installera Docker/Docker Desktop.
+#### Hämta och installera Docker/Docker Desktop från denna url: https://www.docker.com/products/docker-desktop/
+#### Om installationen inte lyckas, vänligen referera till denna url för felsökning (PC, Windows): https://docs.docker.com/desktop/vm-vdi/
+<br/>
+
+### Postman
+
+#### Nu ska vi installera ett program som kommer hjälpa oss att hämta data från vår keycloak klient.
+#### Hämta postman från följande URL: https://www.postman.com/
+#### Installera programmet och säkerställ att det startar korrekt.
+<br/>
+
+### Starta Keycloak container från docker-image
+#### I programmets terminal, kör detta kommando: 
+docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:22.0.5 start-dev
+
+#### Detta kommando skapar en container innehållandes en keycloak klient på din dator.
+#### Säkerställ att containern är igång, antingen i docker desktop gränssnittet eller i terminalen.
+<br/>
+
+### Konfigurera Keycloak klienten
+
+#### Öppna ett nytt webbläsarfönster och kopiera in följande URL: http://localhost:8080/
+#### Klicka på Administration Console och mata in "admin" som både username och password.
+#### Nästan högst upp i vänstra hörnet på sidan kommer ni finna en "drop-down lista" där det just nu står master.
+#### Klicka på pilen och gå ner till "Create Realm" och klicka på den.
+#### 
+
 <br/><br/>
 
 # ¤¤¤ Dokumentation av programmets funktioner ¤¤¤
@@ -604,7 +674,7 @@ Metoden deleteUserKeycloak används för att ta bort användare från Keycloak.
 KeycloakAPI kan också hämta information om användare från Keycloak genom metoder som
 getKeycloakUserEntities och getKeycloakRoleEntities.
 
-## Följande klasser är delar av den kodstruktur som används för att interagera med Keycloak, de används för att representera olika typer av data som är nödvändiga för autentisering och användarhantering.
+### Följande klasser är delar av den kodstruktur som används för att interagera med Keycloak, de används för att representera olika typer av data som är nödvändiga för autentisering och användarhantering.
 
 ### Credentials: Representerar autentiseringsuppgifter för en användare. Den innehåller information som typ av
 
