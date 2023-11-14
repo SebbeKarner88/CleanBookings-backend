@@ -10,15 +10,15 @@ För en enkel och korrekt databasuppkoppling så hämtas PostgreSQL i lämplig v
 
 ### PostgreSQL finns att hämta här: https://www.postgresql.org/
 
-####  * Konfigurera databasen enligt den standard som hänvisas i installationen. <br/>
+#### Konfigurera databasen enligt den standard som hänvisas i installationen. <br/>
 
-####  * Välj ett lämpligt användarnamn och lösenord och spara dessa värden för framtida användning.
+#### Välj ett lämpligt användarnamn och lösenord och spara dessa värden för framtida användning.
 
 <br/>
 
-####  * I programmets filstruktur, navigera till src/main/resources<br/>
+#### I programmets filstruktur, navigera till src/main/resources<br/>
 
-####  * Skapa en fil i resources-mappen som heter env.properties och öppna denna fil.
+#### Skapa en fil i resources-mappen som heter env.properties och öppna denna fil.
 
 #### Kopiera in dessa miljövariabler i env.properties filen:
 
@@ -272,17 +272,17 @@ KLARNA_PASSWORD= [klarna api key password]
 #### Per default så är klassen utkommenterad, första gången vi startar vår applikation vill vi ha med denna kalss.
 #### Ta bort utkommenterings-kommandona (/* */) i klassen.
 #### Starta programmet.
-#### OBS! Glöm inte att ha dockercontainern igång med vår keycloak klient. Denna måste vara igång varje gång vi startar vårt program.
+#### OBS! Glöm inte att ha docker-containern igång med vår keycloak klient. Denna måste vara igång varje gång vi startar vårt program.
 #### Kompilerar programmet som det ska så kan vi vid detta skede kommentera ut klassen igen, då har den fyllt sin funktion.
 
 ## Vi har nu konfigurerat allt vi behöver för att köra vårat program.
 
 
-# ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+# ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 
-# Dokumentation av programmets funktioner
+# Dokumentation av programmets funktionalitet
 
-# ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
+# ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 
 # Controller
 
