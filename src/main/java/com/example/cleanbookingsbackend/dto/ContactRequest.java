@@ -14,4 +14,5 @@ public class ContactRequest {
     private String email;
     private String subject;
     private String message;
+    private String htmlSnippet;
 }

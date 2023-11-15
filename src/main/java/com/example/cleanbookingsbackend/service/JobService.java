@@ -4,7 +4,6 @@ import com.example.cleanbookingsbackend.dto.*;
 import com.example.cleanbookingsbackend.enums.JobStatus;
 import com.example.cleanbookingsbackend.enums.JobType;
 import com.example.cleanbookingsbackend.enums.Role;
-import com.example.cleanbookingsbackend.enums.Timeslot;
 import com.example.cleanbookingsbackend.exception.*;
 import com.example.cleanbookingsbackend.klarna.api.KlarnaAPI;
 import com.example.cleanbookingsbackend.klarna.dto.KlarnaCreateOrderResponse;
@@ -18,12 +17,10 @@ import com.example.cleanbookingsbackend.service.utils.InputValidation;
 import com.example.cleanbookingsbackend.service.utils.MailSenderService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.core.Response;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -36,8 +33,6 @@ import static com.example.cleanbookingsbackend.service.utils.InputValidation.Dat
 @RequiredArgsConstructor
 public class JobService {
     private final JobRepository jobRepository;
-    private final CustomerRepository customerRepository;
-    private final EmployeeRepository employeeRepository;
     private final PaymentService paymentService;
     private final MailSenderService mailSender;
     private final InputValidation input;
@@ -48,7 +43,6 @@ public class JobService {
     private static final String INVALID_ROLE_MESSAGE = "Invalid role. An admin cannot be assigned to a cleaning job.";
     private static final String UNAUTHORIZED_CALL_MESSAGE = "You are not authorized to perform this action.";
     private static final String CANCEL_COMPLETED_JOB_MESSAGE = "You may not cancel a completed job.";
-    private static final String USER_ID_REQUIRED_MESSAGE = "A customer or admin id is required.";
 
     public CreateJobResponse createJobRequest(CreateJobRequest request)
             throws IllegalArgumentException, CustomerNotFoundException, ParseException {
