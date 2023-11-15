@@ -122,6 +122,7 @@ public class EmployeeController {
     private JobResponseDTO convertToJobResponseDTO(JobEntity job) {
         return new JobResponseDTO(
                 job.getId(),
+                job.getBookedDate().toString(),
                 job.getType().toString(),
                 job.getTimeslot().toString(),
                 job.getStatus().toString(),
