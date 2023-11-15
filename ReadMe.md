@@ -6,9 +6,9 @@
 
 ## Databas
 
-För en enkel och korrekt databasuppkoppling så hämtas PostgreSQL i lämplig version och installeras på datorn.
+#### För en enkel och korrekt databasuppkoppling så hämtas PostgreSQL i lämplig version och installeras på datorn.
 
-### PostgreSQL finns att hämta här: https://www.postgresql.org/
+#### PostgreSQL finns att hämta här: https://www.postgresql.org/
 
 #### Konfigurera databasen enligt den standard som hänvisas i installationen. <br/>
 
@@ -44,17 +44,17 @@ KLARNA_PASSWORD=
 
 ### Uppkoppling till databas är nu konfigurerad.
 
-<br/>
+# ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤
 
-## Keycloak Authentiseringstjänst
+## Keycloak Autentiseringstjänst
 
-### Nu ska vi konfigurera vår autentiseringstjänst.
+### Nu ska vi konfigurera autentiseringstjänsten.
 
 <br/>
 
 ### Docker
 
-#### Vi börjar med att installera Docker/Docker Desktop.
+#### Börja med att installera Docker/Docker Desktop.
 
 #### Hämta och installera Docker/Docker Desktop från denna url: https://www.docker.com/products/docker-desktop/
 
@@ -64,7 +64,7 @@ KLARNA_PASSWORD=
 
 ### Postman
 
-#### Nu ska vi installera ett program som kommer hjälpa oss att hämta data från vår keycloak klient.
+#### Nu installerar vi ett program som kommer hjälpa oss att göra anrop till keycloak.
 
 #### Hämta postman från följande URL: https://www.postman.com/
 
@@ -79,7 +79,7 @@ KLARNA_PASSWORD=
 docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:22.0.5
 start-dev
 
-#### Detta kommando skapar en container innehållandes en keycloak klient på din dator.
+#### Detta kommando skapar en container innehållandes en keycloak klient på datorn.
 
 #### Säkerställ att containern är igång, antingen i docker desktop gränssnittet eller i terminalen.
 
@@ -91,11 +91,11 @@ start-dev
 
 #### Klicka på Administration Console och mata in "admin" som både username och password.
 
-#### Nästan högst upp i vänstra hörnet på sidan kommer ni finna en "drop-down lista" där det just nu står master.
+#### Nästan högst upp i vänstra hörnet på sidan finns en "drop-down lista" där det just nu står master.
 
 #### Klicka på pilen och gå ner till "Create Realm" och klicka på den.
 
-#### Under Realm name så matar vi in "CB_REALM", detta blir namnet på vår Realm.
+#### Under Realm name, mata in "CB_REALM", detta blir namnet på vår Realm.
 
 #### Se till så "Enabled" är ikryssad innan vi trycker på "Create".
 
@@ -103,7 +103,7 @@ start-dev
 
 #### När vi tryckt på Create så kommer vi till startsidan för vår nyskapade Realm.
 
-#### Nu navigerar vi till sidomenyn till vänster och trycker på Clients.
+#### Navigera till sidomenyn till vänster och tryck på Clients.
 
 #### När vi kommit till Client-sidan så hittar vi en blå knapp i mitten av sidan som heter Create client, Klicka på denna.
 
@@ -123,13 +123,13 @@ start-dev
 
 <br/>
 
-#### På följande sida, säkerställ att konfigureringen ser ut enligt bildfilen "assets/images/capabilityConfig.png"
+#### På följande sida, säkerställ att konfigureringen ser ut enligt bildfilen "capabilityConfig.png"
 
 #### Tryck på Next.
 
 <br/>
 
-#### På följande sida, säkerställ att konfigureringen ser ut enligt bildfilen "assets/images/accessSettings.png"
+#### På följande sida, säkerställ att konfigureringen ser ut enligt bildfilen "accessSettings.png"
 
 #### Tryck på Save.
 
@@ -141,7 +141,7 @@ start-dev
 
 #### Klicka på Create role.
 
-#### Här ska vi nu skapa 3 olika roller, de roller som behöver upprättas är:
+#### Här ska vi nu skapa tre olika roller, de roller som behöver upprättas är:
 
 "client_admin"  <br/>
 "client_cleaner"  <br/>
@@ -149,9 +149,7 @@ start-dev
 
 #### Skapa dessa 3 roller med varsina passande descriptions.
 
-#### Nu är vi klara med rollskapandet, navigera nu till:
-
-#### Credentials i Client vyn.
+#### Nu är vi klara med rollskapandet, navigera nu till Credentials i Client vyn.
 
 <br/>
 
@@ -168,6 +166,7 @@ KC_CLIENT_SECRET=[din kopierade secret]
 #### Nu är vi klara med konfigureringen av keycloak på klientens sida.
 
 #### Nu ska vi fortsätta med att starta Postman och hämta lite data för konfigurering på applikations-sidan.
+<br/>
 
 ### Konfigurera Keycloak Klienten på applikationssidan
 
@@ -190,7 +189,7 @@ KC_CLIENT_SECRET=[din kopierade secret]
 <br/>
 
 #### I svaret på detta anrop så kommer vi få en lång rad objekt där varje objekt representerar en client i vår keycloak realm.
-#### Svaret ser ut något åt dethär hållet:
+#### En client i listan ser ut något åt dethär hållet:
 
 "id": "0fc8c1c1-7ca8-40b9-8655-bc3a48e95540",
 "clientId": "CB_CLIENT",
@@ -211,14 +210,14 @@ KC_CLIENT_SECRET=[din kopierade secret]
 #### Detta värde ska vi nu klistra in i vår env. fil på:
 KC_CLIENT_ID=[Id från anrop]
 
-#### Vi har nu hämtat vårat Client id, nu saknas bara idn för våra roller. 
+#### Vi har nu hämtat vårat Client id, nu saknas bara IDn för våra roller. 
 <br/>
 
 #### För att hämta våra roll-id så ska vi göra ett liknande anrop via postman.
 #### Säkerställ att vi har skickat ett access_token anrop och att den fortfarande är giltig.
 #### Skriv anropet enligt "assets/images/getRolesKeycloak.png"
 #### Fyll i auth likt tidigare anrop.
-#### Observera att du måste kopiera in det ID vi hämtade i föregående anrop i URL på detta anrop, byt ut placeholder till klientens id.
+#### Observera att du måste kopiera in det ID vi hämtade i föregående anrop i URL på detta anrop, byt ut placeholder till client-id.
 #### Det vi får tillbaka på detta anrop bör se ut något likt detta:
 
 "id": "c0c42f0d-76f0-46ca-9b8a-93a7e1c82407",
@@ -228,8 +227,8 @@ KC_CLIENT_ID=[Id från anrop]
 "clientRole": true,
 "containerId": "0fc8c1c1-7ca8-40b9-8655-bc3a48e95540"
 
-#### Här hämtar vi nu id från våra tre olika roller och sätter dessa värden i vår env. fil.
-#### Här ovanför har vi till exempel client cleaner, då vill vi ta id:
+#### Här hämtar vi nu ID från våra tre olika roller och sätter dessa värden i vår env. fil.
+#### Här ovanför har vi till exempel client cleaner, då tar vi ID:
 c0c42f0d-76f0-46ca-9b8a-93a7e1c82407
 
 #### Och sätta detta id i env. filen till:
@@ -239,7 +238,7 @@ KC_ROLE_CLEANER_ID=c0c42f0d-76f0-46ca-9b8a-93a7e1c82407
 KC_ROLE_ADMIN_ID=
 KC_ROLE_CUSTOMER_ID=
 
-#### Nu har vi konfigurerat vår Keycloak klient på båda sidor av tjänsten, nu kan vi gå vidare till Klarna konfig.
+#### Nu har vi konfigurerat vår Keycloak klient på båda sidor av tjänsten, nu kan vi gå vidare till Klarna config.
 <br/><br/>
 
 ## Klarna Konfigurering
@@ -263,14 +262,14 @@ KLARNA_PASSWORD= [klarna api key password]
 <br/><br/>
 
 # Data Initializer
-#### Det sista vi behöver titta på är 
+#### Det sista vi behöver titta på är Java-klassen:
 "src/main/java/com/example/cleanbookingsbackend/service/DataInitialization/InitDataService.java"
 
 #### Denna klass initierar vår databas och Keycloak klient med test data.
 ### Såhär ser vi till att datan kommer in i systemet på ett korrekt sätt.
 
-#### Per default så är klassen utkommenterad, första gången vi startar vår applikation vill vi ha med denna kalss.
-#### Ta bort utkommenterings-kommandona (/* */) i klassen.
+#### Per default så är klassen utkommenterad, MEN(!) första gången vi startar vår applikation vill vi ha med denna klass.
+#### Ta bort utkommenterings-kommandona (/* */) vid toppen och mot slutet på klassen så all utkommenterad kod blir tillgänglig..
 #### Starta programmet.
 #### OBS! Glöm inte att ha docker-containern igång med vår keycloak klient. Denna måste vara igång varje gång vi startar vårt program.
 #### Kompilerar programmet som det ska så kan vi vid detta skede kommentera ut klassen igen, då har den fyllt sin funktion.
