@@ -236,6 +236,7 @@ public class JobController {
         JobDto jobDto = new JobDto();
         jobDto.setId(jobEntity.getId());
         jobDto.setBookedDate(jobEntity.getBookedDate());
+        jobDto.setTimeslot(jobEntity.getTimeslot().toString());
         jobDto.setType(jobEntity.getType());
         jobDto.setMessage(jobEntity.getMessage());
         jobDto.setStatus(jobEntity.getStatus());

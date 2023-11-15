@@ -11,6 +11,7 @@ import java.util.Date;
 public class JobDto {
     private String id;
     private Date bookedDate;
+    private String timeslot;
     private JobType type;
     private String message;
     private JobStatus status;
