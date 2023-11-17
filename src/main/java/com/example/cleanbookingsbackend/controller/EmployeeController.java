@@ -31,7 +31,7 @@ public class EmployeeController {
         } catch (CustomerNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (AuthException exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
         }
     }
 
@@ -100,7 +100,7 @@ public class EmployeeController {
         } catch (EmployeeNotFoundException | JobNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (UnauthorizedCallException exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
         }
     }
 

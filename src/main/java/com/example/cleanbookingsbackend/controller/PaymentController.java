@@ -26,7 +26,7 @@ public class PaymentController {
         } catch (EmployeeNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (UnauthorizedCallException exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
         }
     }
 
@@ -39,7 +39,7 @@ public class PaymentController {
         } catch (EmployeeNotFoundException | PaymentNotFoundException | JobNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (UnauthorizedCallException exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
         }
     }
 
@@ -54,7 +54,7 @@ public class PaymentController {
         } catch (EmployeeNotFoundException | PaymentNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (UnauthorizedCallException exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
         }
     }
 

@@ -31,7 +31,7 @@ public class CleanerController {
         } catch (EmployeeNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (UnauthorizedCallException exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
         }
     }
 
@@ -44,7 +44,7 @@ public class CleanerController {
         } catch (EmployeeNotFoundException | CustomerNotFoundException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exception.getMessage());
         } catch (UnauthorizedCallException exception) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
         }
     }
 }
