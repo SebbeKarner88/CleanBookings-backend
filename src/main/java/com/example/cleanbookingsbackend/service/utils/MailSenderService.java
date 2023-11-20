@@ -6,6 +6,7 @@ import com.example.cleanbookingsbackend.model.JobEntity;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -14,27 +15,60 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
+
 @Service
 @RequiredArgsConstructor
 public class MailSenderService {
     private final JavaMailSender mailSender;
+
+    @Autowired
+    private SpringTemplateEngine templateEngine;
+
 //    private final static SimpleMailMessage msg = new SimpleMailMessage();
     private final static String CLEAN_BOOKINGS = "order.cleanbookings@gmail.com";
     private final static String EMAIL_NOT_SENT = "Email couldn't be sent: ";
 
+//    public void sendEmailConfirmationBookedJob(JobEntity requestedJob) {
+//        MimeMessage mimeMessage = mailSender.createMimeMessage();
+//        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+//        String originalMessage = "Hej " + getCustomerName(requestedJob) + "! Er bokning av " + requestedJob.getType() + " den "
+//                + getFormattedDateAndTime(requestedJob.getBookedDate()) + requestedJob.getTimeslot() + " har tagits emot av oss.\n\nNi kommer att få en bekräftelse på " +
+//                "bokningen när vi bokat in en städare på ert jobb.\n\n" + "StädaFint AB";
+//        String htmlSnippet = "<h1>Test heading</h1><p>Hello!</p>";
+//
+//        try {
+//            helper.setFrom(CLEAN_BOOKINGS);
+//            helper.setTo(getCustomerEmailAdress(requestedJob));
+//            helper.setSubject("Din bokningsförfrågan.");
+//            helper.setText(htmlSnippet, true);
+//            mailSender.send(mimeMessage);
+//        } catch (MailException | MessagingException exception) {
+//            System.out.println(EMAIL_NOT_SENT + exception.getMessage());
+//        }
+//    }
+
     public void sendEmailConfirmationBookedJob(JobEntity requestedJob) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-        String originalMessage = "Hej " + getCustomerName(requestedJob) + "! Er bokning av " + requestedJob.getType() + " den "
-                + getFormattedDateAndTime(requestedJob.getBookedDate()) + requestedJob.getTimeslot() + " har tagits emot av oss.\n\nNi kommer att få en bekräftelse på " +
-                "bokningen när vi bokat in en städare på ert jobb.\n\n" + "StädaFint AB";
-        String htmlSnippet = "<h1>Test heading</h1><p>Hello!</p>";
 
         try {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, "UTF-8");
+
+            Context context = new Context();
+            context.setVariable("customerName", getCustomerName(requestedJob));
+            context.setVariable("jobType", requestedJob.getType());
+            context.setVariable("bookingDateTime", getFormattedDateAndTime(requestedJob.getBookedDate()));
+
+            String htmlContent = templateEngine.process("bookingConfirmation", context);
+
             helper.setFrom(CLEAN_BOOKINGS);
             helper.setTo(getCustomerEmailAdress(requestedJob));
             helper.setSubject("Din bokningsförfrågan.");
-            helper.setText(htmlSnippet, true);
+            helper.setText(htmlContent, true); // set to true to enable HTML content
+
             mailSender.send(mimeMessage);
         } catch (MailException | MessagingException exception) {
             System.out.println(EMAIL_NOT_SENT + exception.getMessage());
