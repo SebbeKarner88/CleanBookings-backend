@@ -1,0 +1,31 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Bokningsbekräftelse</title>
+</head>
+<body>
+<div style="background-color: #533b1a; margin: 0; padding: 1rem 0; border-radius: 15px;">
+    <h1 style="color: white; text-align: center;">Städafint AB</h1>
+</div>
+<div style="display: flex; justify-content: center; background-color: rgb(208,184,168); border-radius: 15px;">
+<!--    <section style="background-color: #f5f5dc;"> -->
+<!--        <img src="http://localhost:8080/images/logo.png" alt="Städafint Logo" style="max-width: 100%; height: auto;"/>-->
+<!--    </section>-->
+
+    <div style="padding-left: 3rem; padding-bottom: 1rem;">
+        <h1>Bokningsbekräftelse</h1>
+            <p>Hej <span th:text="${customerName}" style="font-weight: bold; font-size: larger;">Kundnamn</span>!</p>
+        <p>Er bokning av <span th:text="${jobType}" style="color: black; text-decoration: underline;">Städtyp</span>
+            den
+            <span th:text="${bookingDateTime}" style="color: black; text-decoration: underline;">Bokningsdatum och tid</span>
+            har tagits emot av oss.</p>
+        <p style="color: black;">Ni kommer att få en bekräftelse på bokningen när vi bokat in en städare på ert jobb.</p>
+        <p>StädaFint AB</p>
+        <a href="/login" style="color: rgb(89, 69, 69); font-weight: bold;">GÅ TILL MINA SIDOR</a>
+    </div>
+</div>
+</body>
+</html>
+
+
