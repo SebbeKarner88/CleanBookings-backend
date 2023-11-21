@@ -32,24 +32,17 @@ public class MailSenderService {
     private final static String CLEAN_BOOKINGS = "order.cleanbookings@gmail.com";
     private final static String EMAIL_NOT_SENT = "Email couldn't be sent: ";
 
-//    public void sendEmailConfirmationBookedJob(JobEntity requestedJob) {
-//        MimeMessage mimeMessage = mailSender.createMimeMessage();
-//        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-//        String originalMessage = "Hej " + getCustomerName(requestedJob) + "! Er bokning av " + requestedJob.getType() + " den "
-//                + getFormattedDateAndTime(requestedJob.getBookedDate()) + requestedJob.getTimeslot() + " har tagits emot av oss.\n\nNi kommer att få en bekräftelse på " +
-//                "bokningen när vi bokat in en städare på ert jobb.\n\n" + "StädaFint AB";
-//        String htmlSnippet = "<h1>Test heading</h1><p>Hello!</p>";
-//
-//        try {
-//            helper.setFrom(CLEAN_BOOKINGS);
-//            helper.setTo(getCustomerEmailAdress(requestedJob));
-//            helper.setSubject("Din bokningsförfrågan.");
-//            helper.setText(htmlSnippet, true);
-//            mailSender.send(mimeMessage);
-//        } catch (MailException | MessagingException exception) {
-//            System.out.println(EMAIL_NOT_SENT + exception.getMessage());
-//        }
-//    }
+
+    public String translateJobType(String type) {
+        return switch (type) {
+            case "BASIC_CLEANING" -> "BASIC-städning";
+            case "TOPP_CLEANING" -> "TOPP-städning";
+            case "WINDOW_CLEANING" -> "Fönsterputs";
+            case "DIAMOND_CLEANING" -> "DIAMANT-städning";
+            default -> type; // Default case to handle unexpected types
+        };
+    }
+
 
     public void sendEmailConfirmationBookedJob(JobEntity requestedJob) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -57,9 +50,11 @@ public class MailSenderService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, "UTF-8");
 
+            String translatedJobType = translateJobType(String.valueOf(requestedJob.getType()));
+
             Context context = new Context();
             context.setVariable("customerName", getCustomerName(requestedJob));
-            context.setVariable("jobType", requestedJob.getType());
+            context.setVariable("jobType", translatedJobType); // Translated job type
             context.setVariable("bookingDateTime", getFormattedDateAndTime(requestedJob.getBookedDate()));
 
             String htmlContent = templateEngine.process("bookingConfirmation", context);
