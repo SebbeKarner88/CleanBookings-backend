@@ -43,26 +43,25 @@ public class MailSenderService {
         };
     }
 
-
-    public void sendEmailConfirmationBookedJob(JobEntity requestedJob) {
+    private void sendEmailWithTemplate(JobEntity jobEntity, String emailSubject, String templateName) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
 
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, "UTF-8");
 
-            String translatedJobType = translateJobType(String.valueOf(requestedJob.getType()));
+            String translatedJobType = translateJobType(String.valueOf(jobEntity.getType()));
 
             Context context = new Context();
-            context.setVariable("customerName", getCustomerName(requestedJob));
+            context.setVariable("customerName", getCustomerName(jobEntity));
             context.setVariable("jobType", translatedJobType); // Translated job type
-            context.setVariable("bookingDateTime", getFormattedDateAndTime(requestedJob.getBookedDate()));
+            context.setVariable("bookingDateTime", getFormattedDateAndTime(jobEntity.getBookedDate()));
 
-            String htmlContent = templateEngine.process("bookingConfirmation", context);
+            String htmlContent = templateEngine.process(templateName, context);
 
             helper.setFrom(CLEAN_BOOKINGS);
-            helper.setTo(getCustomerEmailAdress(requestedJob));
-            helper.setSubject("Din bokningsförfrågan.");
-            helper.setText(htmlContent, true); // set to true to enable HTML content
+            helper.setTo(getCustomerEmailAdress(jobEntity));
+            helper.setSubject(emailSubject);
+            helper.setText(htmlContent, true);
 
             mailSender.send(mimeMessage);
         } catch (MailException | MessagingException exception) {
@@ -70,24 +69,66 @@ public class MailSenderService {
         }
     }
 
+
+//    public void sendEmailConfirmationBookedJob(JobEntity requestedJob) {
+//        MimeMessage mimeMessage = mailSender.createMimeMessage();
+//
+//        try {
+//            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, "UTF-8");
+//
+//            String translatedJobType = translateJobType(String.valueOf(requestedJob.getType()));
+//
+//            Context context = new Context();
+//            context.setVariable("customerName", getCustomerName(requestedJob));
+//            context.setVariable("jobType", translatedJobType); // Translated job type
+//            context.setVariable("bookingDateTime", getFormattedDateAndTime(requestedJob.getBookedDate()));
+//
+//            String htmlContent = templateEngine.process("bookingConfirmation", context);
+//
+//            helper.setFrom(CLEAN_BOOKINGS);
+//            helper.setTo(getCustomerEmailAdress(requestedJob));
+//            helper.setSubject("Din bokningsförfrågan.");
+//            helper.setText(htmlContent, true);
+//
+//            mailSender.send(mimeMessage);
+//        } catch (MailException | MessagingException exception) {
+//            System.out.println(EMAIL_NOT_SENT + exception.getMessage());
+//        }
+//    }
+//
+//
+//    public void sendEmailConfirmationCanceledJob(JobEntity requestedCancel) {
+//        MimeMessage mimeMessage = mailSender.createMimeMessage();
+//
+//        try {
+//            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, "UTF-8");
+//
+//            String translatedJobType = translateJobType(String.valueOf(requestedCancel.getType()));
+//
+//            Context context = new Context();
+//            context.setVariable("customerName", getCustomerName(requestedCancel));
+//            context.setVariable("jobType", translatedJobType); // Translated job type
+//            context.setVariable("bookingDateTime", getFormattedDateAndTime(requestedCancel.getBookedDate()));
+//
+//            String htmlContent = templateEngine.process("cancelJobConfirmation", context);
+//
+//            helper.setFrom(CLEAN_BOOKINGS);
+//            helper.setTo(getCustomerEmailAdress(requestedCancel));
+//            helper.setSubject("Avbokad städning");
+//            helper.setText(htmlContent, true);
+//
+//            mailSender.send(mimeMessage);
+//        } catch (MailException | MessagingException exception) {
+//            System.out.println(EMAIL_NOT_SENT + exception.getMessage());
+//        }
+//    }
+
+    public void sendEmailConfirmationBookedJob(JobEntity requestedJob) {
+        sendEmailWithTemplate(requestedJob, "Din bokningsförfrågan.", "bookingConfirmation");
+    }
+
     public void sendEmailConfirmationCanceledJob(JobEntity requestedCancel) {
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-        String originalMessage = "Hej " + getCustomerName(requestedCancel) + "! Er bokning av " + requestedCancel.getType() +
-                " den " + getFormattedDateAndTime(requestedCancel.getBookedDate()) + " är nu avbokad. \n\n" +
-                "Varmt välkommen åter!\n" +
-                "StädaFint AB";
-
-        try {
-            helper.setFrom(CLEAN_BOOKINGS);
-            helper.setTo(getCustomerEmailAdress(requestedCancel));
-            helper.setSubject("Avbokad städning");
-            helper.setText("<h1>Ein schnippet!</h1>", true);
-
-            mailSender.send(mimeMessage);
-        } catch (MailException | MessagingException exception) {
-            System.out.println(EMAIL_NOT_SENT + exception.getMessage());
-        }
+        sendEmailWithTemplate(requestedCancel, "Avbokad städning", "cancelJobConfirmation");
     }
 
     public void sendEmailConfirmationOnAssignedJob(EmployeeEntity cleaner, JobEntity job) {
