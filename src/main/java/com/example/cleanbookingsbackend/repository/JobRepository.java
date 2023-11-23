@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Repository
 public interface JobRepository extends JpaRepository <JobEntity, String> {
-    Optional<JobEntity> findByBookedDateAndType(Date date, JobType type);
+    Optional<JobEntity> findByBookedDateAndTypeAndCustomerId(Date date, JobType type, String customerId);
 
     List<JobEntity> findByCustomerAndStatusNot(PrivateCustomerEntity customer, JobStatus status);
 

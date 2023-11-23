@@ -52,7 +52,7 @@ public class JobService {
             PrivateCustomerEntity customer = input.validateCustomerId(request.customerId());
             JobType type = validateJobType(request.type());
             Date date = DATE_FORMAT.parse(request.date());
-            if (jobRepository.findByBookedDateAndType(date, type).isPresent())
+            if (jobRepository.findByBookedDateAndTypeAndCustomerId(date, type, customer.getId()).isPresent())
                 throw new IllegalArgumentException("There is already a job of type " + type + " requested on " + date);
             requestedJob = new JobEntity(customer, convertTimeslot(request.timeslot()), type, date, request.message());
             jobRepository.save(requestedJob);
