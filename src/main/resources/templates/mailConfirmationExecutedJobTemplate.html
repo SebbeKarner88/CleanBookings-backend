@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Städning Slutförd</title>
+</head>
+<body>
+<div style="background-color: #533b1a; margin: 0; padding: 1rem 0; border-radius: 15px;">
+    <h1 style="color: white; text-align: center;">Städafint AB</h1>
+</div>
+<div style="display: flex; justify-content: center; background-color: rgb(208,184,168); border-radius: 15px;">
+
+    <div style="padding-left: 3rem; padding-bottom: 1rem;">
+        <h1>Städning Slutförd</h1>
+        <p>Hej <span th:text="${customerName}" style="font-weight: bold; font-size: larger;">Kundnamn</span>!</p>
+        <p>Nu har <span th:text="${cleanerName}" style="font-weight: bold; font-size: larger;">Städarens Namn</span> slutfört sin städning hos dig.</p>
+        <p style="color: black;">Vi hoppas att ni är nöjd med arbetet, navigera till CleanBookings för att godkänna/underkänna städningen.</p>
+        <p>StädaFint AB</p>
+        <a href="/login" style="color: rgb(89, 69, 69); font-weight: bold;">GÅ TILL MINA SIDOR</a>
+    </div>
+</div>
+</body>
+</html>
